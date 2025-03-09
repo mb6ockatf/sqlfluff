@@ -133,7 +133,8 @@ def _parse_and_crawl_outer(sql):
                 "ctes": {"PREP": {"selectables": ["select 1"]}},
                 "query_type": "WithCompound",
                 "selectables": [
-                    "select a.x from a join (select z from b) as b on (a.x = " "b.x)"
+                    "select a.x from a join (select z from b) as b on (a.x = "
+                    "b.x)"
                 ],
                 "subqueries": [{"selectables": ["select z from b"]}],
             },
@@ -277,7 +278,9 @@ SET row_sum = (
 def test_select_crawler_constructor(sql, expected_json):
     """Test Query when created using constructor."""
     query, _ = _parse_and_crawl_outer(sql)
-    assert all(cte.cte_definition_segment is not None for cte in query.ctes.values())
+    assert all(
+        cte.cte_definition_segment is not None for cte in query.ctes.values()
+    )
     query_dict = query.as_dict()
     assert expected_json == query_dict
 
@@ -298,7 +301,9 @@ join (
     query, linter = _parse_and_crawl_outer(sql)
 
     inner_from = (
-        query.selectables[0].select_info.table_aliases[1].from_expression_element
+        query.selectables[0]
+        .select_info.table_aliases[1]
+        .from_expression_element
     )
     inner_select = next(inner_from.recursive_crawl("with_compound_statement"))
     inner_query = Query.from_segment(inner_select, linter.dialect)

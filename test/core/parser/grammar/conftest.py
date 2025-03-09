@@ -35,7 +35,8 @@ def structural_parse_mode_test(generate_test_segments, fresh_ansi_dialect):
         # classes don't support it (e.g. Bracketed).
         if grammar_terminator_seeds:
             grammar_kwargs["terminators"] = [
-                StringParser(e, KeywordSegment) for e in grammar_terminator_seeds
+                StringParser(e, KeywordSegment)
+                for e in grammar_terminator_seeds
             ]
 
         _seq = grammar_class(

@@ -61,7 +61,9 @@ _legacy_dialects = {
 }
 
 
-def load_raw_dialect(label: str, base_module: str = "sqlfluff.dialects") -> Dialect:
+def load_raw_dialect(
+    label: str, base_module: str = "sqlfluff.dialects"
+) -> Dialect:
     """Dynamically load a dialect."""
     if label in _legacy_dialects:
         raise SQLFluffUserError(_legacy_dialects[label])

@@ -226,7 +226,9 @@ clickhouse_dialect.replace(
             r"[a-zA-Z_][0-9a-zA-Z_]*",
             IdentifierSegment,
             type="naked_identifier",
-            anti_template=r"^(" + r"|".join(dialect.sets("reserved_keywords")) + r")$",
+            anti_template=r"^("
+            + r"|".join(dialect.sets("reserved_keywords"))
+            + r")$",
         )
     ),
     SingleIdentifierGrammar=OneOf(
@@ -265,7 +267,9 @@ clickhouse_dialect.replace(
         ],
         before=Ref.keyword("WHERE"),
     ),
-    FromClauseTerminatorGrammar=ansi_dialect.get_grammar("FromClauseTerminatorGrammar")
+    FromClauseTerminatorGrammar=ansi_dialect.get_grammar(
+        "FromClauseTerminatorGrammar"
+    )
     .copy(
         insert=[
             Ref.keyword("PREWHERE"),
@@ -277,7 +281,9 @@ clickhouse_dialect.replace(
     .copy(insert=[Ref("SettingsClauseSegment")]),
     DateTimeLiteralGrammar=Sequence(
         OneOf("DATE", "TIME", "TIMESTAMP"),
-        TypedParser("single_quote", LiteralSegment, type="date_constructor_literal"),
+        TypedParser(
+            "single_quote", LiteralSegment, type="date_constructor_literal"
+        ),
     ),
     AlterTableDropColumnGrammar=Sequence(
         "DROP",
@@ -366,7 +372,12 @@ class FormatClauseSegment(BaseSegment):
     type = "format_clause"
     match_grammar: Matchable = Sequence(
         "FORMAT",
-        OneOf(*[Ref.keyword(allowed_format) for allowed_format in FORMAT_KEYWORDS]),
+        OneOf(
+            *[
+                Ref.keyword(allowed_format)
+                for allowed_format in FORMAT_KEYWORDS
+            ]
+        ),
         Ref("SettingsClauseSegment", optional=True),
     )
 
@@ -517,18 +528,30 @@ class DatatypeSegment(BaseSegment):
         # double args
         Sequence(
             OneOf(
-                StringParser("DECIMAL", CodeSegment, type="data_type_identifier"),
-                StringParser("NUMERIC", CodeSegment, type="data_type_identifier"),
+                StringParser(
+                    "DECIMAL", CodeSegment, type="data_type_identifier"
+                ),
+                StringParser(
+                    "NUMERIC", CodeSegment, type="data_type_identifier"
+                ),
             ),
             Ref("BracketedArguments", optional=True),
         ),
         # single args
         Sequence(
             OneOf(
-                StringParser("DECIMAL32", CodeSegment, type="data_type_identifier"),
-                StringParser("DECIMAL64", CodeSegment, type="data_type_identifier"),
-                StringParser("DECIMAL128", CodeSegment, type="data_type_identifier"),
-                StringParser("DECIMAL256", CodeSegment, type="data_type_identifier"),
+                StringParser(
+                    "DECIMAL32", CodeSegment, type="data_type_identifier"
+                ),
+                StringParser(
+                    "DECIMAL64", CodeSegment, type="data_type_identifier"
+                ),
+                StringParser(
+                    "DECIMAL128", CodeSegment, type="data_type_identifier"
+                ),
+                StringParser(
+                    "DECIMAL256", CodeSegment, type="data_type_identifier"
+                ),
             ),
             Bracketed(Ref("NumericLiteralSegment")),  # scale
         ),
@@ -536,7 +559,9 @@ class DatatypeSegment(BaseSegment):
         Ref("DatatypeIdentifierSegment"),
         Ref("NumericLiteralSegment"),
         Sequence(
-            StringParser("DATETIME64", CodeSegment, type="data_type_identifier"),
+            StringParser(
+                "DATETIME64", CodeSegment, type="data_type_identifier"
+            ),
             Bracketed(
                 Delimited(
                     Ref("NumericLiteralSegment"),  # precision
@@ -717,7 +742,9 @@ class FromExpressionElementSegment(ansi.FromExpressionElementSegment):
         ),
         Ref.keyword("FINAL", optional=True),
         # https://cloud.google.com/bigquery/docs/reference/standard-sql/arrays#flattening_arrays
-        Sequence("WITH", "OFFSET", Ref("AliasExpressionSegment"), optional=True),
+        Sequence(
+            "WITH", "OFFSET", Ref("AliasExpressionSegment"), optional=True
+        ),
         Ref("SamplingExpressionSegment", optional=True),
         Ref("PostTableExpressionGrammar", optional=True),
     )

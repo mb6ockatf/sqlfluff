@@ -26,7 +26,9 @@ def get_simple_config(
         try:
             dialect_selector(dialect)
         except SQLFluffUserError as err:  # pragma: no cover
-            raise SQLFluffUserError(f"Error loading dialect '{dialect}': {str(err)}")
+            raise SQLFluffUserError(
+                f"Error loading dialect '{dialect}': {str(err)}"
+            )
         except KeyError:
             raise SQLFluffUserError(f"Error: Unknown dialect '{dialect}'")
 
@@ -192,8 +194,12 @@ def parse(
     # Return a JSON representation of the parse tree.
     # NOTE: For the simple API - only a single variant is returned.
     root_variant = parsed.root_variant()
-    assert root_variant, "Files parsed without violations must have a valid variant"
-    assert root_variant.tree, "Files parsed without violations must have a valid tree"
+    assert (
+        root_variant
+    ), "Files parsed without violations must have a valid variant"
+    assert (
+        root_variant.tree
+    ), "Files parsed without violations must have a valid tree"
     record = root_variant.tree.as_record(show_raw=True)
     assert record
     return record

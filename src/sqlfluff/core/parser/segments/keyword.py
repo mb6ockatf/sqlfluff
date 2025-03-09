@@ -41,7 +41,9 @@ class KeywordSegment(WordSegment):
         )
 
     def edit(
-        self, raw: Optional[str] = None, source_fixes: Optional[List[SourceFix]] = None
+        self,
+        raw: Optional[str] = None,
+        source_fixes: Optional[List[SourceFix]] = None,
     ) -> "KeywordSegment":
         """Create a new segment, with exactly the same position but different content.
 

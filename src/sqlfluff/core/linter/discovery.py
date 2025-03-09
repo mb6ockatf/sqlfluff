@@ -75,7 +75,9 @@ def _load_ignorefile(dirpath: str, filename: str) -> IgnoreSpecRecord:
     return dirpath, filename, spec
 
 
-def _load_configfile(dirpath: str, filename: str) -> Optional[IgnoreSpecRecord]:
+def _load_configfile(
+    dirpath: str, filename: str
+) -> Optional[IgnoreSpecRecord]:
     """Load ignore specs from a standard config file.
 
     This function leverages the caching used in the config module
@@ -106,7 +108,9 @@ def _load_configfile(dirpath: str, filename: str) -> Optional[IgnoreSpecRecord]:
     return dirpath, filename, spec
 
 
-ignore_file_loaders: Dict[str, Callable[[str, str], Optional[IgnoreSpecRecord]]] = {
+ignore_file_loaders: Dict[
+    str, Callable[[str, str], Optional[IgnoreSpecRecord]]
+] = {
     ".sqlfluffignore": _load_ignorefile,
     "pyproject.toml": _load_configfile,
     ".sqlfluff": _load_configfile,
@@ -118,7 +122,9 @@ def _iter_config_files(
     working_path: Path,
 ) -> Iterator[Tuple[str, str]]:
     """Iterate through paths looking for valid config files."""
-    for search_path in iter_intermediate_paths(target_path.absolute(), working_path):
+    for search_path in iter_intermediate_paths(
+        target_path.absolute(), working_path
+    ):
         for _filename in ignore_file_loaders:
             filepath = os.path.join(search_path, _filename)
             if os.path.isfile(filepath):
@@ -126,7 +132,9 @@ def _iter_config_files(
                 yield str(search_path), _filename
 
 
-def _match_file_extension(filepath: str, valid_extensions: Sequence[str]) -> bool:
+def _match_file_extension(
+    filepath: str, valid_extensions: Sequence[str]
+) -> bool:
     """Match file path against extensions.
 
     Assumes that valid_extensions is already all lowercase.
@@ -202,19 +210,25 @@ def _iter_files_in_path(
                 dirname == inner_dirname
                 or dirname.startswith(os.path.abspath(inner_dirname) + os.sep)
             ):
-                inner_ignore_specs.remove((inner_dirname, inner_file, inner_spec))
+                inner_ignore_specs.remove(
+                    (inner_dirname, inner_file, inner_spec)
+                )
 
         # Then look for any ignore files in the path (if ignoring files), add them
         # to the inner buffer if found.
         if ignore_files:
             for ignore_file in set(filenames) & ignore_filename_set:
-                ignore_spec = ignore_file_loaders[ignore_file](dirname, ignore_file)
+                ignore_spec = ignore_file_loaders[ignore_file](
+                    dirname, ignore_file
+                )
                 if ignore_spec:
                     inner_ignore_specs.append(ignore_spec)
 
         # Then prune any subdirectories which are ignored (by modifying `subdirs`)
         # https://docs.python.org/3/library/os.html#os.walk
-        for subdir in subdirs[:]:  # slice it so that we can modify it in the process.
+        for subdir in subdirs[
+            :
+        ]:  # slice it so that we can modify it in the process.
             # NOTE: The "*" in this next section is a bit of a hack, but pathspec
             # doesn't like matching _directories_ directly, but if we instead match
             # `directory/*` we get the same effect.
@@ -285,9 +299,15 @@ def paths_from_path(
     if ignore_files:
         for ignore_path, ignore_file in _iter_config_files(
             Path(path).absolute(),
-            Path(working_path) if isinstance(working_path, str) else working_path,
+            (
+                Path(working_path)
+                if isinstance(working_path, str)
+                else working_path
+            ),
         ):
-            ignore_spec = ignore_file_loaders[ignore_file](ignore_path, ignore_file)
+            ignore_spec = ignore_file_loaders[ignore_file](
+                ignore_path, ignore_file
+            )
             if ignore_spec:
                 outer_ignore_specs.append(ignore_spec)
 
@@ -300,5 +320,7 @@ def paths_from_path(
     # Otherwise, it's not an exact path and we're going to walk the path
     # progressively, processing ignore files as we go.
     return sorted(
-        _iter_files_in_path(path, ignore_files, outer_ignore_specs, lower_file_exts)
+        _iter_files_in_path(
+            path, ignore_files, outer_ignore_specs, lower_file_exts
+        )
     )

@@ -38,12 +38,17 @@ def test_dialect():
         [
             RegexLexer("whitespace", r"[^\S\r\n]+", WhitespaceSegment),
             RegexLexer(
-                "code", r"[0-9a-zA-Z_]+", CodeSegment, segment_kwargs={"type": "code"}
+                "code",
+                r"[0-9a-zA-Z_]+",
+                CodeSegment,
+                segment_kwargs={"type": "code"},
             ),
         ]
     )
     test_dialect.add(
-        StartBracketSegment=StringParser("(", SymbolSegment, type="start_bracket"),
+        StartBracketSegment=StringParser(
+            "(", SymbolSegment, type="start_bracket"
+        ),
         EndBracketSegment=StringParser(")", SymbolSegment, type="end_bracket"),
     )
     # Return the expanded copy.
@@ -86,7 +91,9 @@ def test__parser__algorithms__next_match(
 ):
     """Test the `next_match()` method."""
     # Make the string parsers for testing.
-    matchers = [StringParser(keyword, KeywordSegment) for keyword in matcher_keywords]
+    matchers = [
+        StringParser(keyword, KeywordSegment) for keyword in matcher_keywords
+    ]
     # Fetch the matching keyword from above (because it will have the same position)
     if winning_matcher:
         winning_matcher = matchers[matcher_keywords.index(winning_matcher)]
@@ -113,7 +120,11 @@ def test__parser__algorithms__next_match(
     "raw_segments,result_slice,error",
     [
         (["(", "a", ")", " ", "foo"], slice(0, 3), None),
-        (["(", "a", "(", "b", ")", "(", "c", ")", "d", ")", "e"], slice(0, 10), None),
+        (
+            ["(", "a", "(", "b", ")", "(", "c", ")", "d", ")", "e"],
+            slice(0, 10),
+            None,
+        ),
         # This should error because we try to close a square bracket
         # inside a round one.
         (["(", "a", "]", "b", ")", "e"], None, SQLParseError),
@@ -128,8 +139,12 @@ def test__parser__algorithms__resolve_bracket(
     test_segments = generate_test_segments(raw_segments)
     start_bracket = StringParser("(", SymbolSegment, type="start_bracket")
     end_bracket = StringParser(")", SymbolSegment, type="end_bracket")
-    start_sq_bracket = StringParser("[", SymbolSegment, type="start_square_bracket")
-    end_sq_bracket = StringParser("]", SymbolSegment, type="end_square_bracket")
+    start_sq_bracket = StringParser(
+        "[", SymbolSegment, type="start_square_bracket"
+    )
+    end_sq_bracket = StringParser(
+        "]", SymbolSegment, type="end_square_bracket"
+    )
     ctx = ParseContext(dialect=None)
 
     # For this test case we assert that the first segment is the initial match.
@@ -169,7 +184,11 @@ def test__parser__algorithms__resolve_bracket(
     ],
 )
 def test__parser__algorithms__next_ex_bracket_match(
-    raw_segments, target_word, result_slice, generate_test_segments, test_dialect
+    raw_segments,
+    target_word,
+    result_slice,
+    generate_test_segments,
+    test_dialect,
 ):
     """Test the `next_ex_bracket_match()` method."""
     test_segments = generate_test_segments(raw_segments)

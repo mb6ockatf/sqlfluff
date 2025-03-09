@@ -86,13 +86,17 @@ class Rule_AM08(BaseRule):
             # See CV12
             return None
 
-        join_keywords = [kw for kw in join_clause_keywords if kw.raw_upper == "JOIN"]
+        join_keywords = [
+            kw for kw in join_clause_keywords if kw.raw_upper == "JOIN"
+        ]
         if len(join_keywords) != 1:
             # This can happen in T-SQL CROSS APPLY / OUTER APPLY
             return None
 
         # Skip if join is part of flattening logic
-        maybe_from_expression_element = join_clause.get_child("from_expression_element")
+        maybe_from_expression_element = join_clause.get_child(
+            "from_expression_element"
+        )
         if maybe_from_expression_element:
             for (
                 function_name_identifier
@@ -113,7 +117,9 @@ class Rule_AM08(BaseRule):
         )
 
     @staticmethod
-    def _get_select_stmt(stack: Tuple[BaseSegment, ...]) -> Optional[BaseSegment]:
+    def _get_select_stmt(
+        stack: Tuple[BaseSegment, ...],
+    ) -> Optional[BaseSegment]:
         for seg in reversed(stack):
             if seg.is_type("select_statement"):
                 return seg

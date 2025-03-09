@@ -5,17 +5,32 @@ or BaseGrammar to un-bloat those classes.
 """
 
 from collections import defaultdict
-from typing import DefaultDict, FrozenSet, List, Optional, Sequence, Tuple, cast
+from typing import (
+    DefaultDict,
+    FrozenSet,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    cast,
+)
 
 from sqlfluff.core.errors import SQLParseError
 from sqlfluff.core.parser.context import ParseContext
 from sqlfluff.core.parser.match_result import MatchResult
 from sqlfluff.core.parser.matchable import Matchable
-from sqlfluff.core.parser.segments import BaseSegment, BracketedSegment, Dedent, Indent
+from sqlfluff.core.parser.segments import (
+    BaseSegment,
+    BracketedSegment,
+    Dedent,
+    Indent,
+)
 
 
 def skip_start_index_forward_to_code(
-    segments: Sequence[BaseSegment], start_idx: int, max_idx: Optional[int] = None
+    segments: Sequence[BaseSegment],
+    start_idx: int,
+    max_idx: Optional[int] = None,
 ) -> int:
     """Move an index forward through segments until segments[index] is code."""
     if max_idx is None:
@@ -123,7 +138,11 @@ def prune_options(
             matched = True
 
         # Match Types
-        if simple_types and not matched and first_types.intersection(simple_types):
+        if (
+            simple_types
+            and not matched
+            and first_types.intersection(simple_types)
+        ):
             # If we get here, it's matched the FIRST element of the string buffer.
             available_options.append(opt)
             matched = True
@@ -414,7 +433,10 @@ def resolve_bracket(
                 child_matches += (match,)
                 _match = MatchResult(
                     # Slice should span from the first to the second.
-                    slice(opening_match.matched_slice.start, match.matched_slice.stop),
+                    slice(
+                        opening_match.matched_slice.start,
+                        match.matched_slice.stop,
+                    ),
                     child_matches=child_matches,
                     insert_segments=(
                         (opening_match.matched_slice.stop, Indent),
@@ -429,7 +451,9 @@ def resolve_bracket(
                     segment_kwargs={
                         # TODO: This feels a bit weird.
                         # Could we infer it on construction?
-                        "start_bracket": (segments[opening_match.matched_slice.start],),
+                        "start_bracket": (
+                            segments[opening_match.matched_slice.start],
+                        ),
                         "end_bracket": (segments[match.matched_slice.start],),
                     },
                 )
@@ -500,7 +524,9 @@ def next_ex_bracket_match(
     start_brackets = [
         parse_context.dialect.ref(seg_ref) for seg_ref in start_bracket_refs
     ]
-    end_brackets = [parse_context.dialect.ref(seg_ref) for seg_ref in end_bracket_refs]
+    end_brackets = [
+        parse_context.dialect.ref(seg_ref) for seg_ref in end_bracket_refs
+    ]
     bracket_matchers = start_brackets + end_brackets
     _matchers = list(matchers) + bracket_matchers
 
@@ -580,7 +606,9 @@ def greedy_match(
         # No match? That means we've not found any terminators.
         if not match:
             # Claim everything left.
-            return MatchResult(slice(idx, len(segments)), child_matches=child_matches)
+            return MatchResult(
+                slice(idx, len(segments)), child_matches=child_matches
+            )
 
         _start_idx = match.matched_slice.start
         _stop_idx = match.matched_slice.stop

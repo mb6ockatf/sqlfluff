@@ -132,14 +132,20 @@ class Rule_JJ01(BaseRule):
         # what type it is, so use `get_templater_class()`.
         _templater_class = context.config.get_templater_class()
         if not issubclass(_templater_class, JinjaTemplater):
-            self.logger.debug(f"Detected non-jinja templater: {_templater_class.name}")
+            self.logger.debug(
+                f"Detected non-jinja templater: {_templater_class.name}"
+            )
             return []
 
         results = []
         # Work through the templated slices
         for raw_slice in context.templated_file.raw_sliced:
             # We only want templated slices.
-            if raw_slice.slice_type not in ("templated", "block_start", "block_end"):
+            if raw_slice.slice_type not in (
+                "templated",
+                "block_start",
+                "block_end",
+            ):
                 continue
 
             stripped = raw_slice.raw.strip()
@@ -147,13 +153,15 @@ class Rule_JJ01(BaseRule):
                 continue  # pragma: no cover
 
             self.logger.debug(
-                "Tag found @ source index %s: %r ", raw_slice.source_idx, stripped
+                "Tag found @ source index %s: %r ",
+                raw_slice.source_idx,
+                stripped,
             )
 
             # Partition and Position
             src_idx = raw_slice.source_idx
-            tag_pre, ws_pre, inner, ws_post, tag_post = self._get_whitespace_ends(
-                stripped
+            tag_pre, ws_pre, inner, ws_post, tag_post = (
+                self._get_whitespace_ends(stripped)
             )
             position = raw_slice.raw.find(stripped[0])
 
@@ -185,7 +193,11 @@ class Rule_JJ01(BaseRule):
                 continue
 
             fixed = (
-                tag_pre + (pre_fix or ws_pre) + inner + (post_fix or ws_post) + tag_post
+                tag_pre
+                + (pre_fix or ws_pre)
+                + inner
+                + (post_fix or ws_post)
+                + tag_post
             )
 
             # We need to identify a raw segment to attach to fix to.

@@ -3,7 +3,12 @@
 from sqlfluff.core import FluffConfig
 from sqlfluff.core.errors import SQLParseError
 from sqlfluff.core.linter.linter import Linter
-from sqlfluff.core.parser import Anything, BaseSegment, KeywordSegment, StringParser
+from sqlfluff.core.parser import (
+    Anything,
+    BaseSegment,
+    KeywordSegment,
+    StringParser,
+)
 from sqlfluff.core.parser.context import ParseContext
 
 BarKeyword = StringParser("bar", KeywordSegment)
@@ -38,7 +43,10 @@ def test__parser__parse_error():
     assert len(parsed.violations) == 1
     violation = parsed.violations[0]
     assert isinstance(violation, SQLParseError)
-    assert violation.desc() == "Line 1, Position 1: Found unparsable section: 'SELECT'"
+    assert (
+        violation.desc()
+        == "Line 1, Position 1: Found unparsable section: 'SELECT'"
+    )
 
     # Check that the expected labels work for logging.
     # TODO: This is more specific that in previous iterations, but we could
@@ -61,7 +69,9 @@ def test_parse_jinja_macro_exclude():
     config_path = "test/fixtures/templater/jinja_exclude_macro_path/.sqlfluff"
     config = FluffConfig.from_path(config_path)
     linter = Linter(config=config)
-    sql_file_path = "test/fixtures/templater/jinja_exclude_macro_path/jinja.sql"
+    sql_file_path = (
+        "test/fixtures/templater/jinja_exclude_macro_path/jinja.sql"
+    )
 
     parsed = linter.parse_path(sql_file_path)
     for parse in parsed:

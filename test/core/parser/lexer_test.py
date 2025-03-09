@@ -9,7 +9,11 @@ from sqlfluff.core import FluffConfig, SQLLexError
 from sqlfluff.core.parser import CodeSegment, Lexer, NewlineSegment
 from sqlfluff.core.parser.lexer import LexMatch, RegexLexer, StringLexer
 from sqlfluff.core.parser.segments.meta import TemplateSegment
-from sqlfluff.core.templaters import JinjaTemplater, RawFileSlice, TemplatedFile
+from sqlfluff.core.templaters import (
+    JinjaTemplater,
+    RawFileSlice,
+    TemplatedFile,
+)
 from sqlfluff.core.templaters.base import TemplatedFileSlice
 
 
@@ -46,7 +50,10 @@ def assert_matches(instring, matcher, matchstring):
         # Test Quotes
         ('abc\'\n "\t\' "de`f"', ["abc", "'\n \"\t'", " ", '"de`f"', ""]),
         # Test Comments
-        ("abc -- comment \nblah", ["abc", " ", "-- comment ", "\n", "blah", ""]),
+        (
+            "abc -- comment \nblah",
+            ["abc", " ", "-- comment ", "\n", "blah", ""],
+        ),
         ("abc # comment \nblah", ["abc", " ", "# comment ", "\n", "blah", ""]),
         # Note the more complicated parsing of block comments.
         # This tests subdivision and trimming (incl the empty case)
@@ -59,8 +66,14 @@ def assert_matches(instring, matcher, matchstring):
         ("*-+bd/", ["*", "-", "+", "bd", "/", ""]),
         # Test Negatives and Minus
         ("2+4 -5", ["2", "+", "4", " ", "-", "5", ""]),
-        ("when 'Spec\\'s 23' like", ["when", " ", "'Spec\\'s 23'", " ", "like", ""]),
-        ('when "Spec\\"s 23" like', ["when", " ", '"Spec\\"s 23"', " ", "like", ""]),
+        (
+            "when 'Spec\\'s 23' like",
+            ["when", " ", "'Spec\\'s 23'", " ", "like", ""],
+        ),
+        (
+            'when "Spec\\"s 23" like',
+            ["when", " ", '"Spec\\"s 23"', " ", "like", ""],
+        ),
     ],
 )
 def test__parser__lexer_obj(raw, res, caplog):
@@ -95,7 +108,11 @@ def test__parser__lexer_string(raw, res):
         # Matching whitespace segments (with a newline)
         ("   \t \n  fsaljk", r"[^\S\r\n]*", "   \t "),
         # Matching quotes containing stuff
-        ("'something boring'   \t \n  fsaljk", r"'[^']*'", "'something boring'"),
+        (
+            "'something boring'   \t \n  fsaljk",
+            r"'[^']*'",
+            "'something boring'",
+        ),
         (
             "' something exciting \t\n '   \t \n  fsaljk",
             r"'[^']*'",
@@ -118,7 +135,9 @@ def test__parser__lexer_lex_match(caplog):
     ]
     with caplog.at_level(logging.DEBUG):
         res = Lexer.lex_match("..#..#..#", matchers)
-        assert res.forward_string == "#"  # Should match right up to the final element
+        assert (
+            res.forward_string == "#"
+        )  # Should match right up to the final element
         assert len(res.elements) == 5
         assert res.elements[2].raw == "#..#"
 
@@ -155,7 +174,10 @@ def test__parser__lexer_trim_post_subdivide(caplog):
             CodeSegment,
             segment_kwargs={"type": "function_script_terminator"},
             subdivider=StringLexer(
-                "semicolon", ";", CodeSegment, segment_kwargs={"type": "semicolon"}
+                "semicolon",
+                ";",
+                CodeSegment,
+                segment_kwargs={"type": "semicolon"},
             ),
             trim_post_subdivide=RegexLexer(
                 "newline",
@@ -182,7 +204,9 @@ class _LexerSlicingCase(NamedTuple):
     #     block_type (if TemplateSegment),
     #     segment_type
     # )
-    expected_segments: List[Tuple[str, Union[str, None], Union[str, None], str]]
+    expected_segments: List[
+        Tuple[str, Union[str, None], Union[str, None], str]
+    ]
 
 
 def _statement(*args, **kwargs):
@@ -242,7 +266,12 @@ def _load_result(*args, **kwargs):
             "FROM baz\n",
             context={},
             expected_segments=[
-                ("", "{% macro render_name(title) %}", "block_start", "placeholder"),
+                (
+                    "",
+                    "{% macro render_name(title) %}",
+                    "block_start",
+                    "placeholder",
+                ),
                 ("", None, None, "indent"),
                 ("", "\n  '", "literal", "placeholder"),
                 ("", "{{ title }}", "templated", "placeholder"),
@@ -301,7 +330,9 @@ def test__parser__lexer_slicing_calls(case: _LexerSlicingCase):
     lexer = Lexer(config=config)
     lexing_segments, lexing_violations = lexer.lex(templated_file)
 
-    assert not lexing_violations, f"Found templater violations: {lexing_violations}"
+    assert (
+        not lexing_violations
+    ), f"Found templater violations: {lexing_violations}"
     assert case.expected_segments == [
         (
             seg.raw,
@@ -324,7 +355,9 @@ class _LexerSlicingTemplateFileCase(NamedTuple):
     #     block_type (if TemplateSegment),
     #     segment_type
     # )
-    expected_segments: List[Tuple[str, Union[str, None], Union[str, None], str]]
+    expected_segments: List[
+        Tuple[str, Union[str, None], Union[str, None], str]
+    ]
 
 
 @pytest.mark.parametrize(
@@ -337,7 +370,9 @@ class _LexerSlicingTemplateFileCase(NamedTuple):
                 templated_str="SELECT 1;",
                 fname="test.sql",
                 sliced_file=[
-                    TemplatedFileSlice("literal", slice(0, 7, None), slice(0, 7, None)),
+                    TemplatedFileSlice(
+                        "literal", slice(0, 7, None), slice(0, 7, None)
+                    ),
                     TemplatedFileSlice(
                         "comment", slice(7, 20, None), slice(7, 7, None)
                     ),
@@ -367,13 +402,17 @@ class _LexerSlicingTemplateFileCase(NamedTuple):
                 templated_str="SELECT 1;",
                 fname="test.sql",
                 sliced_file=[
-                    TemplatedFileSlice("literal", slice(0, 7, None), slice(0, 7, None)),
+                    TemplatedFileSlice(
+                        "literal", slice(0, 7, None), slice(0, 7, None)
+                    ),
                     # this is a special marker that the templater wants to show up
                     # as a meta segment:
                     TemplatedFileSlice(
                         "special_type", slice(7, 7, None), slice(7, 7, None)
                     ),
-                    TemplatedFileSlice("literal", slice(7, 9, None), slice(7, 9, None)),
+                    TemplatedFileSlice(
+                        "literal", slice(7, 9, None), slice(7, 9, None)
+                    ),
                 ],
                 raw_sliced=[
                     RawFileSlice("SELECT 1;", "literal", 0, None, 0),
@@ -395,7 +434,9 @@ class _LexerSlicingTemplateFileCase(NamedTuple):
                 templated_str="SELECT '{}' FROM TAB;",
                 fname="test.sql",
                 sliced_file=[
-                    TemplatedFileSlice("literal", slice(0, 8, None), slice(0, 8, None)),
+                    TemplatedFileSlice(
+                        "literal", slice(0, 8, None), slice(0, 8, None)
+                    ),
                     TemplatedFileSlice(
                         "escaped", slice(8, 12, None), slice(8, 10, None)
                     ),
@@ -425,7 +466,9 @@ class _LexerSlicingTemplateFileCase(NamedTuple):
     ],
     ids=lambda case: case.name,
 )
-def test__parser__lexer_slicing_from_template_file(case: _LexerSlicingTemplateFileCase):
+def test__parser__lexer_slicing_from_template_file(
+    case: _LexerSlicingTemplateFileCase,
+):
     """Test slicing using a provided TemplateFile.
 
     Useful for testing special inputs without having to find a templater to trick
@@ -436,7 +479,9 @@ def test__parser__lexer_slicing_from_template_file(case: _LexerSlicingTemplateFi
     lexer = Lexer(config=config)
     lexing_segments, lexing_violations = lexer.lex(case.file)
 
-    assert not lexing_violations, f"Found templater violations: {lexing_violations}"
+    assert (
+        not lexing_violations
+    ), f"Found templater violations: {lexing_violations}"
     assert case.expected_segments == [
         (
             seg.raw,

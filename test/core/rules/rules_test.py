@@ -53,7 +53,8 @@ class Rule_T001(BaseRule):
                 anchor=context.segment,
                 fixes=[
                     LintFix.replace(
-                        context.segment, [WhitespaceSegment(context.segment.raw + " ")]
+                        context.segment,
+                        [WhitespaceSegment(context.segment.raw + " ")],
                     )
                 ],
             )
@@ -74,7 +75,9 @@ class Rule_T002(BaseRule):
         violations = []
         for seg in context.segment.raw_segments:
             if seg.is_code:
-                violations.append(LintResult(anchor=seg, description="TESTING"))
+                violations.append(
+                    LintResult(anchor=seg, description="TESTING")
+                )
         return violations
 
 
@@ -114,7 +117,10 @@ def test__rules__user_rules():
     # Set up a linter with the user rule
     linter = Linter(user_rules=[Rule_T042], dialect="ansi")
     # Make sure the new one is in there.
-    assert RuleTuple("T042", "", "A dummy rule.", ("all",), ()) in linter.rule_tuples()
+    assert (
+        RuleTuple("T042", "", "A dummy rule.", ("all",), ())
+        in linter.rule_tuples()
+    )
     # Instantiate a second linter and check it's NOT in there.
     # This tests that copying and isolation works.
     linter = Linter(dialect="ansi")
@@ -188,7 +194,11 @@ def test__rules__rule_selection(rules, exclude_rules, resulting_codes):
         aliases = ()
 
     cfg = FluffConfig(
-        overrides={"rules": rules, "exclude_rules": exclude_rules, "dialect": "ansi"}
+        overrides={
+            "rules": rules,
+            "exclude_rules": exclude_rules,
+            "dialect": "ansi",
+        }
     )
     linter = Linter(config=cfg, user_rules=[Rule_T010, Rule_T011, Rule_T012])
     # Get the set of selected codes:
@@ -251,7 +261,11 @@ def test__rules__runaway_fail_catch(sql_query, check_tuples):
     runaway_limit = 5
     # Set up the config to only use the rule we are testing.
     cfg = FluffConfig(
-        overrides={"rules": "T001", "runaway_limit": runaway_limit, "dialect": "ansi"}
+        overrides={
+            "rules": "T001",
+            "runaway_limit": runaway_limit,
+            "dialect": "ansi",
+        }
     )
     # Lint it using the current config (while in fix mode)
     linter = Linter(config=cfg, user_rules=[Rule_T001])
@@ -272,7 +286,9 @@ def test_rules_cannot_be_instantiated_without_declared_configs():
 
         config_keywords = ["case_sensitive"]
 
-    new_rule = Rule_NewRule_ZZ99(code="L000", description="", case_sensitive=False)
+    new_rule = Rule_NewRule_ZZ99(
+        code="L000", description="", case_sensitive=False
+    )
     assert new_rule.case_sensitive is False
     # Error is thrown since "case_sensitive" is defined in class,
     # but not upon instantiation
@@ -319,7 +335,9 @@ def test_rules_configs_are_dynamically_documented():
 
         pass
 
-    print(f"RuleWithoutConfig_ZZ99.__doc__: {RuleWithoutConfig_ZZ99.__doc__!r}")
+    print(
+        f"RuleWithoutConfig_ZZ99.__doc__: {RuleWithoutConfig_ZZ99.__doc__!r}"
+    )
     assert "Configuration" not in RuleWithoutConfig_ZZ99.__doc__
 
 
@@ -332,7 +350,9 @@ def test_rules_name_validation():
 
             name = "MY-KEBAB-CASE-NAME"
 
-    assert "Tried to define rule with unexpected name" in exc_info.value.args[0]
+    assert (
+        "Tried to define rule with unexpected name" in exc_info.value.args[0]
+    )
     assert "MY-KEBAB-CASE-NAME" in exc_info.value.args[0]
 
 
@@ -348,7 +368,9 @@ def test_rule_exception_is_caught_to_validation():
         crawl_behaviour = RootOnlyCrawler()
 
         def _eval(self, segment, parent_stack, **kwargs):
-            raise Exception("Catch me or I'll deny any linting results from you")
+            raise Exception(
+                "Catch me or I'll deny any linting results from you"
+            )
 
     linter = Linter(
         config=FluffConfig(overrides=dict(rules="T000", dialect="ansi")),
@@ -419,7 +441,10 @@ seg = WhitespaceSegment(
     "lint_result, expected",
     [
         (LintResult(), "LintResult(<empty>)"),
-        (LintResult(seg), "LintResult(<WhitespaceSegment: ([L:  1, P:  1]) ' '>)"),
+        (
+            LintResult(seg),
+            "LintResult(<WhitespaceSegment: ([L:  1, P:  1]) ' '>)",
+        ),
         (
             LintResult(seg, description="foo"),
             "LintResult(foo: <WhitespaceSegment: ([L:  1, P:  1]) ' '>)",

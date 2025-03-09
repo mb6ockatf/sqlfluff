@@ -107,7 +107,11 @@ class Delimited(OneOf):
         # frequently during nested comma expressions.
         terminator_matchers = [
             *self.terminators,
-            *(t for t in parse_context.terminators if t not in delimiter_matchers),
+            *(
+                t
+                for t in parse_context.terminators
+                if t not in delimiter_matchers
+            ),
         ]
 
         # If gaps aren't allowed, a gap (or non-code segment), acts like a terminator.
@@ -118,7 +122,9 @@ class Delimited(OneOf):
             # If we're past the start and allowed gaps, work forward
             # through any gaps.
             if self.allow_gaps and working_idx > idx:
-                working_idx = skip_start_index_forward_to_code(segments, working_idx)
+                working_idx = skip_start_index_forward_to_code(
+                    segments, working_idx
+                )
 
             # Do we have anything left to match on?
             if working_idx >= max_idx:
@@ -145,7 +151,9 @@ class Delimited(OneOf):
                 match, _ = longest_match(
                     segments=segments,
                     matchers=(
-                        delimiter_matchers if seeking_delimiter else self._elements
+                        delimiter_matchers
+                        if seeking_delimiter
+                        else self._elements
                     ),
                     idx=working_idx,
                     parse_context=ctx,

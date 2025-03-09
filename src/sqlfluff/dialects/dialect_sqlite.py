@@ -203,7 +203,9 @@ sqlite_dialect.replace(
     TemporaryTransientGrammar=Ref("TemporaryGrammar"),
     DateTimeLiteralGrammar=Sequence(
         OneOf("DATE", "DATETIME"),
-        TypedParser("single_quote", LiteralSegment, type="date_constructor_literal"),
+        TypedParser(
+            "single_quote", LiteralSegment, type="date_constructor_literal"
+        ),
     ),
     BaseExpressionElementGrammar=OneOf(
         Ref("LiteralGrammar"),
@@ -230,10 +232,14 @@ sqlite_dialect.replace(
             Ref("SingleIdentifierGrammar"),
         ),
         Sequence(
-            "ADD", Sequence("COLUMN", optional=True), Ref("ColumnDefinitionSegment")
+            "ADD",
+            Sequence("COLUMN", optional=True),
+            Ref("ColumnDefinitionSegment"),
         ),
         Sequence(
-            "DROP", Sequence("COLUMN", optional=True), Ref("ColumnReferenceSegment")
+            "DROP",
+            Sequence("COLUMN", optional=True),
+            Ref("ColumnReferenceSegment"),
         ),
     ),
     AutoIncrementGrammar=Nothing(),
@@ -247,7 +253,9 @@ sqlite_dialect.replace(
     MLTableExpressionSegment=Nothing(),
     MergeIntoLiteralGrammar=Nothing(),
     SamplingExpressionSegment=Nothing(),
-    BinaryOperatorGrammar=ansi_dialect.get_grammar("BinaryOperatorGrammar").copy(
+    BinaryOperatorGrammar=ansi_dialect.get_grammar(
+        "BinaryOperatorGrammar"
+    ).copy(
         insert=[
             Ref("ColumnPathOperatorSegment"),
             Ref("InlinePathOperatorSegment"),
@@ -300,7 +308,9 @@ sqlite_dialect.replace(
         # Trim function
         Sequence(
             Ref("TrimParametersGrammar"),
-            Ref("ExpressionSegment", optional=True, exclude=Ref.keyword("FROM")),
+            Ref(
+                "ExpressionSegment", optional=True, exclude=Ref.keyword("FROM")
+            ),
             "FROM",
             Ref("ExpressionSegment"),
         ),
@@ -382,10 +392,16 @@ sqlite_dialect.replace(
     ),
     # match ANSI's naked identifier casefold, sqlite is case-insensitive.
     QuotedIdentifierSegment=TypedParser(
-        "double_quote", IdentifierSegment, type="quoted_identifier", casefold=str.upper
+        "double_quote",
+        IdentifierSegment,
+        type="quoted_identifier",
+        casefold=str.upper,
     ),
     SingleQuotedIdentifierSegment=TypedParser(
-        "single_quote", IdentifierSegment, type="quoted_identifier", casefold=str.upper
+        "single_quote",
+        IdentifierSegment,
+        type="quoted_identifier",
+        casefold=str.upper,
     ),
     ColumnConstraintDefaultGrammar=Ref("ExpressionSegment"),
     FrameClauseUnitGrammar=OneOf("ROWS", "RANGE", "GROUPS"),
@@ -426,7 +442,10 @@ class FrameClauseSegment(BaseSegment):
         Sequence(
             "EXCLUDE",
             OneOf(
-                Sequence("NO", "OTHERS"), Sequence("CURRENT", "ROW"), "TIES", "GROUP"
+                Sequence("NO", "OTHERS"),
+                Sequence("CURRENT", "ROW"),
+                "TIES",
+                "GROUP",
             ),
             optional=True,
         ),
@@ -548,7 +567,9 @@ class TableEndClauseSegment(BaseSegment):
     """
 
     type = "table_end_clause_segment"
-    match_grammar: Matchable = Delimited(Sequence("WITHOUT", "ROWID"), "STRICT")
+    match_grammar: Matchable = Delimited(
+        Sequence("WITHOUT", "ROWID"), "STRICT"
+    )
 
 
 class ValuesClauseSegment(ansi.ValuesClauseSegment):
@@ -750,10 +771,13 @@ class ColumnConstraintSegment(ansi.ColumnConstraintSegment):
             ),
             Ref("PrimaryKeyGrammar"),
             Sequence(
-                Ref("UniqueKeyGrammar"), Ref("ConflictClauseSegment", optional=True)
+                Ref("UniqueKeyGrammar"),
+                Ref("ConflictClauseSegment", optional=True),
             ),  # UNIQUE
             Ref("AutoIncrementGrammar"),
-            Ref("ReferenceDefinitionGrammar"),  # REFERENCES reftable [ ( refcolumn) ]x
+            Ref(
+                "ReferenceDefinitionGrammar"
+            ),  # REFERENCES reftable [ ( refcolumn) ]x
             Ref("CommentClauseSegment"),
             Sequence(
                 "COLLATE", Ref("CollationReferenceSegment")
@@ -826,7 +850,9 @@ class TransactionStatementSegment(ansi.TransactionStatementSegment):
     match_grammar: Matchable = Sequence(
         OneOf("BEGIN", "COMMIT", "ROLLBACK", "END"),
         OneOf("TRANSACTION", optional=True),
-        Sequence("TO", "SAVEPOINT", Ref("ObjectReferenceSegment"), optional=True),
+        Sequence(
+            "TO", "SAVEPOINT", Ref("ObjectReferenceSegment"), optional=True
+        ),
     )
 
 
@@ -875,7 +901,9 @@ class PragmaStatementSegment(BaseSegment):
         Ref("PragmaReferenceSegment"),
         Bracketed(_pragma_value, optional=True),
         Sequence(
-            Ref("EqualsSegment"), OptionallyBracketed(_pragma_value), optional=True
+            Ref("EqualsSegment"),
+            OptionallyBracketed(_pragma_value),
+            optional=True,
         ),
     )
 
@@ -912,7 +940,11 @@ class CreateTriggerStatementSegment(ansi.CreateTriggerStatementSegment):
         "ON",
         Ref("TableReferenceSegment"),
         Sequence("FOR", "EACH", "ROW", optional=True),
-        Sequence("WHEN", OptionallyBracketed(Ref("ExpressionSegment")), optional=True),
+        Sequence(
+            "WHEN",
+            OptionallyBracketed(Ref("ExpressionSegment")),
+            optional=True,
+        ),
         "BEGIN",
         Delimited(
             Ref("UpdateStatementSegment"),

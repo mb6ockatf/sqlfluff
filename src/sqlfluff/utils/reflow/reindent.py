@@ -139,16 +139,22 @@ class _IndentLine:
         if self.indent_points[-1].last_line_break_idx is None:
             range_slice = slice(None, self.indent_points[-1].idx)
         else:
-            range_slice = slice(self.indent_points[0].idx, self.indent_points[-1].idx)
+            range_slice = slice(
+                self.indent_points[0].idx, self.indent_points[-1].idx
+            )
         for element in elements[range_slice]:
             yield element
 
-    def iter_blocks(self, elements: ReflowSequenceType) -> Iterator[ReflowBlock]:
+    def iter_blocks(
+        self, elements: ReflowSequenceType
+    ) -> Iterator[ReflowBlock]:
         for element in self.iter_elements(elements):
             if isinstance(element, ReflowBlock):
                 yield element
 
-    def iter_block_segments(self, elements: ReflowSequenceType) -> Iterator[RawSegment]:
+    def iter_block_segments(
+        self, elements: ReflowSequenceType
+    ) -> Iterator[RawSegment]:
         for block in self.iter_blocks(elements):
             yield from block.segments
 
@@ -161,7 +167,9 @@ class _IndentLine:
 
     def is_all_templates(self, elements: ReflowSequenceType) -> bool:
         """Is this line made up of just template elements?"""
-        return all(block.is_all_unrendered() for block in self.iter_blocks(elements))
+        return all(
+            block.is_all_unrendered() for block in self.iter_blocks(elements)
+        )
 
     def desired_indent_units(self, forced_indents: List[int]) -> int:
         """Calculate the desired indent units.
@@ -196,7 +204,9 @@ class _IndentLine:
                 )
             ]
         else:
-            relevant_untaken_indents = list(self.indent_points[0].untaken_indents)
+            relevant_untaken_indents = list(
+                self.indent_points[0].untaken_indents
+            )
 
         desired_indent = (
             self.initial_indent_balance
@@ -313,7 +323,10 @@ def _revise_templated_lines(
         group_lines = grouped[group_uuid]
 
         # Check for case 1.
-        if len(set(lines[idx].initial_indent_balance for idx in group_lines)) == 1:
+        if (
+            len(set(lines[idx].initial_indent_balance for idx in group_lines))
+            == 1
+        ):
             reflow_logger.debug("    Case 1: All the same")
             continue
 
@@ -357,7 +370,9 @@ def _revise_templated_lines(
                 # NOTE: We still need the forward version of this.
                 elif not _element.segments[0].is_type("placeholder"):
                     break
-                elif cast(TemplateSegment, _element.segments[0]).block_type not in (
+                elif cast(
+                    TemplateSegment, _element.segments[0]
+                ).block_type not in (
                     "block_start",
                     "block_end",
                     "skipped_source",
@@ -418,10 +433,16 @@ def _revise_templated_lines(
             if _case_type in ("block_end", "block_mid"):
                 # Is preceding _line_ AND element also a block?
                 # i.e. nothing else between.
-                if first_point_idx - 1 == lines[idx - 1].indent_points[0].idx + 1:
+                if (
+                    first_point_idx - 1
+                    == lines[idx - 1].indent_points[0].idx + 1
+                ):
                     seg = elements[first_point_idx - 1].segments[0]
                     if seg.is_type("placeholder"):
-                        if cast(TemplateSegment, seg).block_type == "block_end":
+                        if (
+                            cast(TemplateSegment, seg).block_type
+                            == "block_end"
+                        ):
                             _inter_steps = list(
                                 range(
                                     line.initial_indent_balance,
@@ -429,7 +450,8 @@ def _revise_templated_lines(
                                 )
                             )
                             reflow_logger.debug(
-                                "      Follows block. Adding Steps: %s", _inter_steps
+                                "      Follows block. Adding Steps: %s",
+                                _inter_steps,
                             )
                             steps.update(_inter_steps)
 
@@ -493,7 +515,8 @@ def _revise_templated_lines(
             elif last_group_line:
                 # It's not a group line, but we're still tracking. Update with impulses.
                 is_subgroup_line = any(
-                    idx in grouped[grp] for grp in sorted_group_indices[:group_idx]
+                    idx in grouped[grp]
+                    for grp in sorted_group_indices[:group_idx]
                 )
                 for ip in lines[idx].indent_points[:-1]:
                     # Don't count the trough on group lines we've already covered.
@@ -513,7 +536,9 @@ def _revise_templated_lines(
 
                         # Is there anything rendered between here and the next
                         # group line?
-                        next_group_line = min(n for n in group_lines if n > idx)
+                        next_group_line = min(
+                            n for n in group_lines if n > idx
+                        )
                         next_group_line_start_point = (
                             lines[next_group_line].indent_points[0].idx
                         )
@@ -552,9 +577,13 @@ def _revise_templated_lines(
         reflow_logger.debug("    Balance Trough: %s", balance_trough)
         if not overlap or (balance_trough is not None and balance_trough <= 0):
             # Set the indent to the minimum of the existing ones.
-            best_indent = min(lines[idx].initial_indent_balance for idx in group_lines)
+            best_indent = min(
+                lines[idx].initial_indent_balance for idx in group_lines
+            )
             reflow_logger.debug(
-                "    Case 3: Best: %s. Inner Lines: %s", best_indent, inner_lines
+                "    Case 3: Best: %s. Inner Lines: %s",
+                best_indent,
+                inner_lines,
             )
             # Remove one indent from all intermediate lines.
             # This is because we're effectively saying that these
@@ -572,7 +601,9 @@ def _revise_templated_lines(
                 # We've got more than one option. To help narrow down, see whether
                 # we we can net outside the lines immediately inside.
                 check_lines = [group_lines[0] + 1, group_lines[-1] - 1]
-                fallback = max(lines[idx].initial_indent_balance for idx in check_lines)
+                fallback = max(
+                    lines[idx].initial_indent_balance for idx in check_lines
+                )
                 for idx in check_lines:
                     # NOTE: It's important here that we've already called
                     # _revise_skipped_source_lines. We don't want to take
@@ -663,7 +694,9 @@ def _revise_skipped_source_lines(
                 # If it's also had skipped source. Make a note of the location
                 # in both the source and template.
                 if has_skipped_source:
-                    reflow_logger.debug(f"  Skipped line found: {template_loc}")
+                    reflow_logger.debug(
+                        f"  Skipped line found: {template_loc}"
+                    )
                     skipped_source_blocks.append((source_loc, template_loc))
 
     ignore_locs = []
@@ -700,7 +733,9 @@ def _revise_skipped_source_lines(
 
 
 def _revise_comment_lines(
-    lines: List[_IndentLine], elements: ReflowSequenceType, ignore_comment_lines: bool
+    lines: List[_IndentLine],
+    elements: ReflowSequenceType,
+    ignore_comment_lines: bool,
 ) -> None:
     """Given an initial set of individual lines. Revise comment ones.
 
@@ -726,11 +761,15 @@ def _revise_comment_lines(
             # to this one.
             for comment_line_idx in comment_line_buffer:
                 reflow_logger.debug(
-                    "  Comment Only Line: %s. Anchoring to %s", comment_line_idx, idx
+                    "  Comment Only Line: %s. Anchoring to %s",
+                    comment_line_idx,
+                    idx,
                 )
                 # Mutate reference lines to match this one.
                 comment_line = lines[comment_line_idx]
-                comment_line.initial_indent_balance = line.initial_indent_balance
+                comment_line.initial_indent_balance = (
+                    line.initial_indent_balance
+                )
             # Reset the buffer
             comment_line_buffer = []
 
@@ -789,7 +828,10 @@ def _prune_untaken_indents(
     if indent_stats.impulse > indent_stats.trough and not has_newline:
         for i in range(indent_stats.trough, indent_stats.impulse):
             indent_val = incoming_balance + i + 1
-            if indent_val - incoming_balance not in indent_stats.implicit_indents:
+            if (
+                indent_val - incoming_balance
+                not in indent_stats.implicit_indents
+            ):
                 ui += (indent_val,)
 
     return ui
@@ -918,7 +960,9 @@ def _crawl_indent_points(
                         untaken_indents, indent_balance, indent_stats, True
                     )
                     # Set indent stats to zero because we've already yielded.
-                    indent_stats = IndentStats(0, 0, indent_stats.implicit_indents)
+                    indent_stats = IndentStats(
+                        0, 0, indent_stats.implicit_indents
+                    )
                 else:
                     # It's a trailing (or mid) comment. Yield it in the next.
                     yield _IndentPoint(
@@ -938,7 +982,9 @@ def _crawl_indent_points(
             cached_point = None
 
             # Do we have a newline?
-            has_newline = has_untemplated_newline(elem) and idx != last_line_break_idx
+            has_newline = (
+                has_untemplated_newline(elem) and idx != last_line_break_idx
+            )
 
             # Construct the point we may yield
             indent_point = _IndentPoint(
@@ -967,7 +1013,9 @@ def _crawl_indent_points(
             # to the comment case.
             if "comment" in elements[idx + 1].class_types or (
                 "placeholder" in elements[idx + 1].class_types
-                and cast(TemplateSegment, elements[idx + 1].segments[0]).source_str
+                and cast(
+                    TemplateSegment, elements[idx + 1].segments[0]
+                ).source_str
                 == ""
             ):
                 cached_indent_stats = indent_stats
@@ -1043,11 +1091,15 @@ def _map_line_buffers(
             indent_stats = cast(
                 ReflowPoint, elements[indent_point.idx]
             ).get_indent_impulse()
-            if indent_point.indent_impulse > indent_point.indent_trough and not (
-                allow_implicit_indents and indent_stats.implicit_indents
+            if (
+                indent_point.indent_impulse > indent_point.indent_trough
+                and not (
+                    allow_implicit_indents and indent_stats.implicit_indents
+                )
             ):
                 untaken_indent_locs[
-                    indent_point.initial_indent_balance + indent_point.indent_impulse
+                    indent_point.initial_indent_balance
+                    + indent_point.indent_impulse
                 ] = indent_point.idx
             continue
 
@@ -1081,7 +1133,8 @@ def _map_line_buffers(
             passing_indents = list(
                 range(
                     indent_point.initial_indent_balance,
-                    indent_point.initial_indent_balance + indent_point.indent_trough,
+                    indent_point.initial_indent_balance
+                    + indent_point.indent_trough,
                     -1,
                 )
             )
@@ -1138,7 +1191,11 @@ def _map_line_buffers(
 
         # Remove any which are now no longer relevant from the working buffer.
         for k in list(untaken_indent_locs.keys()):
-            if k > indent_point.initial_indent_balance + indent_point.indent_trough:
+            if (
+                k
+                > indent_point.initial_indent_balance
+                + indent_point.indent_trough
+            ):
                 del untaken_indent_locs[k]
 
         # Reset the buffer
@@ -1183,7 +1240,10 @@ def _deduce_line_current_indent(
         else:
             reflow_logger.debug("    Handling as initial leading whitespace")
             for indent_seg in elements[0].segments[::-1]:
-                if indent_seg.is_type("whitespace") and not indent_seg.is_templated:
+                if (
+                    indent_seg.is_type("whitespace")
+                    and not indent_seg.is_templated
+                ):
                     break
             # Handle edge case of no whitespace, but with newline.
             if not indent_seg.is_type("whitespace"):
@@ -1197,10 +1257,14 @@ def _deduce_line_current_indent(
     # but also don't support calling is_templated.
     if indent_seg.is_type("placeholder"):
         # It's a consumed indent.
-        return cast(TemplateSegment, indent_seg).source_str.split("\n")[-1] or ""
+        return (
+            cast(TemplateSegment, indent_seg).source_str.split("\n")[-1] or ""
+        )
     elif not indent_seg.pos_marker or not indent_seg.is_templated:
         # It's a literal
-        assert "\n" not in indent_seg.raw, f"Found newline in indent: {indent_seg}"
+        assert (
+            "\n" not in indent_seg.raw
+        ), f"Found newline in indent: {indent_seg}"
         return indent_seg.raw
     else:  # pragma: no cover
         # It's templated. This shouldn't happen. Segments returned by
@@ -1357,7 +1421,10 @@ def _lint_line_untaken_positive_indents(
     starting_balance = indent_line.opening_balance()
     last_ip = indent_line.indent_points[-1]
     # Check whether it closes the opening indent.
-    if last_ip.initial_indent_balance + last_ip.indent_trough <= starting_balance:
+    if (
+        last_ip.initial_indent_balance + last_ip.indent_trough
+        <= starting_balance
+    ):
         return [], []
     # It's not, we don't close out an opened indent.
     # NOTE: Because trailing comments should always shift their any
@@ -1485,9 +1552,9 @@ def _lint_line_untaken_negative_indents(
         # more configurable.
         # NOTE: This could potentially lead to a weird situation if two
         # statements are already on the same line. That's a bug to solve later.
-        if elements[ip.idx + 1 :] and elements[ip.idx + 1].class_types.intersection(
-            ("statement_terminator", "comma")
-        ):
+        if elements[ip.idx + 1 :] and elements[
+            ip.idx + 1
+        ].class_types.intersection(("statement_terminator", "comma")):
             reflow_logger.debug(
                 "    Detected missing -ve line break @ line %s, before "
                 "semicolon or comma. Ignoring...",
@@ -1497,7 +1564,10 @@ def _lint_line_untaken_negative_indents(
 
         # Edge case: template blocks. These sometimes sit in odd places
         # in the parse tree so don't force newlines before them
-        if elements[ip.idx + 1 :] and "placeholder" in elements[ip.idx + 1].class_types:
+        if (
+            elements[ip.idx + 1 :]
+            and "placeholder" in elements[ip.idx + 1].class_types
+        ):
             # are any of those placeholders blocks?
             if any(
                 cast(TemplateSegment, seg).block_type.startswith("block")
@@ -1507,14 +1577,18 @@ def _lint_line_untaken_negative_indents(
                 reflow_logger.debug(
                     "    Detected missing -ve line break @ line %s, before "
                     "block placeholder. Ignoring...",
-                    elements[ip.idx + 1].segments[0].pos_marker.working_line_no,
+                    elements[ip.idx + 1]
+                    .segments[0]
+                    .pos_marker.working_line_no,
                 )
                 continue
 
         # It's negative, not a line break and was taken on the way up.
         # This *should* be an indent!
         desired_indent = single_indent * (
-            ip.closing_indent_balance - len(ip.untaken_indents) + len(forced_indents)
+            ip.closing_indent_balance
+            - len(ip.untaken_indents)
+            + len(forced_indents)
         )
         reflow_logger.debug(
             "    Detected missing -ve line break @ line %s. Indenting to %r",
@@ -1581,7 +1655,9 @@ def _lint_line_buffer_indents(
         [
             repr(elem.raw)
             for elem in elements[
-                indent_line.indent_points[0].idx : indent_line.indent_points[-1].idx
+                indent_line.indent_points[0]
+                .idx : indent_line.indent_points[-1]
+                .idx
             ]
         ],
     )
@@ -1664,7 +1740,9 @@ def lint_indent_points(
     _revise_skipped_source_lines(lines, elements)
     _revise_templated_lines(lines, elements)
     # Revise comment indents
-    _revise_comment_lines(lines, elements, ignore_comment_lines=ignore_comment_lines)
+    _revise_comment_lines(
+        lines, elements, ignore_comment_lines=ignore_comment_lines
+    )
 
     # Skip elements we're configured to not touch (i.e. scripts)
     for line in lines[:]:
@@ -1690,7 +1768,11 @@ def lint_indent_points(
     elem_buffer = elements.copy()  # Make a working copy to mutate.
     for line in lines:
         line_results = _lint_line_buffer_indents(
-            elem_buffer, line, single_indent, forced_indents, imbalanced_indent_locs
+            elem_buffer,
+            line,
+            single_indent,
+            forced_indents,
+            imbalanced_indent_locs,
         )
         if line_results:
             reflow_logger.info("      PROBLEMS:")
@@ -1977,7 +2059,10 @@ def _fix_long_line_with_comment(
 
     # If the comment is longer than the limit _anyway_, don't move
     # it. It will still be too long.
-    if len(line_buffer[-1].segments[-1].raw) + len(current_indent) > line_length_limit:
+    if (
+        len(line_buffer[-1].segments[-1].raw) + len(current_indent)
+        > line_length_limit
+    ):
         reflow_logger.debug("    Unfixable because comment too long anyway.")
         return elements, []
 
@@ -1995,9 +2080,13 @@ def _fix_long_line_with_comment(
     # be an indent.
     if trailing_comments == "after":
         anchor_point = cast(ReflowPoint, line_buffer[-2])
-        results, new_point = anchor_point.indent_to(current_indent, before=comment_seg)
+        results, new_point = anchor_point.indent_to(
+            current_indent, before=comment_seg
+        )
         elements = (
-            elements[: last_elem_idx - 1] + [new_point] + elements[last_elem_idx:]
+            elements[: last_elem_idx - 1]
+            + [new_point]
+            + elements[last_elem_idx:]
         )
         return elements, fixes_from_results(results)
 
@@ -2118,7 +2207,9 @@ def _fix_long_line_with_integer_targets(
         # If we get this far, then it's positive, but still within
         # the line limit. We can purge any pairs before this.
         purge_before = e_idx
-        reflow_logger.debug("    ...breaks before %s unnecessary.", purge_before)
+        reflow_logger.debug(
+            "    ...breaks before %s unnecessary.", purge_before
+        )
     # Only keep indices which are after the critical point.
     target_breaks = [e_idx for e_idx in target_breaks if e_idx >= purge_before]
     reflow_logger.debug("    Remaining breaks: %s.", target_breaks)
@@ -2137,7 +2228,9 @@ def _fix_long_line_with_integer_targets(
             if elements[e_idx + 1].class_types.intersection(
                 ("statement_terminator", "comma")
             ):
-                reflow_logger.debug("    Skipping dedent before comma or semicolon.")
+                reflow_logger.debug(
+                    "    Skipping dedent before comma or semicolon."
+                )
                 # We break rather than continue because this is
                 # necessarily a step back down.
                 break
@@ -2224,7 +2317,9 @@ def lint_line_length(
 
         # Get the current indent.
         if last_indent_idx is not None:
-            current_indent = _deduce_line_current_indent(elem_buffer, last_indent_idx)
+            current_indent = _deduce_line_current_indent(
+                elem_buffer, last_indent_idx
+            )
         else:
             current_indent = ""
 
@@ -2280,7 +2375,9 @@ def lint_line_length(
             )
             reflow_logger.debug("    spans: %s", spans)
             rebreak_priorities = _rebreak_priorities(spans)
-            reflow_logger.debug("    rebreak_priorities: %s", rebreak_priorities)
+            reflow_logger.debug(
+                "    rebreak_priorities: %s", rebreak_priorities
+            )
 
             # Identify indent points second, taking into
             # account rebreak_priorities.

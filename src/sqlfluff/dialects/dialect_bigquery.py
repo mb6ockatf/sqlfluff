@@ -160,7 +160,9 @@ bigquery_dialect.add(
     StartAngleBracketSegment=StringParser(
         "<", SymbolSegment, type="start_angle_bracket"
     ),
-    EndAngleBracketSegment=StringParser(">", SymbolSegment, type="end_angle_bracket"),
+    EndAngleBracketSegment=StringParser(
+        ">", SymbolSegment, type="end_angle_bracket"
+    ),
     RightArrowSegment=StringParser("=>", SymbolSegment, type="right_arrow"),
     DashSegment=StringParser("-", SymbolSegment, type="dash"),
     SelectClauseElementListGrammar=Delimited(
@@ -205,7 +207,9 @@ bigquery_dialect.add(
             r"[A-Z_][A-Z0-9_]*",
             IdentifierSegment,
             type="naked_identifier",
-            anti_template=r"^(" + r"|".join(dialect.sets("reserved_keywords")) + r")$",
+            anti_template=r"^("
+            + r"|".join(dialect.sets("reserved_keywords"))
+            + r")$",
         )
     ),
     QuotedCSIdentifierSegment=TypedParser(
@@ -281,7 +285,9 @@ bigquery_dialect.replace(
             r"[A-Z_][A-Z0-9_]*",
             IdentifierSegment,
             type="naked_identifier",
-            anti_template=r"^(" + r"|".join(dialect.sets("reserved_keywords")) + r")$",
+            anti_template=r"^("
+            + r"|".join(dialect.sets("reserved_keywords"))
+            + r")$",
             casefold=str.upper,
         )
     ),
@@ -304,7 +310,9 @@ bigquery_dialect.replace(
     ),
     DateTimeLiteralGrammar=Sequence(
         OneOf("DATE", "DATETIME", "TIME", "TIMESTAMP"),
-        TypedParser("single_quote", LiteralSegment, type="date_constructor_literal"),
+        TypedParser(
+            "single_quote", LiteralSegment, type="date_constructor_literal"
+        ),
     ),
     JoinLikeClauseGrammar=Sequence(
         AnyNumberOf(
@@ -317,7 +325,9 @@ bigquery_dialect.replace(
     ConditionalCrossJoinKeywordsGrammar=Nothing(),
     NaturalJoinKeywordsGrammar=Nothing(),
     UnconditionalCrossJoinKeywordsGrammar=Ref.keyword("CROSS"),
-    MergeIntoLiteralGrammar=Sequence("MERGE", Ref.keyword("INTO", optional=True)),
+    MergeIntoLiteralGrammar=Sequence(
+        "MERGE", Ref.keyword("INTO", optional=True)
+    ),
     AccessorGrammar=AnyNumberOf(
         Ref("ArrayAccessorSegment"),
         # Add in semi structured expressions
@@ -362,7 +372,9 @@ bigquery_dialect.sets("datetime_units").update(
 )
 
 # Add additional datetime units only recognised in some functions (e.g. extract)
-bigquery_dialect.sets("extended_datetime_units").update(["DATE", "DATETIME", "TIME"])
+bigquery_dialect.sets("extended_datetime_units").update(
+    ["DATE", "DATETIME", "TIME"]
+)
 
 bigquery_dialect.sets("date_part_function_name").clear()
 bigquery_dialect.sets("date_part_function_name").update(
@@ -1127,7 +1139,10 @@ class FunctionDefinitionGrammar(ansi.FunctionDefinitionGrammar):
                     Ref("DoubleQuotedUDFBody"),
                     Ref("SingleQuotedUDFBody"),
                     Bracketed(
-                        OneOf(Ref("ExpressionSegment"), Ref("SelectStatementSegment"))
+                        OneOf(
+                            Ref("ExpressionSegment"),
+                            Ref("SelectStatementSegment"),
+                        )
                     ),
                 ),
             ),
@@ -1179,14 +1194,18 @@ class BeginStatementSegment(BaseSegment):
 
     match_grammar = Sequence(
         Sequence(
-            Ref("SingleIdentifierFullGrammar"), Ref("ColonSegment"), optional=True
+            Ref("SingleIdentifierFullGrammar"),
+            Ref("ColonSegment"),
+            optional=True,
         ),
         "BEGIN",
         Sequence(
             Indent,
             AnyNumberOf(
                 Sequence(
-                    OneOf(Ref("StatementSegment"), Ref("MultiStatementSegment")),
+                    OneOf(
+                        Ref("StatementSegment"), Ref("MultiStatementSegment")
+                    ),
                     Ref("DelimiterGrammar"),
                 ),
                 # We can't terminate on `END` due to possible nesting
@@ -1203,7 +1222,10 @@ class BeginStatementSegment(BaseSegment):
                 Indent,
                 AnyNumberOf(
                     Sequence(
-                        OneOf(Ref("StatementSegment"), Ref("MultiStatementSegment")),
+                        OneOf(
+                            Ref("StatementSegment"),
+                            Ref("MultiStatementSegment"),
+                        ),
                         Ref("DelimiterGrammar"),
                     ),
                     min_times=1,
@@ -1430,7 +1452,10 @@ class ColumnReferenceSegment(ansi.ObjectReferenceSegment):
         min_level = min(levels_tmp)
         max_level = max(levels_tmp)
         refs = list(self.iter_raw_references())
-        if max_level == self.ObjectReferenceLevel.SCHEMA.value and len(refs) >= 3:
+        if (
+            max_level == self.ObjectReferenceLevel.SCHEMA.value
+            and len(refs) >= 3
+        ):
             return [tuple(refs[0 : max_level - min_level + 1])]
         # Note we aren't handling other possible cases. We'll add these as
         # needed.
@@ -1611,14 +1636,20 @@ class ExecuteImmediateSegment(BaseSegment):
                 Bracketed(Ref("SelectableGrammar")),  # Expression Subquery
             )
         ),
-        Sequence("INTO", Delimited(Ref("SingleIdentifierFullGrammar")), optional=True),
+        Sequence(
+            "INTO",
+            Delimited(Ref("SingleIdentifierFullGrammar")),
+            optional=True,
+        ),
         Sequence(
             "USING",
             Delimited(
                 Sequence(
                     Ref("BaseExpressionElementGrammar"),
                     # The `AS` is required when using an alias in this context
-                    Sequence("AS", Ref("SingleIdentifierFullGrammar"), optional=True),
+                    Sequence(
+                        "AS", Ref("SingleIdentifierFullGrammar"), optional=True
+                    ),
                 ),
             ),
             optional=True,
@@ -2014,7 +2045,9 @@ class AlterTableStatementSegment(ansi.AlterTableStatementSegment):
                                 ),
                             ),
                         ),
-                        Sequence("DROP", OneOf("DEFAULT", Sequence("NOT", "NULL"))),
+                        Sequence(
+                            "DROP", OneOf("DEFAULT", Sequence("NOT", "NULL"))
+                        ),
                     ),
                 ),
             ),
@@ -2085,7 +2118,12 @@ class CreateExternalTableStatementSegment(BaseSegment):
         # CREATE EXTERNAL TABLE statements can be ordered arbitrarily.
         AnyNumberOf(
             # connection names have the same rules as table names in BigQuery
-            Sequence("WITH", "CONNECTION", Ref("TableReferenceSegment"), optional=True),
+            Sequence(
+                "WITH",
+                "CONNECTION",
+                Ref("TableReferenceSegment"),
+                optional=True,
+            ),
             Sequence(
                 "WITH",
                 "PARTITION",
@@ -2338,7 +2376,9 @@ class ParameterizedSegment(BaseSegment):
     """
 
     type = "parameterized_expression"
-    match_grammar = OneOf(Ref("AtSignLiteralSegment"), Ref("QuestionMarkSegment"))
+    match_grammar = OneOf(
+        Ref("AtSignLiteralSegment"), Ref("QuestionMarkSegment")
+    )
 
 
 class PivotForClauseSegment(BaseSegment):
@@ -2426,7 +2466,9 @@ class FromUnpivotExpressionSegment(BaseSegment):
                     Delimited(
                         Sequence(
                             Delimited(Ref("SingleIdentifierGrammar")),
-                            Ref("UnpivotAliasExpressionSegment", optional=True),
+                            Ref(
+                                "UnpivotAliasExpressionSegment", optional=True
+                            ),
                         ),
                     ),
                 ),
@@ -2451,7 +2493,9 @@ class FromUnpivotExpressionSegment(BaseSegment):
                                     min_delimiters=1,
                                 ),
                             ),
-                            Ref("UnpivotAliasExpressionSegment", optional=True),
+                            Ref(
+                                "UnpivotAliasExpressionSegment", optional=True
+                            ),
                         ),
                     ),
                 ),
@@ -2482,7 +2526,9 @@ class SamplingExpressionSegment(ansi.SamplingExpressionSegment):
     """
 
     match_grammar = Sequence(
-        "TABLESAMPLE", "SYSTEM", Bracketed(Ref("NumericLiteralSegment"), "PERCENT")
+        "TABLESAMPLE",
+        "SYSTEM",
+        Bracketed(Ref("NumericLiteralSegment"), "PERCENT"),
     )
 
 
@@ -2593,7 +2639,9 @@ class ExportStatementSegment(BaseSegment):
     match_grammar: Matchable = Sequence(
         "EXPORT",
         "DATA",
-        Sequence("WITH", "CONNECTION", Ref("ObjectReferenceSegment"), optional=True),
+        Sequence(
+            "WITH", "CONNECTION", Ref("ObjectReferenceSegment"), optional=True
+        ),
         "OPTIONS",
         Bracketed(
             Delimited(
@@ -2747,7 +2795,9 @@ class LoadDataStatementSegment(BaseSegment):
             ),
             optional=True,
         ),
-        Sequence("WITH", "CONNECTION", Ref("ObjectReferenceSegment"), optional=True),
+        Sequence(
+            "WITH", "CONNECTION", Ref("ObjectReferenceSegment"), optional=True
+        ),
     )
 
 

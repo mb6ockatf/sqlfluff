@@ -2,7 +2,12 @@
 
 from typing import List
 
-from sqlfluff.core.parser import BaseSegment, Indent, NewlineSegment, WhitespaceSegment
+from sqlfluff.core.parser import (
+    BaseSegment,
+    Indent,
+    NewlineSegment,
+    WhitespaceSegment,
+)
 from sqlfluff.core.rules import BaseRule, LintFix, LintResult, RuleContext
 from sqlfluff.core.rules.crawlers import SegmentSeekerCrawler
 from sqlfluff.utils.functional import FunctionalContext, Segments, sp
@@ -61,7 +66,9 @@ class Rule_ST04(BaseRule):
         ).get()
         case1_last_when = case1_children.last(sp.is_type("when_clause")).get()
         case1_else_clause = case1_children.select(sp.is_type("else_clause"))
-        case1_else_expressions = case1_else_clause.children(sp.is_type("expression"))
+        case1_else_expressions = case1_else_clause.children(
+            sp.is_type("expression")
+        )
         expression_children = case1_else_expressions.children()
         case2 = expression_children.select(sp.is_type("case_expression"))
         case2_children = case2.children()
@@ -109,7 +116,8 @@ class Rule_ST04(BaseRule):
         )
         # Restore any comments that were deleted
         after_last_comment_index = (
-            case1_to_delete.find(case1_to_delete.last(sp.is_comment()).get()) + 1
+            case1_to_delete.find(case1_to_delete.last(sp.is_comment()).get())
+            + 1
         )
         case1_comments_to_restore = case1_to_delete.select(
             stop_seg=case1_to_delete.get(after_last_comment_index)
@@ -122,7 +130,9 @@ class Rule_ST04(BaseRule):
         # Delete the nested "CASE" expression.
         fixes = case1_to_delete.apply(LintFix.delete)
 
-        tab_space_size: int = context.config.get("tab_space_size", ["indentation"])
+        tab_space_size: int = context.config.get(
+            "tab_space_size", ["indentation"]
+        )
         indent_unit: str = context.config.get("indent_unit", ["indentation"])
 
         # Determine the indentation to use when we move the nested "WHEN"
@@ -139,7 +149,13 @@ class Rule_ST04(BaseRule):
         # Move the nested "when" and "else" clauses after the last outer
         # "when".
         nested_clauses = case2.children(
-            sp.is_type("when_clause", "else_clause", "newline", "comment", "whitespace")
+            sp.is_type(
+                "when_clause",
+                "else_clause",
+                "newline",
+                "comment",
+                "whitespace",
+            )
         )
 
         # Rebuild the nested case statement.
@@ -149,7 +165,9 @@ class Rule_ST04(BaseRule):
         segments += self._rebuild_spacing(when_indent_str, after_else_comment)
         # The nested "WHEN", "ELSE" or "comments", with logical spacing
         segments += self._rebuild_spacing(when_indent_str, nested_clauses)
-        fixes.append(LintFix.create_after(case1_last_when, segments, source=segments))
+        fixes.append(
+            LintFix.create_after(case1_last_when, segments, source=segments)
+        )
 
         # Delete the outer "else" clause.
         fixes.append(LintFix.delete(case1_else_clause_seg))
@@ -177,7 +195,9 @@ class Rule_ST04(BaseRule):
             .reversed()
             .first(sp.is_type("whitespace"))
         )
-        seg_indent = parent_segments.select(stop_seg=segment).last(sp.is_type("indent"))
+        seg_indent = parent_segments.select(stop_seg=segment).last(
+            sp.is_type("indent")
+        )
         indent_level = 1
         if (
             seg_indent
@@ -190,7 +210,8 @@ class Rule_ST04(BaseRule):
             if leading_whitespace
             and (whitespace_seg := leading_whitespace.get())
             and len(whitespace_seg.raw) > 1
-            else construct_single_indent(indent_unit, tab_space_size) * indent_level
+            else construct_single_indent(indent_unit, tab_space_size)
+            * indent_level
         )
 
         return indent_str
@@ -212,7 +233,9 @@ class Rule_ST04(BaseRule):
         first_comment = trailing_end.first(sp.is_comment()).get()
         if first_comment:
             segments = [NewlineSegment(), WhitespaceSegment(end_indent_str)]
-            fixes.append(LintFix.create_before(first_comment, segments, segments))
+            fixes.append(
+                LintFix.create_before(first_comment, segments, segments)
+            )
         return fixes
 
     def _rebuild_spacing(

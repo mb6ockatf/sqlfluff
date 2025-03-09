@@ -49,13 +49,17 @@ def distribute_work(work_items: List[S], work_fn: Callable[[S], None]) -> None:
             if not expected_cases[example.dialect]:
                 # It's done. Report success rate.
                 local_success_map = {
-                    k: v for k, v in success_map.items() if k.dialect == example.dialect
+                    k: v
+                    for k, v in success_map.items()
+                    if k.dialect == example.dialect
                 }
                 if all(local_success_map.values()):
                     print(f"{example.dialect!r} complete.\t\tAll Success ✅")
                 else:
                     fail_files = [
-                        k.sqlfile for k, v in local_success_map.items() if not v
+                        k.sqlfile
+                        for k, v in local_success_map.items()
+                        if not v
                     ]
                     print(
                         f"{example.dialect!r} complete.\t\t{len(fail_files)} fails. ⚠️"
@@ -103,12 +107,16 @@ def generate_one_parse_fixture(
         tree = parse_example_file(dialect, sqlfile)
     except Exception as err:
         # Catch parsing errors, and wrap the file path only it.
-        return example, SQLParseError(f"Fatal parsing error: {sql_path}: {err}")
+        return example, SQLParseError(
+            f"Fatal parsing error: {sql_path}: {err}"
+        )
 
     # Check we don't have any base types or unparsable sections
     types = tree.type_set()
     if "base" in types:
-        return example, SQLParseError(f"Unnamed base section when parsing: {sql_path}")
+        return example, SQLParseError(
+            f"Unnamed base section when parsing: {sql_path}"
+        )
     if "unparsable" in types:
         return example, SQLParseError(f"Could not parse: {sql_path}")
 
@@ -164,7 +172,9 @@ def gather_file_list(
     if dialect:
         dialect = dialect.lower()
         parse_success_examples = [
-            example for example in parse_success_examples if example[0] == dialect
+            example
+            for example in parse_success_examples
+            if example[0] == dialect
         ]
         if len(parse_success_examples) == 0:
             raise ValueError(f'Unknown Dialect "{dialect}"')
@@ -182,9 +192,14 @@ def gather_file_list(
 
 @click.command()
 @click.option(
-    "--filter", "-f", default=None, help="A glob filter to apply to file names."
+    "--filter",
+    "-f",
+    default=None,
+    help="A glob filter to apply to file names.",
 )
-@click.option("--dialect", "-d", default=None, help="Filter to a given dialect.")
+@click.option(
+    "--dialect", "-d", default=None, help="Filter to a given dialect."
+)
 @click.option(
     "--new-only",
     "new_only",

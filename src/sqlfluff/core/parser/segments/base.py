@@ -50,9 +50,14 @@ if TYPE_CHECKING:  # pragma: no cover
 # Instantiate the linter logger (only for use in methods involved with fixing.)
 linter_logger = logging.getLogger("sqlfluff.linter")
 
-TupleSerialisedSegment = Tuple[str, Union[str, Tuple["TupleSerialisedSegment", ...]]]
+TupleSerialisedSegment = Tuple[
+    str, Union[str, Tuple["TupleSerialisedSegment", ...]]
+]
 RecordSerialisedSegment = Dict[
-    str, Union[None, str, "RecordSerialisedSegment", List["RecordSerialisedSegment"]]
+    str,
+    Union[
+        None, str, "RecordSerialisedSegment", List["RecordSerialisedSegment"]
+    ],
 ]
 
 
@@ -72,7 +77,9 @@ class SourceFix:
     def __hash__(self) -> int:
         # Only hash based on the source slice, not the
         # templated slice (which might change)
-        return hash((self.edit, self.source_slice.start, self.source_slice.stop))
+        return hash(
+            (self.edit, self.source_slice.start, self.source_slice.stop)
+        )
 
 
 @dataclass(frozen=True)
@@ -141,8 +148,12 @@ class SegmentMetaclass(type, Matchable):
 
         # Populate the `_class_types` property on creation.
         added_type = class_dict.get("type", None)
-        class_dict["_class_types"] = frozenset(_iter_base_types(added_type, bases))
-        return cast(Type["BaseSegment"], type.__new__(mcs, name, bases, class_dict))
+        class_dict["_class_types"] = frozenset(
+            _iter_base_types(added_type, bases)
+        )
+        return cast(
+            Type["BaseSegment"], type.__new__(mcs, name, bases, class_dict)
+        )
 
 
 class BaseSegment(metaclass=SegmentMetaclass):
@@ -205,7 +216,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
                     *(seg.pos_marker for seg in segments)
                 )
 
-        assert not hasattr(self, "parse_grammar"), "parse_grammar is deprecated."
+        assert not hasattr(
+            self, "parse_grammar"
+        ), "parse_grammar is deprecated."
 
         self.pos_marker = pos_marker
         self.segments: Tuple["BaseSegment", ...] = segments
@@ -260,7 +273,11 @@ class BaseSegment(metaclass=SegmentMetaclass):
                 # NOTE: We use the start of the source slice because it's
                 # the lowest cost way of getting a reliable location in the source
                 # file for deduplication.
-                self.pos_marker.source_slice.start if self.pos_marker else None,
+                (
+                    self.pos_marker.source_slice.start
+                    if self.pos_marker
+                    else None
+                ),
             )
         )
 
@@ -308,7 +325,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
 
         This is used in the path_to algorithm for tree traversal.
         """
-        return tuple(idx for idx, seg in enumerate(self.segments) if seg.is_code)
+        return tuple(
+            idx for idx, seg in enumerate(self.segments) if seg.is_code
+        )
 
     @cached_property
     def is_comment(self) -> bool:  # pragma: no cover TODO?
@@ -343,7 +362,8 @@ class BaseSegment(metaclass=SegmentMetaclass):
         """
         return frozenset(
             chain.from_iterable(
-                seg.descendant_type_set | seg.class_types for seg in self.segments
+                seg.descendant_type_set | seg.class_types
+                for seg in self.segments
             )
         )
 
@@ -355,7 +375,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
 
         NOTE: Does not include the types of the parent segment itself.
         """
-        return set(chain.from_iterable(seg.class_types for seg in self.segments))
+        return set(
+            chain.from_iterable(seg.class_types for seg in self.segments)
+        )
 
     @cached_property
     def raw_upper(self) -> str:
@@ -375,7 +397,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
         buffer = []
         for idx, seg in enumerate(self.segments):
             # If it's a raw, yield it with this segment as the parent
-            new_step = [PathStep(self, idx, len(self.segments), self._code_indices)]
+            new_step = [
+                PathStep(self, idx, len(self.segments), self._code_indices)
+            ]
             if seg.is_type("raw"):
                 buffer.append((cast("RawSegment", seg), new_step))
             # If it's not, recurse - prepending self to the ancestor stack
@@ -420,7 +444,8 @@ class BaseSegment(metaclass=SegmentMetaclass):
         #   not templated.
         assert self.pos_marker
         return (
-            self.pos_marker.source_slice.start != self.pos_marker.source_slice.stop
+            self.pos_marker.source_slice.start
+            != self.pos_marker.source_slice.stop
             and not self.pos_marker.is_literal()
         )
 
@@ -506,7 +531,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
 
             # Regardless of whether we change the position, we still need to
             # update the working location and keep track of it.
-            new_position = new_position.with_working_position(line_no, line_pos)
+            new_position = new_position.with_working_position(
+                line_no, line_pos
+            )
             line_no, line_pos = new_position.infer_next_position(
                 segment.raw, line_no, line_pos
             )
@@ -536,7 +563,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
 
     @classmethod
     def simple(
-        cls, parse_context: ParseContext, crumbs: Optional[Tuple[str, ...]] = None
+        cls,
+        parse_context: ParseContext,
+        crumbs: Optional[Tuple[str, ...]] = None,
     ) -> Optional["SimpleHintType"]:
         """Does this matcher support an uppercase hash matching route?
 
@@ -545,7 +574,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
         if they wish to be considered simple.
         """
         if cls.match_grammar:
-            return cls.match_grammar.simple(parse_context=parse_context, crumbs=crumbs)
+            return cls.match_grammar.simple(
+                parse_context=parse_context, crumbs=crumbs
+            )
         else:  # pragma: no cover TODO?
             # Other segments will either override this method, or aren't
             # simple.
@@ -623,7 +654,10 @@ class BaseSegment(metaclass=SegmentMetaclass):
 
     @classmethod
     def match(
-        cls, segments: Sequence["BaseSegment"], idx: int, parse_context: ParseContext
+        cls,
+        segments: Sequence["BaseSegment"],
+        idx: int,
+        parse_context: ParseContext,
     ) -> MatchResult:
         """Match a list of segments against this segment.
 
@@ -793,7 +827,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
         buff.write(preface + "\n")
         if not code_only and self.comment_separate and len(self._comments) > 0:
             if self._comments:  # pragma: no cover TODO?
-                buff.write((" " * ((ident + 1) * tabsize)) + "Comments:" + "\n")
+                buff.write(
+                    (" " * ((ident + 1) * tabsize)) + "Comments:" + "\n"
+                )
                 for seg in self._comments:
                     buff.write(
                         seg.stringify(
@@ -891,7 +927,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
 
         # Reset the parent if provided.
         if parent:
-            assert parent_idx is not None, "parent_idx must be provided it parent is."
+            assert (
+                parent_idx is not None
+            ), "parent_idx must be provided it parent is."
             new_segment.set_parent(parent, parent_idx)
 
         # If the segment doesn't have a segments property, we're done.
@@ -932,10 +970,14 @@ class BaseSegment(metaclass=SegmentMetaclass):
 
     def raw_normalized(self, casefold: bool = True) -> str:
         """Iterate raw segments, return normalized value."""
-        return "".join(seg.raw_normalized(casefold) for seg in self.get_raw_segments())
+        return "".join(
+            seg.raw_normalized(casefold) for seg in self.get_raw_segments()
+        )
 
     def iter_segments(
-        self, expanding: Optional[Sequence[str]] = None, pass_through: bool = False
+        self,
+        expanding: Optional[Sequence[str]] = None,
+        pass_through: bool = False,
     ) -> Iterator["BaseSegment"]:
         """Iterate segments, optionally expanding some children."""
         for s in self.segments:
@@ -990,7 +1032,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
         whitespace segments between two already known segments.
         """
         start_index = self.segments.index(start_seg) if start_seg else -1
-        stop_index = self.segments.index(stop_seg) if stop_seg else len(self.segments)
+        stop_index = (
+            self.segments.index(stop_seg) if stop_seg else len(self.segments)
+        )
         buff = []
         for seg in self.segments[start_index + 1 : stop_index]:
             if loop_while and not loop_while(seg):
@@ -999,7 +1043,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
                 buff.append(seg)
         return buff
 
-    def recursive_crawl_all(self, reverse: bool = False) -> Iterator[BaseSegment]:
+    def recursive_crawl_all(
+        self, reverse: bool = False
+    ) -> Iterator[BaseSegment]:
         """Recursively crawl all descendant segments."""
         if reverse:
             for seg in reversed(self.segments):
@@ -1053,7 +1099,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
                 # recurse into.
                 # NOTE: Setting no_recursive_seg_type can significantly
                 # improve performance in many cases.
-                if not no_recursive_seg_type or not seg.is_type(*no_recursive_seg_type):
+                if not no_recursive_seg_type or not seg.is_type(
+                    *no_recursive_seg_type
+                ):
                     yield from seg.recursive_crawl(
                         *seg_type,
                         recurse_into=recurse_into,
@@ -1128,7 +1176,11 @@ class BaseSegment(metaclass=SegmentMetaclass):
             return []  # pragma: no cover
         # Are we in the right ballpark?
         # NOTE: Comparisons have a higher precedence than `not`.
-        elif not self.get_start_loc() <= midpoint.get_start_loc() <= self.get_end_loc():
+        elif (
+            not self.get_start_loc()
+            <= midpoint.get_start_loc()
+            <= self.get_end_loc()
+        ):
             return []
 
         # From here, we've worked "up" as far as we can, we now work "down".
@@ -1231,7 +1283,9 @@ class BaseSegment(metaclass=SegmentMetaclass):
         linter_logger.critical(message, exc_info=True, *args)
 
     def edit(
-        self, raw: Optional[str] = None, source_fixes: Optional[List[SourceFix]] = None
+        self,
+        raw: Optional[str] = None,
+        source_fixes: Optional[List[SourceFix]] = None,
     ) -> BaseSegment:
         """Stub."""
         raise NotImplementedError()

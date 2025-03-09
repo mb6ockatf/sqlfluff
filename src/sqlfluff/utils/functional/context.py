@@ -21,21 +21,24 @@ class FunctionalContext:
     def parent_stack(self) -> "Segments":  # pragma: no cover
         """Returns a Segments object for context.parent_stack."""
         return Segments(
-            *self.context.parent_stack, templated_file=self.context.templated_file
+            *self.context.parent_stack,
+            templated_file=self.context.templated_file,
         )
 
     @property
     def siblings_pre(self) -> "Segments":  # pragma: no cover
         """Returns a Segments object for context.siblings_pre."""
         return Segments(
-            *self.context.siblings_pre, templated_file=self.context.templated_file
+            *self.context.siblings_pre,
+            templated_file=self.context.templated_file,
         )
 
     @property
     def siblings_post(self) -> "Segments":  # pragma: no cover
         """Returns a Segments object for context.siblings_post."""
         return Segments(
-            *self.context.siblings_post, templated_file=self.context.templated_file
+            *self.context.siblings_post,
+            templated_file=self.context.templated_file,
         )
 
     @property
@@ -50,5 +53,6 @@ class FunctionalContext:
         """Returns a Segments object for all the raw segments in the file."""
         file_segment = self.context.parent_stack[0]
         return Segments(
-            *file_segment.get_raw_segments(), templated_file=self.context.templated_file
+            *file_segment.get_raw_segments(),
+            templated_file=self.context.templated_file,
         )

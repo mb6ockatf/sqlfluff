@@ -35,7 +35,9 @@ def validate_segment(segmentref, config):
     except TypeError:
         pass
     raise TypeError(
-        "{} is not of type Segment or Matchable. Test is invalid.".format(segmentref)
+        "{} is not of type Segment or Matchable. Test is invalid.".format(
+            segmentref
+        )
     )
 
 
@@ -92,7 +94,9 @@ def _dialect_specific_segment_not_match(dialect, segmentref, raw, caplog):
     assert not match
 
 
-def _validate_dialect_specific_statements(dialect, segment_cls, raw, stmt_count):
+def _validate_dialect_specific_statements(
+    dialect, segment_cls, raw, stmt_count
+):
     """This validates one or multiple statements against specified segment class.
 
     It even validates the number of parsed statements with the number of expected
@@ -107,7 +111,9 @@ def _validate_dialect_specific_statements(dialect, segment_cls, raw, stmt_count)
     assert "unparsable" not in typs
 
     # Find the expected type in the parsed segment
-    child_segments = [seg for seg in parsed.tree.recursive_crawl(segment_cls.type)]
+    child_segments = [
+        seg for seg in parsed.tree.recursive_crawl(segment_cls.type)
+    ]
     assert len(child_segments) == stmt_count
 
     # Check if all child segments are the correct type

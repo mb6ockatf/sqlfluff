@@ -231,8 +231,12 @@ vertica_dialect.add(
     NullEqualsOperatorSegment=StringParser(
         "<=>", SymbolSegment, type="null_equals_operator"
     ),
-    IntervalUnitsGrammar=OneOf("YEAR", "MONTH", "DAY", "HOUR", "MINUTE", "SECOND"),
-    InterpolateGrammar=Sequence("INTERPOLATE", OneOf("PREVIOUS", "NEXT"), "VALUE"),
+    IntervalUnitsGrammar=OneOf(
+        "YEAR", "MONTH", "DAY", "HOUR", "MINUTE", "SECOND"
+    ),
+    InterpolateGrammar=Sequence(
+        "INTERPOLATE", OneOf("PREVIOUS", "NEXT"), "VALUE"
+    ),
     IntervalLiteralGrammar=Sequence(
         Ref("IntervalUnitsGrammar"),
         Sequence(
@@ -244,7 +248,9 @@ vertica_dialect.add(
             optional=True,
         ),
     ),
-    IntegerDivideSegment=StringParser("//", SymbolSegment, type="binary_operator"),
+    IntegerDivideSegment=StringParser(
+        "//", SymbolSegment, type="binary_operator"
+    ),
 )
 
 vertica_dialect.replace(
@@ -260,7 +266,9 @@ vertica_dialect.replace(
         # Trim function
         Sequence(
             Ref("TrimParametersGrammar"),
-            Ref("ExpressionSegment", optional=True, exclude=Ref.keyword("FROM")),
+            Ref(
+                "ExpressionSegment", optional=True, exclude=Ref.keyword("FROM")
+            ),
             "FROM",
             Ref("ExpressionSegment"),
         ),
@@ -484,7 +492,10 @@ vertica_dialect.replace(
         ),
     ),
     QuotedIdentifierSegment=TypedParser(
-        "double_quote", IdentifierSegment, type="quoted_identifier", casefold=str.upper
+        "double_quote",
+        IdentifierSegment,
+        type="quoted_identifier",
+        casefold=str.upper,
     ),
     NakedIdentifierSegment=SegmentGenerator(
         # Generate the anti template from the set of reserved keywords
@@ -514,7 +525,9 @@ vertica_dialect.replace(
             r"[\p{L}_][\p{L}\p{N}$_]*",
             IdentifierSegment,
             type="naked_identifier",
-            anti_template=r"^(" + r"|".join(dialect.sets("reserved_keywords")) + r")$",
+            anti_template=r"^("
+            + r"|".join(dialect.sets("reserved_keywords"))
+            + r")$",
             casefold=str.upper,
         )
     ),
@@ -538,7 +551,9 @@ class ShorthandCastSegment(ansi.ShorthandCastSegment):
         ),
         AnyNumberOf(
             Sequence(
-                OneOf(Ref("CastOperatorSegment"), Ref("NullCastOperatorSegment")),
+                OneOf(
+                    Ref("CastOperatorSegment"), Ref("NullCastOperatorSegment")
+                ),
                 Ref("DatatypeSegment"),
                 Ref("TimeZoneGrammar", optional=True),
                 allow_gaps=True,
@@ -846,7 +861,9 @@ class CreateTableStatementSegment(ansi.CreateTableStatementSegment):
                             Ref("ColumnConstraintSegment"),
                             Ref("ColumnEncodingSegment"),
                             Sequence(
-                                "ACCESSRANK", Ref("IntegerSegment"), optional=True
+                                "ACCESSRANK",
+                                Ref("IntegerSegment"),
+                                optional=True,
                             ),
                         ),
                     ),
@@ -902,7 +919,9 @@ class CreateTableAsStatementSegment(BaseSegment):
                     Sequence(
                         Ref("ColumnReferenceSegment"),
                         Ref("ColumnEncodingSegment", optional=True),
-                        Sequence("ACCESSRANK", Ref("IntegerSegment"), optional=True),
+                        Sequence(
+                            "ACCESSRANK", Ref("IntegerSegment"), optional=True
+                        ),
                         # TODO: need to add GROUPED clause
                         # https://docs.vertica.com/latest/en/sql-reference/statements/
                         # create-statements/create-projection/grouped-clause/
@@ -918,12 +937,19 @@ class CreateTableAsStatementSegment(BaseSegment):
         # working-with-native-tables/creating-table-from-other-tables/creating-table-from-query/
         Sequence(
             "AT",
-            OneOf("LATEST", Ref("NumericLiteralSegment"), Ref("DatetimeUnitSegment")),
+            OneOf(
+                "LATEST",
+                Ref("NumericLiteralSegment"),
+                Ref("DatetimeUnitSegment"),
+            ),
             optional=True,
         ),
         Ref(
             "SelectableGrammar",
-            terminators=[Ref("SegmentedByClauseSegment"), Ref("OrderByClauseSegment")],
+            terminators=[
+                Ref("SegmentedByClauseSegment"),
+                Ref("OrderByClauseSegment"),
+            ],
         ),
         Ref("OrderByClauseSegment", optional=True),
         Ref("SegmentedByClauseSegment", optional=True),
@@ -964,22 +990,30 @@ class CopyOptionsForColumnsSegment(BaseSegment):
     match_grammar = Sequence(
         AnySetOf(
             Sequence(
-                "DELIMITER", Sequence("AS", optional=True), Ref("QuotedLiteralSegment")
+                "DELIMITER",
+                Sequence("AS", optional=True),
+                Ref("QuotedLiteralSegment"),
             ),
             Sequence(
-                "ENCLOSED", Sequence("BY", optional=True), Ref("QuotedLiteralSegment")
+                "ENCLOSED",
+                Sequence("BY", optional=True),
+                Ref("QuotedLiteralSegment"),
             ),
             "ENFORCELENGTH",
             OneOf(
                 Sequence(
-                    "ESCAPE", Sequence("AS", optional=True), Ref("QuotedLiteralSegment")
+                    "ESCAPE",
+                    Sequence("AS", optional=True),
+                    Ref("QuotedLiteralSegment"),
                 ),
                 Sequence("NO", "ESCAPE"),
             ),
             Sequence("FILLER", Ref("DatatypeSegment")),
             Sequence("FORMAT", Ref("QuotedLiteralSegment")),
             Sequence(
-                "NULL", Sequence("AS", optional=True), Ref("QuotedLiteralSegment")
+                "NULL",
+                Sequence("AS", optional=True),
+                Ref("QuotedLiteralSegment"),
             ),
             Sequence("TRIM", Ref("QuotedLiteralSegment")),
         ),
@@ -1050,7 +1084,9 @@ class CreateExternalTableSegment(BaseSegment):
                             Ref("ColumnConstraintSegment"),
                             Ref("ColumnEncodingSegment"),
                             Sequence(
-                                "ACCESSRANK", Ref("IntegerSegment"), optional=True
+                                "ACCESSRANK",
+                                Ref("IntegerSegment"),
+                                optional=True,
                             ),
                         ),
                     ),
@@ -1086,7 +1122,13 @@ class CreateExternalTableSegment(BaseSegment):
         ),
         "FROM",
         Ref("QuotedLiteralSegment"),
-        OneOf("NATIVE", Sequence("NATIVE", "VARCHAR"), "ORC", "PARQUET", optional=True),
+        OneOf(
+            "NATIVE",
+            Sequence("NATIVE", "VARCHAR"),
+            "ORC",
+            "PARQUET",
+            optional=True,
+        ),
         Ref("CopyOptionsSegment", optional=True),
     )
 
@@ -1136,7 +1178,9 @@ class CreateProjectionStatementSegment(BaseSegment):
                 Sequence(
                     Ref("ColumnReferenceSegment"),
                     Ref("ColumnEncodingSegment", optional=True),
-                    Sequence("ACCESSRANK", Ref("IntegerSegment"), optional=True),
+                    Sequence(
+                        "ACCESSRANK", Ref("IntegerSegment"), optional=True
+                    ),
                     # TODO: need to add GROUPED clause
                     # https://docs.vertica.com/latest/en/sql-reference/statements/
                     # create-statements/create-projection/grouped-clause/
@@ -1294,7 +1338,8 @@ class AlterTableActionSegment(BaseSegment):
             "SET",
             OneOf(
                 Sequence(
-                    "ActivePartitionCount", OneOf(Ref("IntegerSegment"), "DEFAULT")
+                    "ActivePartitionCount",
+                    OneOf(Ref("IntegerSegment"), "DEFAULT"),
                 ),
                 Sequence("IMMUTABLE", "ROWS"),
                 Sequence("MERGEOUT", OneOf("1", "2")),
@@ -1344,12 +1389,17 @@ class AlterDefaultPrivilegesGrantSegment(BaseSegment):
         OneOf(
             Delimited(
                 Sequence(
-                    Ref.keyword("TABLE", optional=True), Ref("TableReferenceSegment")
+                    Ref.keyword("TABLE", optional=True),
+                    Ref("TableReferenceSegment"),
                 )
             ),
             Delimited(
                 Sequence(
-                    "ALL", "TABLES", "IN", "SCHEMA", Ref("SchemaReferenceSegment")
+                    "ALL",
+                    "TABLES",
+                    "IN",
+                    "SCHEMA",
+                    Ref("SchemaReferenceSegment"),
                 ),
             ),
             terminators=["WITH"],
@@ -1517,21 +1567,26 @@ class SetStatementSegment(BaseSegment):
                 "TIME",
                 "ZONE",
                 Ref.keyword("TO", optional=True),
-                OneOf(Ref("ParameterNameSegment"), Ref("QuotedLiteralSegment")),
+                OneOf(
+                    Ref("ParameterNameSegment"), Ref("QuotedLiteralSegment")
+                ),
             ),
             Sequence(
                 Ref.keyword("SESSION", optional=True),
                 "RESOURCE_POOL",
                 Ref("EqualsSegment"),
                 OneOf(
-                    Ref("QuotedLiteralSegment"), Ref("ParameterNameSegment"), "DEFAULT"
+                    Ref("QuotedLiteralSegment"),
+                    Ref("ParameterNameSegment"),
+                    "DEFAULT",
                 ),
             ),
             Sequence(
                 "SESSION",
                 OneOf(
                     Sequence(
-                        "AUTHORIZATION", OneOf(Ref("ParameterNameSegment"), "DEFAULT")
+                        "AUTHORIZATION",
+                        OneOf(Ref("ParameterNameSegment"), "DEFAULT"),
                     ),
                     Sequence("AUTOCOMMIT", "TO", OneOf("ON", "OFF")),
                     Sequence(
@@ -1541,7 +1596,9 @@ class SetStatementSegment(BaseSegment):
                         Ref("ParameterNameSegment"),
                     ),
                     Sequence(
-                        OneOf("GRACEPERIOD", "IDLESESSIONTIMEOUT", "RUNTIMECAP"),
+                        OneOf(
+                            "GRACEPERIOD", "IDLESESSIONTIMEOUT", "RUNTIMECAP"
+                        ),
                         OneOf(
                             "NONE",
                             Sequence(Ref("EqualsSegment"), "DEFAULT"),
@@ -1556,7 +1613,9 @@ class SetStatementSegment(BaseSegment):
                             Ref("QuotedLiteralSegment"),
                         ),
                     ),
-                    Sequence("MULTIPLEACTIVERESULTSETS", "TO", OneOf("ON", "OFF")),
+                    Sequence(
+                        "MULTIPLEACTIVERESULTSETS", "TO", OneOf("ON", "OFF")
+                    ),
                     Sequence(
                         "WORKLOAD",
                         Ref.keyword("TO", optional=True),
@@ -1605,7 +1664,9 @@ class CommentOnStatementSegment(BaseSegment):
                     OneOf("AGGREGATE", "ANALYTIC", "TRANSFORM", optional=True),
                     "FUNCTION",
                     Ref("FunctionNameSegment"),
-                    Sequence(Ref("FunctionParameterListGrammar"), optional=True),
+                    Sequence(
+                        Ref("FunctionParameterListGrammar"), optional=True
+                    ),
                 ),
                 Sequence(
                     "SCHEMA",
@@ -1715,7 +1776,8 @@ class DatatypeSegment(ansi.DatatypeSegment):
                 # TODO: need to add an opportunity to specify size of array
                 AnyNumberOf(
                     Bracketed(
-                        Ref("ExpressionSegment", optional=True), bracket_type="square"
+                        Ref("ExpressionSegment", optional=True),
+                        bracket_type="square",
                     )
                 ),
                 Ref("ArrayTypeSegment"),
@@ -1856,11 +1918,19 @@ class CopyStatementSegment(BaseSegment):
             Sequence(
                 "VERTICA",
                 Ref("TableReferenceSegment"),
-                Bracketed(Delimited(Ref("ColumnReferenceSegment")), optional=True),
+                Bracketed(
+                    Delimited(Ref("ColumnReferenceSegment")), optional=True
+                ),
             ),
             Sequence(Delimited(Ref("QuotedLiteralSegment"))),
         ),
-        OneOf("NATIVE", Sequence("NATIVE", "VARCHAR"), "ORC", "PARQUET", optional=True),
+        OneOf(
+            "NATIVE",
+            Sequence("NATIVE", "VARCHAR"),
+            "ORC",
+            "PARQUET",
+            optional=True,
+        ),
         Ref("CopyOptionsSegment", optional=True),
     )
 
@@ -1907,7 +1977,9 @@ class WithinGroupClauseSegment(BaseSegment):
 
     type = "within_group_clause_statement"
 
-    match_grammar = Sequence("WITHIN", "GROUP", Bracketed(Ref("OrderByClauseSegment")))
+    match_grammar = Sequence(
+        "WITHIN", "GROUP", Bracketed(Ref("OrderByClauseSegment"))
+    )
 
 
 class TimeseriesClauseSegment(BaseSegment):
@@ -2035,7 +2107,8 @@ class FrameClauseSegment(ansi.FrameClauseSegment):
                         # for the interval representation.
                         Ref.keyword("INTERVAL", optional=True),
                         OneOf(
-                            Ref("IntervalLiteralGrammar"), Ref("QuotedLiteralSegment")
+                            Ref("IntervalLiteralGrammar"),
+                            Ref("QuotedLiteralSegment"),
                         ),
                         Ref("DatetimeUnitSegment", optional=True),
                     ),
@@ -2048,7 +2121,10 @@ class FrameClauseSegment(ansi.FrameClauseSegment):
 
     match_grammar: Matchable = Sequence(
         Ref("FrameClauseUnitGrammar"),
-        OneOf(_frame_extent, Sequence("BETWEEN", _frame_extent, "AND", _frame_extent)),
+        OneOf(
+            _frame_extent,
+            Sequence("BETWEEN", _frame_extent, "AND", _frame_extent),
+        ),
     )
 
 
@@ -2113,9 +2189,15 @@ class AliasExpressionSegment(ansi.AliasExpressionSegment):
                 Sequence(
                     Ref("SingleIdentifierGrammar"),
                     # Column alias in VALUES clause
-                    Bracketed(Ref("SingleIdentifierListSegment"), optional=True),
+                    Bracketed(
+                        Ref("SingleIdentifierListSegment"), optional=True
+                    ),
                 ),
-                Sequence(Bracketed(Ref("SingleIdentifierListSegment"), optional=True)),
+                Sequence(
+                    Bracketed(
+                        Ref("SingleIdentifierListSegment"), optional=True
+                    )
+                ),
                 Ref("SingleQuotedIdentifierSegment"),
             ),
         ),

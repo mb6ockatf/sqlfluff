@@ -2,7 +2,12 @@
 
 from typing import List, NamedTuple, Optional, Sequence, cast
 
-from sqlfluff.core.parser import BaseSegment, NewlineSegment, RawSegment, SymbolSegment
+from sqlfluff.core.parser import (
+    BaseSegment,
+    NewlineSegment,
+    RawSegment,
+    SymbolSegment,
+)
 from sqlfluff.core.rules import BaseRule, LintFix, LintResult, RuleContext
 from sqlfluff.core.rules.crawlers import RootOnlyCrawler
 from sqlfluff.utils.functional import Segments, sp
@@ -87,7 +92,9 @@ class Rule_CV06(BaseRule):
         # before_segment accordingly.
         if same_line_comment:
             anchor_segment = same_line_comment
-            before_segment = before_segment[: before_segment.index(same_line_comment)]
+            before_segment = before_segment[
+                : before_segment.index(same_line_comment)
+            ]
 
         return before_segment, anchor_segment
 
@@ -152,7 +159,9 @@ class Rule_CV06(BaseRule):
         # We're selecting from the raw stack, so we know that before_code is
         # made of RawSegment elements.
         anchor_segment = (
-            cast(RawSegment, before_code[-1]) if before_code else target_segment
+            cast(RawSegment, before_code[-1])
+            if before_code
+            else target_segment
         )
         first_code = reversed_raw_stack.select(
             sp.is_code(), start_seg=target_segment
@@ -167,7 +176,9 @@ class Rule_CV06(BaseRule):
         # We can tidy up any whitespace between the segment
         # and the preceding code/comment segment.
         # Don't mess with comment spacing/placement.
-        whitespace_deletions = before_segment.select(loop_while=sp.is_whitespace())
+        whitespace_deletions = before_segment.select(
+            loop_while=sp.is_whitespace()
+        )
         return SegmentMoveContext(
             anchor_segment, is_one_line, before_segment, whitespace_deletions
         )
@@ -176,7 +187,9 @@ class Rule_CV06(BaseRule):
         self, target_segment: RawSegment, parent_segment: BaseSegment
     ) -> Optional[LintResult]:
         info = self._get_segment_move_context(target_segment, parent_segment)
-        semicolon_newline = self.multiline_newline if not info.is_one_line else False
+        semicolon_newline = (
+            self.multiline_newline if not info.is_one_line else False
+        )
         self.logger.debug("Semicolon Newline: %s", semicolon_newline)
 
         # Semi-colon on same line.
@@ -186,7 +199,9 @@ class Rule_CV06(BaseRule):
             )
         # Semi-colon on new line.
         else:
-            return self._handle_semicolon_newline(target_segment, parent_segment, info)
+            return self._handle_semicolon_newline(
+                target_segment, parent_segment, info
+            )
 
     def _handle_semicolon_same_line(
         self,
@@ -223,8 +238,10 @@ class Rule_CV06(BaseRule):
         # Adjust before_segment and anchor_segment for preceding inline
         # comments. Inline comments can contain noqa logic so we need to add the
         # newline after the inline comment.
-        (before_segment, anchor_segment) = self._handle_preceding_inline_comments(
-            info.before_segment, info.anchor_segment
+        (before_segment, anchor_segment) = (
+            self._handle_preceding_inline_comments(
+                info.before_segment, info.anchor_segment
+            )
         )
 
         if (len(before_segment) == 1) and all(
@@ -317,7 +334,9 @@ class Rule_CV06(BaseRule):
             if segment.is_type("statement_terminator"):
                 semi_colon_exist_flag = True
             elif segment.is_code:
-                is_one_line = self._is_one_line_statement(parent_segment, segment)
+                is_one_line = self._is_one_line_statement(
+                    parent_segment, segment
+                )
                 break
             elif not segment.is_meta:
                 before_segment.append(segment)
@@ -327,7 +346,9 @@ class Rule_CV06(BaseRule):
         self.logger.debug("Trigger on: %s", trigger_segment)
         self.logger.debug("Anchoring on: %s", anchor_segment)
 
-        semicolon_newline = self.multiline_newline if not is_one_line else False
+        semicolon_newline = (
+            self.multiline_newline if not is_one_line else False
+        )
 
         if not semi_colon_exist_flag:
             # Create the final semi-colon if it does not yet exist.
@@ -343,7 +364,9 @@ class Rule_CV06(BaseRule):
                             filter_meta=True,
                         ),
                         [
-                            SymbolSegment(raw=";", type="statement_terminator"),
+                            SymbolSegment(
+                                raw=";", type="statement_terminator"
+                            ),
                         ],
                     )
                 ]
@@ -368,7 +391,9 @@ class Rule_CV06(BaseRule):
                         ),
                         [
                             NewlineSegment(),
-                            SymbolSegment(raw=";", type="statement_terminator"),
+                            SymbolSegment(
+                                raw=";", type="statement_terminator"
+                            ),
                         ],
                     )
                 ]

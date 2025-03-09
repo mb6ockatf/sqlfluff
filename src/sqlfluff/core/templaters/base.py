@@ -72,7 +72,11 @@ def large_file_check(func: Callable[..., T]) -> Callable[..., T]:
                     "value, or disable by setting it to zero."
                 )
         return func(
-            self, in_str=in_str, fname=fname, config=config, formatter=formatter
+            self,
+            in_str=in_str,
+            fname=fname,
+            config=config,
+            formatter=formatter,
         )
 
     return _wrapped
@@ -109,7 +113,12 @@ class RawFileSlice(NamedTuple):
         to an empty string.
         """
         # TODO: should any new logic go here?
-        return self.slice_type in ("comment", "block_end", "block_start", "block_mid")
+        return self.slice_type in (
+            "comment",
+            "block_end",
+            "block_start",
+            "block_mid",
+        )
 
 
 class TemplatedFileSlice(NamedTuple):
@@ -166,19 +175,25 @@ class TemplatedFile:
         """
         self.source_str = source_str
         # An empty string is still allowed as the templated string.
-        self.templated_str = source_str if templated_str is None else templated_str
+        self.templated_str = (
+            source_str if templated_str is None else templated_str
+        )
         # If no fname, we assume this is from a string or stdin.
         self.fname = fname
         # Assume that no sliced_file, means the file is not templated
         self.sliced_file: List[TemplatedFileSlice]
         if sliced_file is None:
             if self.templated_str != self.source_str:  # pragma: no cover
-                raise ValueError("Cannot instantiate a templated file unsliced!")
+                raise ValueError(
+                    "Cannot instantiate a templated file unsliced!"
+                )
             # If we get here and we don't have sliced files,
             # then it's raw, so create them.
             self.sliced_file = [
                 TemplatedFileSlice(
-                    "literal", slice(0, len(source_str)), slice(0, len(source_str))
+                    "literal",
+                    slice(0, len(source_str)),
+                    slice(0, len(source_str)),
                 )
             ]
             assert (
@@ -189,12 +204,16 @@ class TemplatedFile:
             ]
         else:
             self.sliced_file = sliced_file
-            assert raw_sliced is not None, "Templated file was sliced, but not raw."
+            assert (
+                raw_sliced is not None
+            ), "Templated file was sliced, but not raw."
             self.raw_sliced = raw_sliced
 
         # Precalculate newlines, character positions.
         self._source_newlines = list(iter_indices_of_newlines(self.source_str))
-        self._templated_newlines = list(iter_indices_of_newlines(self.templated_str))
+        self._templated_newlines = list(
+            iter_indices_of_newlines(self.templated_str)
+        )
 
         # Consistency check raw string and slices.
         pos = 0
@@ -215,7 +234,10 @@ class TemplatedFile:
         tfs: Optional[TemplatedFileSlice] = None
         for tfs in self.sliced_file:
             if previous_slice:
-                if tfs.templated_slice.start != previous_slice.templated_slice.stop:
+                if (
+                    tfs.templated_slice.start
+                    != previous_slice.templated_slice.stop
+                ):
                     raise SQLFluffSkipFile(  # pragma: no cover
                         "Templated slices found to be non-contiguous. "
                         f"{tfs.templated_slice} (starting"
@@ -319,14 +341,17 @@ class TemplatedFile:
         """Return a list of the raw slices spanning a set of indices."""
         # Special case: The source_slice is at the end of the file.
         last_raw_slice = self.raw_sliced[-1]
-        if source_slice.start >= last_raw_slice.source_idx + len(last_raw_slice.raw):
+        if source_slice.start >= last_raw_slice.source_idx + len(
+            last_raw_slice.raw
+        ):
             return []
         # First find the start index
         raw_slice_idx = 0
         # Move the raw pointer forward to the start of this patch
         while (
             raw_slice_idx + 1 < len(self.raw_sliced)
-            and self.raw_sliced[raw_slice_idx + 1].source_idx <= source_slice.start
+            and self.raw_sliced[raw_slice_idx + 1].source_idx
+            <= source_slice.start
         ):
             raw_slice_idx += 1
         # Find slice index of the end of this patch.
@@ -348,11 +373,13 @@ class TemplatedFile:
         if not self.sliced_file:
             return template_slice  # pragma: no cover TODO?
 
-        ts_start_sf_start, ts_start_sf_stop = self._find_slice_indices_of_templated_pos(
-            template_slice.start
+        ts_start_sf_start, ts_start_sf_stop = (
+            self._find_slice_indices_of_templated_pos(template_slice.start)
         )
 
-        ts_start_subsliced_file = self.sliced_file[ts_start_sf_start:ts_start_sf_stop]
+        ts_start_subsliced_file = self.sliced_file[
+            ts_start_sf_start:ts_start_sf_stop
+        ]
 
         # Work out the insertion point
         insertion_point = -1
@@ -378,7 +405,10 @@ class TemplatedFile:
                     ts_start_subsliced_file
                     and ts_start_subsliced_file[0][0] == "literal"
                 ):
-                    offset = template_slice.start - ts_start_subsliced_file[0][2].start
+                    offset = (
+                        template_slice.start
+                        - ts_start_subsliced_file[0][2].start
+                    )
                     return zero_slice(
                         ts_start_subsliced_file[0][1].start + offset,
                     )
@@ -391,8 +421,10 @@ class TemplatedFile:
         # Otherwise it's a slice with length.
 
         # Use a non inclusive match to get the end point.
-        ts_stop_sf_start, ts_stop_sf_stop = self._find_slice_indices_of_templated_pos(
-            template_slice.stop, inclusive=False
+        ts_stop_sf_start, ts_stop_sf_stop = (
+            self._find_slice_indices_of_templated_pos(
+                template_slice.stop, inclusive=False
+            )
         )
 
         # Update starting position based on insertion point:
@@ -412,7 +444,9 @@ class TemplatedFile:
         if ts_start_sf_start == ts_start_sf_stop:
             if ts_start_sf_start > len(self.sliced_file):  # pragma: no cover
                 # We should never get here
-                raise ValueError("Starting position higher than sliced file position")
+                raise ValueError(
+                    "Starting position higher than sliced file position"
+                )
             if ts_start_sf_start < len(self.sliced_file):  # pragma: no cover
                 return self.sliced_file[1].source_slice
             else:
@@ -493,7 +527,9 @@ class TemplatedFile:
                 ret_buff.append(elem)
         return ret_buff
 
-    def source_position_dict_from_slice(self, source_slice: slice) -> Dict[str, int]:
+    def source_position_dict_from_slice(
+        self, source_slice: slice
+    ) -> Dict[str, int]:
         """Create a source position dict from a slice."""
         start = self.get_line_pos_of_char_pos(source_slice.start, source=True)
         stop = self.get_line_pos_of_char_pos(source_slice.stop, source=True)
@@ -637,7 +673,8 @@ class RawTemplater:
             # This is now a nested section
             loaded_context = (
                 config.get_section(
-                    (self.templater_selector, self.name) + self.config_subsection
+                    (self.templater_selector, self.name)
+                    + self.config_subsection
                 )
                 or {}
             )

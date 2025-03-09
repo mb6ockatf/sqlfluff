@@ -27,17 +27,25 @@ def parse_ansi_string(sql, config):
         ("select 1\n+2", "select 1\n+2"),
         ("select 1+\n2", "select 1\n+ 2"),  # NOTE: Implicit respace.
         ("select\n  1 +\n  2", "select\n  1\n  + 2"),
-        ("select\n  1 +\n  -- comment\n  2", "select\n  1\n  -- comment\n  + 2"),
+        (
+            "select\n  1 +\n  -- comment\n  2",
+            "select\n  1\n  -- comment\n  + 2",
+        ),
         # These rely on the default config being for trailing commas
         ("select a,b", "select a,b"),
         ("select a\n,b", "select a,\nb"),
         ("select\n  a\n  , b", "select\n  a,\n  b"),
         ("select\n    a\n    , b", "select\n    a,\n    b"),
         ("select\n  a\n    , b", "select\n  a,\n    b"),
-        ("select\n  a\n  -- comment\n  , b", "select\n  a,\n  -- comment\n  b"),
+        (
+            "select\n  a\n  -- comment\n  , b",
+            "select\n  a,\n  -- comment\n  b",
+        ),
     ],
 )
-def test_reflow__sequence_rebreak_root(raw_sql_in, raw_sql_out, default_config, caplog):
+def test_reflow__sequence_rebreak_root(
+    raw_sql_in, raw_sql_out, default_config, caplog
+):
     """Test the ReflowSequence.rebreak() method directly.
 
     Focused around a whole segment.
@@ -80,7 +88,9 @@ def test_reflow__sequence_rebreak_target(
     print(root.stringify())
     target = root.raw_segments[target_idx]
     print("Target: ", target)
-    seq = ReflowSequence.from_around_target(target, root, config=default_config)
+    seq = ReflowSequence.from_around_target(
+        target, root, config=default_config
+    )
     for idx, elem in enumerate(seq.elements):
         print(idx, elem)
     assert seq.get_raw() == seq_sql_in

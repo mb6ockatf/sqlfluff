@@ -197,7 +197,11 @@ def test__linted_file__build_up_fixed_source_string(
     ],
 )
 def test__linted_file__slice_source_file_using_patches(
-    source_patches, source_only_slices, raw_source_string, expected_result, caplog
+    source_patches,
+    source_only_slices,
+    raw_source_string,
+    expected_result,
+    caplog,
 ):
     """Test _slice_source_file_using_patches.
 

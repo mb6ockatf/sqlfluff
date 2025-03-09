@@ -48,7 +48,9 @@ databricks_dialect.sets("unreserved_keywords").update(UNRESERVED_KEYWORDS)
 databricks_dialect.sets("unreserved_keywords").update(
     sparksql_dialect.sets("reserved_keywords")
 )
-databricks_dialect.sets("unreserved_keywords").difference_update(RESERVED_KEYWORDS)
+databricks_dialect.sets("unreserved_keywords").difference_update(
+    RESERVED_KEYWORDS
+)
 databricks_dialect.sets("reserved_keywords").clear()
 databricks_dialect.sets("reserved_keywords").update(RESERVED_KEYWORDS)
 
@@ -69,7 +71,9 @@ databricks_dialect.insert_lexer_matchers(
     # Notebook Cell Delimiter:
     # https://learn.microsoft.com/en-us/azure/databricks/notebooks/notebook-export-import#sql-1
     [
-        RegexLexer("command", r"(\r?\n){2}-- COMMAND ----------(\r?\n)", CodeSegment),
+        RegexLexer(
+            "command", r"(\r?\n){2}-- COMMAND ----------(\r?\n)", CodeSegment
+        ),
     ],
     before="newline",
 )
@@ -81,17 +85,23 @@ databricks_dialect.insert_lexer_matchers(
     # https://learn.microsoft.com/en-us/azure/databricks/notebooks/notebooks-code#language-magic
     [
         RegexLexer(
-            "notebook_start", r"-- Databricks notebook source(\r?\n){1}", CommentSegment
+            "notebook_start",
+            r"-- Databricks notebook source(\r?\n){1}",
+            CommentSegment,
         ),
         RegexLexer("magic_line", r"(-- MAGIC)( [^%]{1})([^\n]*)", CodeSegment),
-        RegexLexer("magic_start", r"(-- MAGIC %)([^\n]{2,})(\r?\n)", CodeSegment),
+        RegexLexer(
+            "magic_start", r"(-- MAGIC %)([^\n]{2,})(\r?\n)", CodeSegment
+        ),
     ],
     before="inline_comment",
 )
 
 
 databricks_dialect.add(
-    CommandCellSegment=TypedParser("command", CodeSegment, type="statement_terminator"),
+    CommandCellSegment=TypedParser(
+        "command", CodeSegment, type="statement_terminator"
+    ),
     DoubleQuotedUDFBody=TypedParser(
         "double_quote",
         CodeSegment,
@@ -235,9 +245,13 @@ databricks_dialect.add(
             optional=True,
         ),
     ),
-    NotebookStart=TypedParser("notebook_start", CommentSegment, type="notebook_start"),
+    NotebookStart=TypedParser(
+        "notebook_start", CommentSegment, type="notebook_start"
+    ),
     MagicLineGrammar=TypedParser("magic_line", CodeSegment, type="magic_line"),
-    MagicStartGrammar=TypedParser("magic_start", CodeSegment, type="magic_start"),
+    MagicStartGrammar=TypedParser(
+        "magic_start", CodeSegment, type="magic_start"
+    ),
     VariableNameIdentifierSegment=OneOf(
         Ref("NakedIdentifierSegment"),
         Ref("BackQuotedIdentifierSegment"),
@@ -247,7 +261,9 @@ databricks_dialect.add(
 databricks_dialect.replace(
     DelimiterGrammar=OneOf(Ref("SemicolonSegment"), Ref("CommandCellSegment")),
     # https://docs.databricks.com/en/sql/language-manual/sql-ref-syntax-aux-describe-volume.html
-    DescribeObjectGrammar=sparksql_dialect.get_grammar("DescribeObjectGrammar").copy(
+    DescribeObjectGrammar=sparksql_dialect.get_grammar(
+        "DescribeObjectGrammar"
+    ).copy(
         insert=[
             Sequence(
                 "VOLUME",
@@ -1025,7 +1041,11 @@ class SetTimeZoneStatementSegment(BaseSegment):
         "SET",
         "TIME",
         "ZONE",
-        OneOf("LOCAL", Ref("QuotedLiteralSegment"), Ref("IntervalExpressionSegment")),
+        OneOf(
+            "LOCAL",
+            Ref("QuotedLiteralSegment"),
+            Ref("IntervalExpressionSegment"),
+        ),
     )
 
 
@@ -1115,7 +1135,10 @@ class FunctionDefinitionGrammar(ansi.FunctionDefinitionGrammar):
             ),
             Ref("CommentClauseSegment", optional=True),
             Sequence(
-                OneOf(Sequence("CONTAINS", "SQL"), Sequence("READS", "SQL", "DATA")),
+                OneOf(
+                    Sequence("CONTAINS", "SQL"),
+                    Sequence("READS", "SQL", "DATA"),
+                ),
                 optional=True,
             ),
             Sequence(
@@ -1429,7 +1452,9 @@ class TableClausesSegment(BaseSegment):
     )
 
 
-class GeneratedColumnDefinitionSegment(sparksql.GeneratedColumnDefinitionSegment):
+class GeneratedColumnDefinitionSegment(
+    sparksql.GeneratedColumnDefinitionSegment
+):
     """A generated column definition, e.g. for CREATE TABLE or ALTER TABLE.
 
     https://docs.databricks.com/en/sql/language-manual/sql-ref-syntax-ddl-create-table-using.html
@@ -1561,7 +1586,10 @@ class FunctionNameSegment(BaseSegment):
             terminators=[Ref("BracketedSegment")],
         ),
         # Base function name
-        Ref("FunctionNameIdentifierSegment", terminators=[Ref("BracketedSegment")]),
+        Ref(
+            "FunctionNameIdentifierSegment",
+            terminators=[Ref("BracketedSegment")],
+        ),
         allow_gaps=False,
     )
 

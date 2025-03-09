@@ -112,7 +112,9 @@ class Rule_AL07(BaseRule):
         assert context.segment.is_type("select_statement")
 
         children = FunctionalContext(context).segment.children()
-        from_clause_segment = children.select(sp.is_type("from_clause")).first()
+        from_clause_segment = children.select(
+            sp.is_type("from_clause")
+        ).first()
         base_table = (
             from_clause_segment.children(sp.is_type("from_expression"))
             .first()
@@ -186,14 +188,20 @@ class Rule_AL07(BaseRule):
             )
 
     def _lint_aliases_in_join(
-        self, base_table, from_expression_elements, column_reference_segments, segment
+        self,
+        base_table,
+        from_expression_elements,
+        column_reference_segments,
+        segment,
     ) -> Optional[List[LintResult]]:
         """Lint and fix all aliases in joins - except for self-joins."""
         # A buffer to keep any violations.
         violation_buff = []
 
         to_check = list(
-            self._filter_table_expressions(base_table, from_expression_elements)
+            self._filter_table_expressions(
+                base_table, from_expression_elements
+            )
         )
 
         # How many times does each table appear in the FROM clause?
@@ -204,7 +212,9 @@ class Rule_AL07(BaseRule):
         table_aliases = defaultdict(set)
         for ai in to_check:
             if ai and ai.table_ref and ai.alias_identifier_ref:
-                table_aliases[ai.table_ref.raw].add(ai.alias_identifier_ref.raw)
+                table_aliases[ai.table_ref.raw].add(
+                    ai.alias_identifier_ref.raw
+                )
 
         # For each aliased table, check whether to keep or remove it.
         for alias_info in to_check:
@@ -260,7 +270,9 @@ class Rule_AL07(BaseRule):
                     for part in identifier_parts:
                         if edits:
                             edits.append(SymbolSegment(".", type="dot"))
-                        edits.append(IdentifierSegment(part, type="naked_identifier"))
+                        edits.append(
+                            IdentifierSegment(part, type="naked_identifier")
+                        )
 
                     fixes.append(
                         LintFix.replace(

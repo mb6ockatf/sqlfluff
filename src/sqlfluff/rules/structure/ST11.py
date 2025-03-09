@@ -140,7 +140,9 @@ class Rule_ST11(BaseRule):
             for from_expression_elem in from_expression.get_children(
                 "from_expression_element"
             ):
-                ref = self._extract_references_from_expression(from_expression_elem)
+                ref = self._extract_references_from_expression(
+                    from_expression_elem
+                )
                 if ref:
                     joined_tables.append((ref, from_expression_elem))
                 if len(joined_tables) > 1:
@@ -154,16 +156,21 @@ class Rule_ST11(BaseRule):
                 # configured. For example, INNER joins are often used as filters
                 # without being referenced.
                 join_keywords = set(
-                    keyword.raw_upper for keyword in join_clause.get_children("keyword")
+                    keyword.raw_upper
+                    for keyword in join_clause.get_children("keyword")
                 )
                 _this_clause_refs = []
                 for from_expression_elem in join_clause.get_children(
                     "from_expression_element"
                 ):
-                    ref = self._extract_references_from_expression(from_expression_elem)
+                    ref = self._extract_references_from_expression(
+                        from_expression_elem
+                    )
                     # Only mark it as a possible issue if it's an explicit LEFT, RIGHT
                     # or FULL join.
-                    if ref and join_keywords.intersection({"FULL", "LEFT", "RIGHT"}):
+                    if ref and join_keywords.intersection(
+                        {"FULL", "LEFT", "RIGHT"}
+                    ):
                         joined_tables.append((ref, from_expression_elem))
                         _this_clause_refs.append(ref)
                     # If we have functions in the table_expression, we referenced them,
@@ -175,7 +182,9 @@ class Rule_ST11(BaseRule):
                             referenced_tables.append(tbl_ref)
 
                 # Look for any references in the ON clause to other tables.
-                for join_on_condition in join_clause.get_children("join_on_condition"):
+                for join_on_condition in join_clause.get_children(
+                    "join_on_condition"
+                ):
                     # We can tolerate some unqualified references here, so no need
                     # to raise exceptions.
                     for tbl_ref in self._extract_referenced_tables(
@@ -199,7 +208,9 @@ class Rule_ST11(BaseRule):
         # If a table is referenced elsewhere in the join, we shouldn't consider
         # it as a potential issue later. So purge them from the list now.
         return [
-            (ref, seg) for (ref, seg) in joined_tables if ref not in referenced_tables
+            (ref, seg)
+            for (ref, seg) in joined_tables
+            if ref not in referenced_tables
         ]
 
     def _eval(self, context: RuleContext) -> List[LintResult]:
@@ -232,12 +243,16 @@ class Rule_ST11(BaseRule):
         # aren't otherwise referred to in the FROM clause. Now we work
         # through all the other clauses.
         table_references = set()
-        for other_clause in context.segment.get_children(*reference_clause_types):
+        for other_clause in context.segment.get_children(
+            *reference_clause_types
+        ):
             try:
                 for tbl_ref in self._extract_referenced_tables(
                     other_clause, allow_unqualified=False
                 ):
-                    self.logger.debug(f"    {tbl_ref!r} referenced in {other_clause}")
+                    self.logger.debug(
+                        f"    {tbl_ref!r} referenced in {other_clause}"
+                    )
                     table_references.add(tbl_ref)
             except UnqualifiedReferenceError as err:
                 self.logger.debug(

@@ -54,7 +54,9 @@ class Rule_CP01(BaseRule):
 
     lint_phase = "post"
     # Binary operators behave like keywords too.
-    crawl_behaviour = SegmentSeekerCrawler({"keyword", "binary_operator", "date_part"})
+    crawl_behaviour = SegmentSeekerCrawler(
+        {"keyword", "binary_operator", "date_part"}
+    )
     # Skip literals (which are also keywords) as they have their own rule (CP04)
     _exclude_types: Tuple[str, ...] = ("literal",)
     _exclude_parent_types: Tuple[str, ...] = (
@@ -62,7 +64,11 @@ class Rule_CP01(BaseRule):
         "datetime_type_identifier",
         "primitive_type",
     )
-    config_keywords = ["capitalisation_policy", "ignore_words", "ignore_words_regex"]
+    config_keywords = [
+        "capitalisation_policy",
+        "ignore_words",
+        "ignore_words_regex",
+    ]
     # Human readable target elem for description
     _description_elem = "Keywords"
 
@@ -90,10 +96,14 @@ class Rule_CP01(BaseRule):
 
         return [self._handle_segment(context.segment, context)]
 
-    def _handle_segment(self, segment: BaseSegment, context: RuleContext) -> LintResult:
+    def _handle_segment(
+        self, segment: BaseSegment, context: RuleContext
+    ) -> LintResult:
         # NOTE: this mutates the memory field.
         memory = context.memory
-        self.logger.info("_handle_segment: %s, %s", segment, segment.get_type())
+        self.logger.info(
+            "_handle_segment: %s, %s", segment, segment.get_type()
+        )
         # Config type hints
         self.ignore_words_regex: str
 
@@ -169,7 +179,9 @@ class Rule_CP01(BaseRule):
         # Skip if no inconsistencies, otherwise compute a concrete policy
         # to convert to.
         if cap_policy == "consistent":
-            possible_cases = [c for c in cap_policy_opts if c not in refuted_cases]
+            possible_cases = [
+                c for c in cap_policy_opts if c not in refuted_cases
+            ]
             self.logger.debug(
                 f"Possible cases after segment '{segment.raw}': {possible_cases}"
             )
@@ -217,7 +229,9 @@ class Rule_CP01(BaseRule):
             # do. We do correct underscore_words to Underscore_Words.
             fixed_raw = regex.sub(
                 "([^a-zA-Z0-9]+|^)([a-zA-Z0-9])([a-zA-Z0-9]*)",
-                lambda match: match.group(1) + match.group(2).upper() + match.group(3),
+                lambda match: match.group(1)
+                + match.group(2).upper()
+                + match.group(3),
                 segment.raw,
             )
         elif concrete_policy == "camel":
@@ -225,7 +239,9 @@ class Rule_CP01(BaseRule):
             # This presents as us never changing case mid-string.
             fixed_raw = regex.sub(
                 "([^a-zA-Z0-9]+|^)([a-zA-Z0-9])([a-zA-Z0-9]*)",
-                lambda match: match.group(1) + match.group(2).lower() + match.group(3),
+                lambda match: match.group(1)
+                + match.group(2).lower()
+                + match.group(3),
                 segment.raw,
             )
         elif concrete_policy == "snake":
@@ -249,7 +265,13 @@ class Rule_CP01(BaseRule):
             # build description based on the policy in use
             consistency = "consistently " if cap_policy == "consistent" else ""
 
-            if concrete_policy in ["upper", "lower", "pascal", "camel", "snake"]:
+            if concrete_policy in [
+                "upper",
+                "lower",
+                "pascal",
+                "camel",
+                "snake",
+            ]:
                 policy = f"{concrete_policy} case."
             elif concrete_policy == "capitalise":
                 policy = "capitalised."
@@ -277,7 +299,9 @@ class Rule_CP01(BaseRule):
     def _init_capitalisation_policy(self, context: RuleContext):
         """Called first time rule is evaluated to fetch & cache the policy."""
         cap_policy_name = next(
-            k for k in self.config_keywords if k.endswith("capitalisation_policy")
+            k
+            for k in self.config_keywords
+            if k.endswith("capitalisation_policy")
         )
         self.cap_policy = getattr(self, cap_policy_name)
         self.cap_policy_opts = [
@@ -293,7 +317,9 @@ class Rule_CP01(BaseRule):
             )
         else:
             self.ignore_words_list = []
-        self.ignore_templated_areas = context.config.get("ignore_templated_areas")
+        self.ignore_templated_areas = context.config.get(
+            "ignore_templated_areas"
+        )
         self.logger.debug(
             f"Selected '{cap_policy_name}': '{self.cap_policy}' from options "
             f"{self.cap_policy_opts}"
@@ -302,4 +328,9 @@ class Rule_CP01(BaseRule):
         cap_policy_opts = self.cap_policy_opts
         ignore_words_list = self.ignore_words_list
         ignore_templated_areas = self.ignore_templated_areas
-        return cap_policy, cap_policy_opts, ignore_words_list, ignore_templated_areas
+        return (
+            cap_policy,
+            cap_policy_opts,
+            ignore_words_list,
+            ignore_templated_areas,
+        )

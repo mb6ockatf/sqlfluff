@@ -89,7 +89,8 @@ class Rule_CV07(BaseRule):
                 *[
                     segment
                     for segment in bracketed_segment.segments
-                    if segment.get_type() not in bracket_set and not segment.is_meta
+                    if segment.get_type() not in bracket_set
+                    and not segment.is_meta
                 ]
             )
 
@@ -97,7 +98,9 @@ class Rule_CV07(BaseRule):
             # segment above. This avoids introducing a parse error (ANSI and other
             # dialects generally don't allow this at lower levels of the parse
             # tree).
-            to_lift_predicate = sp.or_(sp.is_whitespace(), sp.is_type("inline_comment"))
+            to_lift_predicate = sp.or_(
+                sp.is_whitespace(), sp.is_type("inline_comment")
+            )
             leading = filtered_children.select(loop_while=to_lift_predicate)
             self.logger.debug("Leading: %s", leading)
             trailing = (
@@ -111,8 +114,12 @@ class Rule_CV07(BaseRule):
             if lift_nodes:
                 fixes.append(LintFix.create_before(parent, list(leading)))
                 fixes.append(LintFix.create_after(parent, list(trailing)))
-                fixes.extend([LintFix.delete(segment) for segment in lift_nodes])
-                filtered_children = filtered_children[len(leading) : -len(trailing)]
+                fixes.extend(
+                    [LintFix.delete(segment) for segment in lift_nodes]
+                )
+                filtered_children = filtered_children[
+                    len(leading) : -len(trailing)
+                ]
 
             fixes.append(
                 LintFix.replace(

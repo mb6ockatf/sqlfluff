@@ -11,7 +11,11 @@ def test__rules__std_LT12_and_CV06_interaction() -> None:
     # Ensure final semicolon requirement is active.
     cfg = FluffConfig(overrides={"dialect": "ansi"})
     cfg.set_value(
-        config_path=["rules", "convention.terminator", "require_final_semicolon"],
+        config_path=[
+            "rules",
+            "convention.terminator",
+            "require_final_semicolon",
+        ],
         val=True,
     )
     linter = Linter(config=cfg)
@@ -20,7 +24,10 @@ def test__rules__std_LT12_and_CV06_interaction() -> None:
     linted_file = linter.lint_string(sql, fix=True)
 
     # Check expected lint errors are raised.
-    assert set([v.rule.code for v in linted_file.violations]) == {"LT12", "CV06"}
+    assert set([v.rule.code for v in linted_file.violations]) == {
+        "LT12",
+        "CV06",
+    }
 
     # Check file is fixed.
     assert linted_file.fix_string()[0] == "SELECT foo FROM bar;\n"

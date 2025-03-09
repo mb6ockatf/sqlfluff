@@ -53,7 +53,9 @@ class Rule_CV01(BaseRule):
         memory = context.memory
         # If style is consistent, add the style of the first occurrence to memory
         if self.preferred_not_equal_style == "consistent":
-            preferred_not_equal_style = context.memory.get("preferred_not_equal_style")
+            preferred_not_equal_style = context.memory.get(
+                "preferred_not_equal_style"
+            )
             if not preferred_not_equal_style:
                 preferred_not_equal_style = (
                     "ansi" if raw_operator_list == ["<", ">"] else "c_style"
@@ -79,11 +81,19 @@ class Rule_CV01(BaseRule):
         fixes = [
             LintFix.replace(
                 raw_comparison_operators[0],
-                [SymbolSegment(raw=replacement[0], type="raw_comparison_operator")],
+                [
+                    SymbolSegment(
+                        raw=replacement[0], type="raw_comparison_operator"
+                    )
+                ],
             ),
             LintFix.replace(
                 raw_comparison_operators[1],
-                [SymbolSegment(raw=replacement[1], type="raw_comparison_operator")],
+                [
+                    SymbolSegment(
+                        raw=replacement[1], type="raw_comparison_operator"
+                    )
+                ],
             ),
         ]
 

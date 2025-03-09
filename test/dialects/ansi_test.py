@@ -43,7 +43,10 @@ def test__dialect__ansi__file_lex(raw, res, caplog):
         ("NumericLiteralSegment", "1000.0"),
         ("ExpressionSegment", "online_sales / 1000.0"),
         ("IntervalExpressionSegment", "INTERVAL 1 YEAR"),
-        ("ExpressionSegment", "CASE WHEN id = 1 THEN 'nothing' ELSE 'test' END"),
+        (
+            "ExpressionSegment",
+            "CASE WHEN id = 1 THEN 'nothing' ELSE 'test' END",
+        ),
         # Nested Case Expressions
         # https://github.com/sqlfluff/sqlfluff/issues/172
         (
@@ -92,7 +95,10 @@ def test__dialect__ansi__file_lex(raw, res, caplog):
         # Dense math expressions
         # https://github.com/sqlfluff/sqlfluff/issues/178
         # https://github.com/sqlfluff/sqlfluff/issues/179
-        ("SelectStatementSegment", "SELECT t.val/t.id FROM test WHERE id*1.0/id > 0.8"),
+        (
+            "SelectStatementSegment",
+            "SELECT t.val/t.id FROM test WHERE id*1.0/id > 0.8",
+        ),
         ("SelectClauseElementSegment", "t.val/t.id"),
         # Issue with casting raise as part of PR #177
         ("SelectClauseElementSegment", "CAST(num AS INT64)"),
@@ -166,7 +172,10 @@ def test__dialect__ansi_specific_segment_not_match(
         # raised on the UNION.
         ("SELECT * FROM a ORDER BY 1 UNION SELECT * FROM b", [(1, 28)]),
         ("SELECT * FROM a LIMIT 1 UNION SELECT * FROM b", [(1, 25)]),
-        ("SELECT * FROM a ORDER BY 1 LIMIT 1 UNION SELECT * FROM b", [(1, 36)]),
+        (
+            "SELECT * FROM a ORDER BY 1 LIMIT 1 UNION SELECT * FROM b",
+            [(1, 36)],
+        ),
     ],
 )
 def test__dialect__ansi_specific_segment_not_parse(raw, err_locations):
@@ -182,7 +191,9 @@ def test__dialect__ansi_specific_segment_not_parse(raw, err_locations):
 def test__dialect__ansi_is_whitespace():
     """Test proper tagging with is_whitespace."""
     lnt = Linter(dialect="ansi")
-    with open("test/fixtures/dialects/ansi/select_in_multiline_comment.sql") as f:
+    with open(
+        "test/fixtures/dialects/ansi/select_in_multiline_comment.sql"
+    ) as f:
         parsed = lnt.parse_string(f.read())
     # Check all the segments that *should* be whitespace, ARE
     for raw_seg in parsed.tree.get_raw_segments():
@@ -198,7 +209,11 @@ def test__dialect__ansi_is_whitespace():
             True,
             (1, 4, 8, 11, 15, 16, 17, 18, 19),
         ),
-        ("select field_1 from my_table as alias_1", False, (1, 4, 8, 11, 15, 16, 17)),
+        (
+            "select field_1 from my_table as alias_1",
+            False,
+            (1, 4, 8, 11, 15, 16, 17),
+        ),
         (
             "select field_1 from my_table as alias_1 join foo using (field_1)",
             True,
@@ -211,7 +226,9 @@ def test__dialect__ansi_is_whitespace():
         ),
     ],
 )
-def test__dialect__ansi_parse_indented_joins(sql_string, indented_joins, meta_loc):
+def test__dialect__ansi_parse_indented_joins(
+    sql_string, indented_joins, meta_loc
+):
     """Test parsing of meta segments using Conditional works with indented_joins."""
     lnt = Linter(
         config=FluffConfig(
@@ -226,6 +243,8 @@ def test__dialect__ansi_parse_indented_joins(sql_string, indented_joins, meta_lo
     # Check all the segments that *should* be metas, ARE.
     # NOTE: This includes the end of file marker.
     res_meta_locs = tuple(
-        idx for idx, raw_seg in enumerate(tree.get_raw_segments()) if raw_seg.is_meta
+        idx
+        for idx, raw_seg in enumerate(tree.get_raw_segments())
+        if raw_seg.is_meta
     )
     assert res_meta_locs == meta_loc

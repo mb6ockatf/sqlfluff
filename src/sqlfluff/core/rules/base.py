@@ -76,7 +76,10 @@ class RuleLoggingAdapter(_LoggerAdapter):
 
     def process(self, msg: str, kwargs: Any) -> Tuple[str, Any]:
         """Add the code element to the logging message before emit."""
-        return "[{}] {}".format(self.extra["code"] if self.extra else "", msg), kwargs
+        return (
+            "[{}] {}".format(self.extra["code"] if self.extra else "", msg),
+            kwargs,
+        )
 
 
 class LintResult:
@@ -216,7 +219,9 @@ class RuleMetaclass(type):
         return class_dict
 
     @staticmethod
-    def _populate_docstring(name: str, class_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def _populate_docstring(
+        name: str, class_dict: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Enrich the docstring in the class_dict.
 
         This takes the various defined values in the BaseRule class
@@ -240,12 +245,20 @@ class RuleMetaclass(type):
             else ""
         )
         alias_docs = (
-            ("    **Aliases**: ``" + "``, ``".join(class_dict["aliases"]) + "``\n\n")
+            (
+                "    **Aliases**: ``"
+                + "``, ``".join(class_dict["aliases"])
+                + "``\n\n"
+            )
             if class_dict.get("aliases", [])
             else ""
         )
         groups_docs = (
-            ("    **Groups**: ``" + "``, ``".join(class_dict["groups"]) + "``\n\n")
+            (
+                "    **Groups**: ``"
+                + "``, ``".join(class_dict["groups"])
+                + "``\n\n"
+            )
             if class_dict.get("groups", [])
             else ""
         )
@@ -303,7 +316,9 @@ class RuleMetaclass(type):
                     )
             config_docs += "\n"
 
-        all_docs = fix_docs + name_docs + alias_docs + groups_docs + config_docs
+        all_docs = (
+            fix_docs + name_docs + alias_docs + groups_docs + config_docs
+        )
         # Modify the docstring using the search regex.
         class_dict["__doc__"] = RuleMetaclass._doc_search_regex.sub(
             f"\n\n{all_docs}\n\n\\1", class_dict["__doc__"], count=1
@@ -349,7 +364,9 @@ class RuleMetaclass(type):
         class_dict = RuleMetaclass._populate_docstring(name, class_dict)
         # Don't try and infer code and description for the base classes
         if name not in ("BaseRule",):
-            class_dict = RuleMetaclass._populate_code_and_description(name, class_dict)
+            class_dict = RuleMetaclass._populate_code_and_description(
+                name, class_dict
+            )
         # Validate rule names
         rule_name = class_dict.get("name", "")
         if rule_name:
@@ -538,7 +555,9 @@ class BaseRule(metaclass=RuleMetaclass):
                     exc_info=True,
                 )
                 assert context.segment.pos_marker
-                exception_line, _ = context.segment.pos_marker.source_position()
+                exception_line, _ = (
+                    context.segment.pos_marker.source_position()
+                )
                 self._log_critical_errors(e)
                 vs.append(
                     SQLLintError(
@@ -568,7 +587,12 @@ class BaseRule(metaclass=RuleMetaclass):
                 memory = res.memory
                 self._adjust_anchors_for_fixes(context, res)
                 self._process_lint_result(
-                    res, templated_file, ignore_mask, new_lerrs, new_fixes, tree
+                    res,
+                    templated_file,
+                    ignore_mask,
+                    new_lerrs,
+                    new_fixes,
+                    tree,
                 )
             elif isinstance(res, list) and all(
                 isinstance(elem, LintResult) for elem in res
@@ -579,7 +603,12 @@ class BaseRule(metaclass=RuleMetaclass):
                 for elem in res:
                     self._adjust_anchors_for_fixes(context, elem)
                     self._process_lint_result(
-                        elem, templated_file, ignore_mask, new_lerrs, new_fixes, tree
+                        elem,
+                        templated_file,
+                        ignore_mask,
+                        new_lerrs,
+                        new_fixes,
+                        tree,
                     )
             else:  # pragma: no cover
                 raise TypeError(
@@ -603,7 +632,12 @@ class BaseRule(metaclass=RuleMetaclass):
             # Consume the new results
             vs += new_lerrs
             fixes += new_fixes
-        return vs, context.raw_stack if context else tuple(), fixes, context.memory
+        return (
+            vs,
+            context.raw_stack if context else tuple(),
+            fixes,
+            context.memory,
+        )
 
     # HELPER METHODS --------
     @staticmethod
@@ -639,7 +673,9 @@ class BaseRule(metaclass=RuleMetaclass):
         # there.
         anchors = [lerr.segment] + [fix.anchor for fix in lerr.fixes]
         for anchor in anchors:
-            if not self.crawl_behaviour.passes_filter(anchor):  # pragma: no cover
+            if not self.crawl_behaviour.passes_filter(
+                anchor
+            ):  # pragma: no cover
                 # NOTE: This clause is untested, because it's a hard to produce
                 # edge case. The latter clause is much more likely.
                 linter_logger.info(
@@ -649,7 +685,8 @@ class BaseRule(metaclass=RuleMetaclass):
 
             parent_stack = root.path_to(anchor)
             if not all(
-                self.crawl_behaviour.passes_filter(ps.segment) for ps in parent_stack
+                self.crawl_behaviour.passes_filter(ps.segment)
+                for ps in parent_stack
             ):
                 linter_logger.info(
                     "Fix skipped due to parent of anchor not passing filter: %s",
@@ -907,7 +944,9 @@ class RuleSet:
 
     """
 
-    def __init__(self, name: str, config_info: Dict[str, Dict[str, Any]]) -> None:
+    def __init__(
+        self, name: str, config_info: Dict[str, Dict[str, Any]]
+    ) -> None:
         self.name = name
         self.config_info = config_info
         self._register: Dict[str, RuleManifest] = {}
@@ -974,9 +1013,9 @@ class RuleSet:
                 )
             )
 
-        assert "all" in cls.groups, "Rule {!r} must belong to the 'all' group".format(
-            code
-        )
+        assert (
+            "all" in cls.groups
+        ), "Rule {!r} must belong to the 'all' group".format(code)
 
         self._register[code] = RuleManifest(
             code=code,
@@ -1023,7 +1062,9 @@ class RuleSet:
         the alias is wrong)
         """
         valid_codes: Set[str] = set(self._register.keys())
-        reference_map: Dict[str, Set[str]] = {code: {code} for code in valid_codes}
+        reference_map: Dict[str, Set[str]] = {
+            code: {code} for code in valid_codes
+        }
 
         # Generate name map.
         name_map: Dict[str, Set[str]] = {
@@ -1100,7 +1141,8 @@ class RuleSet:
         valid_codes: Set[str] = set(self._register.keys())
         reference_map = self.rule_reference_map()
         valid_config_lookups = set(
-            manifest.rule_class.get_config_ref() for manifest in self._register.values()
+            manifest.rule_class.get_config_ref()
+            for manifest in self._register.values()
         )
 
         # Validate config doesn't try to specify values for unknown rules.
@@ -1182,7 +1224,9 @@ class RuleSet:
 
         # Then we filter the rules
         keylist = [
-            r for r in keylist if r in expanded_allowlist and r not in expanded_denylist
+            r
+            for r in keylist
+            if r in expanded_allowlist and r not in expanded_denylist
         ]
 
         # Construct the kwargs for each rule and instantiate in turn.
@@ -1197,7 +1241,9 @@ class RuleSet:
             rule_class = self._register[code].rule_class
             # Fetch the lookup code for the rule.
             rule_config_ref = rule_class.get_config_ref()
-            specific_rule_config = config.get_section(("rules", rule_config_ref))
+            specific_rule_config = config.get_section(
+                ("rules", rule_config_ref)
+            )
             if generic_rule_config:
                 kwargs.update(generic_rule_config)
             if specific_rule_config:
@@ -1206,7 +1252,9 @@ class RuleSet:
                 kwargs.update(specific_rule_config)
             kwargs["code"] = code
             # Allow variable substitution in making the description
-            kwargs["description"] = self._register[code].description.format(**kwargs)
+            kwargs["description"] = self._register[code].description.format(
+                **kwargs
+            )
             # Instantiate when ready
             instantiated_rules.append(rule_class(**kwargs))
 

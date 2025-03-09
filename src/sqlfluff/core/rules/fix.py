@@ -86,7 +86,9 @@ class LintFix:
             # Once stripped, we shouldn't replace any markers because
             # later code may rely on them being accurate, which we
             # can't guarantee with edits.
-        self.source = [seg for seg in source if seg.pos_marker] if source else []
+        self.source = (
+            [seg for seg in source if seg.pos_marker] if source else []
+        )
 
         # On creation of the fix we'll also validate the edits are non-trivial.
         if self.edit_type in ("create_before", "create_after"):
@@ -296,7 +298,9 @@ class LintFix:
         #    character positions surrounding the insertion point (**NOT** the
         #    whole anchor segment, because we're not *touching* the anchor
         #    segment, we're inserting **RELATIVE** to it.
-        assert self.anchor.pos_marker, f"Anchor missing position marker: {self.anchor}"
+        assert (
+            self.anchor.pos_marker
+        ), f"Anchor missing position marker: {self.anchor}"
         anchor_slice = self.anchor.pos_marker.templated_slice
         templated_slices = [anchor_slice]
 
@@ -308,13 +312,18 @@ class LintFix:
             # Consider the first position of the anchor segment and the
             # position just before it.
             templated_slices = [
-                slice(anchor_slice.start - 1, anchor_slice.start + adjust_boundary),
+                slice(
+                    anchor_slice.start - 1,
+                    anchor_slice.start + adjust_boundary,
+                ),
             ]
         elif self.edit_type == "create_after":
             # Consider the last position of the anchor segment and the
             # character just after it.
             templated_slices = [
-                slice(anchor_slice.stop - adjust_boundary, anchor_slice.stop + 1),
+                slice(
+                    anchor_slice.stop - adjust_boundary, anchor_slice.stop + 1
+                ),
             ]
         elif (
             self.edit_type == "replace"
@@ -328,8 +337,14 @@ class LintFix:
             return set()
         elif (
             self.edit_type == "replace"
-            and all(edit.is_type("raw") for edit in cast(List[RawSegment], self.edit))
-            and all(edit._source_fixes for edit in cast(List[RawSegment], self.edit))
+            and all(
+                edit.is_type("raw")
+                for edit in cast(List[RawSegment], self.edit)
+            )
+            and all(
+                edit._source_fixes
+                for edit in cast(List[RawSegment], self.edit)
+            )
         ):
             # As an exception to the general rule about "replace" fixes (where
             # they're only safe if they don't touch a templated section at all),
@@ -359,7 +374,9 @@ class LintFix:
                     "Unable to handle multiple source only slices."
                 )
             return set(
-                templated_file.raw_slices_spanning_source_slice(source_edit_slices[0])
+                templated_file.raw_slices_spanning_source_slice(
+                    source_edit_slices[0]
+                )
             )
 
         # TRICKY: For creations at the end of the file, there won't be an
@@ -385,7 +402,9 @@ class LintFix:
             if edit.raw == self.anchor.raw and edit.source_fixes:
                 return False
         # Given fix slices, check for conflicts.
-        check_fn = all if self.edit_type in ("create_before", "create_after") else any
+        check_fn = (
+            all if self.edit_type in ("create_before", "create_after") else any
+        )
         fix_slices = self.get_fix_slices(templated_file, within_only=False)
         result = check_fn(fs.slice_type == "templated" for fs in fix_slices)
         if result or not self.source:
@@ -412,7 +431,9 @@ class LintFix:
             try:
                 raw_slices.update(
                     templated_file.raw_slices_spanning_source_slice(
-                        templated_file.templated_slice_to_source_slice(templated_slice)
+                        templated_file.templated_slice_to_source_slice(
+                            templated_slice
+                        )
                     )
                 )
             except (IndexError, ValueError):

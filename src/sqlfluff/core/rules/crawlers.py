@@ -11,7 +11,9 @@ from sqlfluff.core.rules.context import RuleContext
 class BaseCrawler(ABC):
     """The base interface for crawler classes."""
 
-    def __init__(self, works_on_unparsable: bool = False, **kwargs: Any) -> None:
+    def __init__(
+        self, works_on_unparsable: bool = False, **kwargs: Any
+    ) -> None:
         self.works_on_unparsable = works_on_unparsable
 
     def passes_filter(self, segment: BaseSegment) -> bool:
@@ -95,7 +97,9 @@ class SegmentSeekerCrawler(BaseCrawler):
         # Abort if not - we've already yielded self.
         # NOTE: This same clause also works if we did match but aren't
         # allowed to recurse.
-        if not context.segment.segments or (self_match and not self.allow_recurse):
+        if not context.segment.segments or (
+            self_match and not self.allow_recurse
+        ):
             # Add self to raw stack first if so.
             if self.provide_raw_stack:
                 context.raw_stack += (cast(RawSegment, context.segment),)

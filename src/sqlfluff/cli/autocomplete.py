@@ -28,5 +28,7 @@ def dialect_shell_complete(ctx, param, incomplete) -> List["CompletionItem"]:
     """
     dialect_names = [e.label for e in list_dialects()]
     return [
-        CompletionItem(name) for name in dialect_names if name.startswith(incomplete)
+        CompletionItem(name)
+        for name in dialect_names
+        if name.startswith(incomplete)
     ]

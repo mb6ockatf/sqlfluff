@@ -6,7 +6,11 @@ from typing import List, Tuple, Type, cast
 
 from sqlfluff.core.parser import BaseSegment, RawSegment
 from sqlfluff.core.rules import LintFix, LintResult
-from sqlfluff.utils.reflow.elements import ReflowBlock, ReflowPoint, ReflowSequenceType
+from sqlfluff.utils.reflow.elements import (
+    ReflowBlock,
+    ReflowPoint,
+    ReflowSequenceType,
+)
 from sqlfluff.utils.reflow.helpers import (
     deduce_line_indent,
     fixes_from_results,
@@ -47,7 +51,10 @@ class _RebreakIndices:
         dir: int,
     ) -> "_RebreakIndices":
         """Iterate through the elements to deduce important point indices."""
-        assert dir in (1, -1), "Direction must be a unit direction (i.e. 1 or -1)."
+        assert dir in (
+            1,
+            -1,
+        ), "Direction must be a unit direction (i.e. 1 or -1)."
         # Limit depends on the direction
         limit = 0 if dir == -1 else len(elements)
         # The adjacent point is just the next one.
@@ -56,12 +63,16 @@ class _RebreakIndices:
         # only points, which alternate with blocks.
         for newline_point_idx in range(adj_point_idx, limit, 2 * dir):
             if "newline" in elements[newline_point_idx].class_types or any(
-                seg.is_code for seg in elements[newline_point_idx + dir].segments
+                seg.is_code
+                for seg in elements[newline_point_idx + dir].segments
             ):
                 break
         # Finally we look for the point preceding the next code element.
         for pre_code_point_idx in range(newline_point_idx, limit, 2 * dir):
-            if any(seg.is_code for seg in elements[pre_code_point_idx + dir].segments):
+            if any(
+                seg.is_code
+                for seg in elements[pre_code_point_idx + dir].segments
+            ):
                 break
         return cls(dir, adj_point_idx, newline_point_idx, pre_code_point_idx)
 
@@ -78,7 +89,9 @@ class _RebreakLocation:
 
     @classmethod
     def from_span(
-        cls: Type["_RebreakLocation"], span: _RebreakSpan, elements: ReflowSequenceType
+        cls: Type["_RebreakLocation"],
+        span: _RebreakSpan,
+        elements: ReflowSequenceType,
     ) -> "_RebreakLocation":
         """Expand a span to a location."""
         return cls(
@@ -159,7 +172,9 @@ def first_create_anchor(
         # NOTE: We don't test this because we *should* always find
         # _something_ to anchor the creation on, even if we're
         # unlucky enough not to find it on the first pass.
-        raise NotImplementedError("Could not find anchor for creation.") from exc
+        raise NotImplementedError(
+            "Could not find anchor for creation."
+        ) from exc
 
     return create_anchor
 
@@ -233,16 +248,19 @@ def identify_rebreak_spans(
                     # in detecting the "end" and "solo" markers effectively in larger
                     # sections.
                     final_idx = end_idx - 2  # pragma: no cover
-                elif end_elem.depth_info.stack_positions[key].type in ("end", "solo"):
+                elif end_elem.depth_info.stack_positions[key].type in (
+                    "end",
+                    "solo",
+                ):
                     final_idx = end_idx
 
                 if final_idx is not None:
                     # Found the end. Add it to the stack.
                     # We reference the appropriate element from the parent stack.
                     target_depth = elem.depth_info.stack_hashes.index(key)
-                    target = root_segment.path_to(element_buffer[idx].segments[0])[
-                        target_depth
-                    ].segment
+                    target = root_segment.path_to(
+                        element_buffer[idx].segments[0]
+                    )[target_depth].segment
                     spans.append(
                         _RebreakSpan(
                             target,
@@ -302,9 +320,9 @@ def identify_keyword_rebreak_spans(
                 continue
 
             # Then make sure it's actually a keyword.
-            if not element_buffer[idx].segments or not element_buffer[idx].segments[
-                0
-            ].is_type("keyword"):
+            if not element_buffer[idx].segments or not element_buffer[
+                idx
+            ].segments[0].is_type("keyword"):
                 continue
 
             # Can we find the end?
@@ -320,7 +338,10 @@ def identify_keyword_rebreak_spans(
                         final_idx = end_idx - 1
                     else:
                         continue
-                elif end_elem.depth_info.stack_positions[key].type in ("end", "solo"):
+                elif end_elem.depth_info.stack_positions[key].type in (
+                    "end",
+                    "solo",
+                ):
                     final_idx = end_idx
 
                 if final_idx is not None:
@@ -334,8 +355,12 @@ def identify_keyword_rebreak_spans(
                             final_idx,
                             # NOTE: this isn't pretty but until it needs to be more
                             # complex, this works.
-                            elem.keyword_line_position_configs[key].split(":")[0],
-                            elem.keyword_line_position_configs[key].endswith("strict"),
+                            elem.keyword_line_position_configs[key].split(":")[
+                                0
+                            ],
+                            elem.keyword_line_position_configs[key].endswith(
+                                "strict"
+                            ),
                         )
                     )
                     break
@@ -481,7 +506,9 @@ def rebreak_sequence(
 
                 create_anchor = first_create_anchor(
                     elem_buff,
-                    range(loc.next.pre_code_pt_idx, loc.next.adj_pt_idx - 1, -1),
+                    range(
+                        loc.next.pre_code_pt_idx, loc.next.adj_pt_idx - 1, -1
+                    ),
                 )[-1]
 
                 fixes.append(
@@ -493,7 +520,9 @@ def rebreak_sequence(
 
                 elem_buff = (
                     elem_buff[: loc.prev.adj_pt_idx]
-                    + elem_buff[loc.next.adj_pt_idx : loc.next.pre_code_pt_idx + 1]
+                    + elem_buff[
+                        loc.next.adj_pt_idx : loc.next.pre_code_pt_idx + 1
+                    ]
                     + elem_buff[
                         loc.prev.adj_pt_idx + 1 : loc.next.adj_pt_idx
                     ]  # the target
@@ -510,9 +539,7 @@ def rebreak_sequence(
             pretty_name = loc.pretty_target_name()
             if loc.strict:  # pragma: no cover
                 # TODO: The 'strict' option isn't widely tested yet.
-                desc = (
-                    f"{pretty_name.capitalize()} should always be at the end of a line."
-                )
+                desc = f"{pretty_name.capitalize()} should always be at the end of a line."
             else:
                 desc = (
                     f"Found leading {pretty_name}. Expected only trailing "
@@ -567,7 +594,8 @@ def rebreak_sequence(
                 )
 
                 lead_create_anchor = first_create_anchor(
-                    elem_buff, range(loc.prev.pre_code_pt_idx, loc.prev.adj_pt_idx + 1)
+                    elem_buff,
+                    range(loc.prev.pre_code_pt_idx, loc.prev.adj_pt_idx + 1),
                 )
 
                 # Attempt to skip dedent elements on reinsertion. These are typically
@@ -604,7 +632,9 @@ def rebreak_sequence(
                     + elem_buff[
                         loc.prev.adj_pt_idx + 1 : loc.next.adj_pt_idx
                     ]  # the target
-                    + elem_buff[loc.prev.pre_code_pt_idx : loc.prev.adj_pt_idx + 1]
+                    + elem_buff[
+                        loc.prev.pre_code_pt_idx : loc.prev.adj_pt_idx + 1
+                    ]
                     + elem_buff[loc.next.adj_pt_idx + 1 :]
                 )
 
@@ -622,9 +652,13 @@ def rebreak_sequence(
 
             # First handle the following newlines first (easy).
             if not elem_buff[loc.next.newline_pt_idx].num_newlines():
-                reflow_logger.debug("  Found missing newline after in alone case")
+                reflow_logger.debug(
+                    "  Found missing newline after in alone case"
+                )
                 new_results, next_point = next_point.indent_to(
-                    deduce_line_indent(loc.target.raw_segments[-1], root_segment),
+                    deduce_line_indent(
+                        loc.target.raw_segments[-1], root_segment
+                    ),
                     after=loc.target,
                 )
                 # Update the point in the buffer
@@ -632,14 +666,18 @@ def rebreak_sequence(
 
             # Then handle newlines before. (hoisting past comments if needed).
             if not elem_buff[loc.prev.adj_pt_idx].num_newlines():
-                reflow_logger.debug("  Found missing newline before in alone case")
+                reflow_logger.debug(
+                    "  Found missing newline before in alone case"
+                )
                 # NOTE: In the case that there are comments _after_ the
                 # target, they will be moved with it. This might break things
                 # but there isn't an unambiguous way to do this, because we
                 # can't be sure what the comments are referring to.
                 # Given that, we take the simple option.
                 new_results, prev_point = prev_point.indent_to(
-                    deduce_line_indent(loc.target.raw_segments[0], root_segment),
+                    deduce_line_indent(
+                        loc.target.raw_segments[0], root_segment
+                    ),
                     before=loc.target,
                 )
                 # Update the point in the buffer
@@ -809,7 +847,9 @@ def rebreak_keywords_sequence(
 
             # First handle the following newlines first (easy).
             if not elem_buff[loc.next.newline_pt_idx].num_newlines():
-                reflow_logger.debug("  Found missing newline after in alone case")
+                reflow_logger.debug(
+                    "  Found missing newline after in alone case"
+                )
                 new_results, next_point = next_point.indent_to(
                     prev_point.get_indent() or "",
                     after=elem_buff[loc.next.adj_pt_idx - 1].segments[-1],
@@ -819,7 +859,9 @@ def rebreak_keywords_sequence(
 
             # Then handle newlines before. (hoisting past comments if needed).
             if not elem_buff[loc.prev.adj_pt_idx].num_newlines():
-                reflow_logger.debug("  Found missing newline before in alone case")
+                reflow_logger.debug(
+                    "  Found missing newline before in alone case"
+                )
                 # NOTE: In the case that there are comments _after_ the
                 # target, they will be moved with it. This might break things
                 # but there isn't an unambiguous way to do this, because we

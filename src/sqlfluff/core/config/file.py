@@ -64,7 +64,9 @@ def _resolve_path(filepath: str, val: str) -> str:
 
 
 def _resolve_paths_in_config(
-    config: ConfigMappingType, filepath: str, logging_reference: Optional[str] = None
+    config: ConfigMappingType,
+    filepath: str,
+    logging_reference: Optional[str] = None,
 ) -> None:
     """Attempt to resolve any paths found in the config file.
 
@@ -75,14 +77,18 @@ def _resolve_paths_in_config(
     for key, val in config.items():
         # If it's a dict, recurse.
         if isinstance(val, dict):
-            _resolve_paths_in_config(val, filepath, logging_reference=logging_reference)
+            _resolve_paths_in_config(
+                val, filepath, logging_reference=logging_reference
+            )
         # If it's a potential multi-path, split, resolve and join
         if key.lower() in COMMA_SEPARATED_PATH_KEYS:
             assert isinstance(
                 val, str
             ), f"Value for {key} in {log_filename} must be a string not {type(val)}."
             paths = split_comma_separated_string(val)
-            config[key] = ",".join(_resolve_path(filepath, path) for path in paths)
+            config[key] = ",".join(
+                _resolve_path(filepath, path) for path in paths
+            )
         # It it's a single path key, resolve it.
         elif key.lower().endswith(RESOLVE_PATH_SUFFIXES):
             assert isinstance(

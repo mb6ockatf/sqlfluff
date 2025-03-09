@@ -100,10 +100,14 @@ def process_struct(obj):
         if isinstance(obj[0], dict):
             buff = [process_struct(elem) for elem in obj]
             if any(len(elem) > 1 for elem in buff):
-                raise ValueError(f"Not sure how to deal with multi key dict: {buff!r}")
+                raise ValueError(
+                    f"Not sure how to deal with multi key dict: {buff!r}"
+                )
             return tuple(elem[0] for elem in buff)
         else:
-            raise TypeError(f"Did not expect a list of {type(obj[0])}: {obj[0]!r}")
+            raise TypeError(
+                f"Did not expect a list of {type(obj[0])}: {obj[0]!r}"
+            )
     elif isinstance(obj, (str, int, float)):
         return str(obj)
     elif obj is None:
@@ -130,7 +134,9 @@ def compute_parse_tree_hash(tree):
         if r:
             r_io = io.StringIO()
             yaml.dump(r, r_io, sort_keys=False, allow_unicode=True)
-            result = hashlib.blake2s(r_io.getvalue().encode("utf-8")).hexdigest()
+            result = hashlib.blake2s(
+                r_io.getvalue().encode("utf-8")
+            ).hexdigest()
             return result
     return None
 
@@ -174,12 +180,20 @@ def _generate_test_segments_func(elems):
     for elem in elems:
         if elem == "<indent>":
             buff.append(
-                Indent(pos_marker=PositionMarker.from_point(idx, idx, templated_file))
+                Indent(
+                    pos_marker=PositionMarker.from_point(
+                        idx, idx, templated_file
+                    )
+                )
             )
             continue
         elif elem == "<dedent>":
             buff.append(
-                Dedent(pos_marker=PositionMarker.from_point(idx, idx, templated_file))
+                Dedent(
+                    pos_marker=PositionMarker.from_point(
+                        idx, idx, templated_file
+                    )
+                )
             )
             continue
 
@@ -268,15 +282,21 @@ def fail_on_parse_error_after_fix(monkeypatch):
     """
 
     @staticmethod
-    def raise_error_apply_fixes_check_issue(message, *args):  # pragma: no cover
+    def raise_error_apply_fixes_check_issue(
+        message, *args
+    ):  # pragma: no cover
         raise ValueError(message % args)
 
     @staticmethod
-    def raise_error_conflicting_fixes_same_anchor(message: str):  # pragma: no cover
+    def raise_error_conflicting_fixes_same_anchor(
+        message: str,
+    ):  # pragma: no cover
         raise ValueError(message)
 
     monkeypatch.setattr(
-        BaseSegment, "_log_apply_fixes_check_issue", raise_error_apply_fixes_check_issue
+        BaseSegment,
+        "_log_apply_fixes_check_issue",
+        raise_error_apply_fixes_check_issue,
     )
 
     monkeypatch.setattr(

@@ -111,7 +111,9 @@ class Rule_ST02(BaseRule):
         # Add coalesce and opening parenthesis.
         edits = [
             FunctionNameSegment(
-                segments=(WordSegment("coalesce", type="function_name_identifier"),)
+                segments=(
+                    WordSegment("coalesce", type="function_name_identifier"),
+                )
             ),
             FunctionContentsSegment(
                 segments=(
@@ -168,18 +170,26 @@ class Rule_ST02(BaseRule):
                 return None
 
             # Find condition and then expressions.
-            condition_expression = when_clauses.children(sp.is_type("expression"))[0]
-            then_expression = when_clauses.children(sp.is_type("expression"))[1]
+            condition_expression = when_clauses.children(
+                sp.is_type("expression")
+            )[0]
+            then_expression = when_clauses.children(sp.is_type("expression"))[
+                1
+            ]
 
             # Method 1: Check if THEN/ELSE expressions are both Boolean and can
             # therefore be reduced.
             if else_clauses:
-                else_expression = else_clauses.children(sp.is_type("expression"))[0]
+                else_expression = else_clauses.children(
+                    sp.is_type("expression")
+                )[0]
                 upper_bools = ["TRUE", "FALSE"]
                 if (
                     (then_expression.raw_upper in upper_bools)
                     and (else_expression.raw_upper in upper_bools)
-                    and (then_expression.raw_upper != else_expression.raw_upper)
+                    and (
+                        then_expression.raw_upper != else_expression.raw_upper
+                    )
                 ):
                     coalesce_arg_1: BaseSegment = condition_expression
                     coalesce_arg_2: BaseSegment = KeywordSegment("false")
@@ -207,7 +217,9 @@ class Rule_ST02(BaseRule):
                 segment.raw_upper for segment in condition_expression.segments
             }
             if {"IS", "NULL"}.issubset(condition_expression_segments_raw) and (
-                not condition_expression_segments_raw.intersection({"AND", "OR"})
+                not condition_expression_segments_raw.intersection(
+                    {"AND", "OR"}
+                )
             ):
                 # Check if the comparison is to NULL or NOT NULL.
                 is_not_prefix = "NOT" in condition_expression_segments_raw
@@ -239,7 +251,9 @@ class Rule_ST02(BaseRule):
                     )
 
                 if else_clauses:
-                    else_expression = else_clauses.children(sp.is_type("expression"))[0]
+                    else_expression = else_clauses.children(
+                        sp.is_type("expression")
+                    )[0]
                     # Check if we can reduce the CASE expression to a single coalesce
                     # function.
                     if (
@@ -282,7 +296,10 @@ class Rule_ST02(BaseRule):
                         description="Unnecessary CASE statement. "
                         "Use COALESCE function instead.",
                     )
-                elif column_reference_segment.raw_upper == then_expression.raw_upper:
+                elif (
+                    column_reference_segment.raw_upper
+                    == then_expression.raw_upper
+                ):
                     # Can just specify the column on it's own
                     # rather than using a COALESCE function.
                     # In this case no ELSE statement is equivalent to ELSE NULL.

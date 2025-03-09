@@ -55,7 +55,9 @@ class Rule_AM03(BaseRule):
         for child_segment in segment.segments:
             if child_segment.is_type("column_reference"):
                 column_reference = child_segment
-            elif child_segment.is_type("keyword") and child_segment.raw_upper in (
+            elif child_segment.is_type(
+                "keyword"
+            ) and child_segment.raw_upper in (
                 "ASC",
                 "DESC",
             ):
@@ -63,7 +65,8 @@ class Rule_AM03(BaseRule):
             if column_reference and child_segment.raw == ",":
                 result.append(
                     OrderByColumnInfo(
-                        column_reference=column_reference, order=ordering_reference
+                        column_reference=column_reference,
+                        order=ordering_reference,
                     )
                 )
 

@@ -11,7 +11,12 @@ from sqlfluff.core.parser.segments.common import (
     WhitespaceSegment,
 )
 from sqlfluff.core.parser.segments.keyword import KeywordSegment
-from sqlfluff.core.rules import BaseRule, EvalResultType, LintResult, RuleContext
+from sqlfluff.core.rules import (
+    BaseRule,
+    EvalResultType,
+    LintResult,
+    RuleContext,
+)
 from sqlfluff.core.rules.crawlers import SegmentSeekerCrawler
 from sqlfluff.core.rules.fix import LintFix
 
@@ -70,7 +75,9 @@ class Rule_CV12(BaseRule):
             return
 
         where_clause = maybe_where_clause
-        where_clause_simplifable = self._is_where_clause_simplifable(where_clause)
+        where_clause_simplifable = self._is_where_clause_simplifable(
+            where_clause
+        )
 
         if where_clause_simplifable:
             expr = where_clause.get_child("expression")
@@ -146,7 +153,8 @@ class Rule_CV12(BaseRule):
                     if len(qualified_column_references) > 1 and all(
                         col_ref.raw_upper.startswith(
                             tuple(
-                                f"{table_ref}." for table_ref in encountered_references
+                                f"{table_ref}."
+                                for table_ref in encountered_references
                             )
                         )
                         for col_ref in qualified_column_references
@@ -157,21 +165,31 @@ class Rule_CV12(BaseRule):
                 if not this_join_clause_subexpressions:
                     yield LintResult(join_clause)
                 else:
-                    join_clause_fix_segments: Deque[BaseSegment] = collections.deque()
-                    for subexpr_idx, subexpr_segments in enumerate(subexpressions):
+                    join_clause_fix_segments: Deque[BaseSegment] = (
+                        collections.deque()
+                    )
+                    for subexpr_idx, subexpr_segments in enumerate(
+                        subexpressions
+                    ):
                         if subexpr_idx in this_join_clause_subexpressions:
                             join_clause_fix_segments.extend(subexpr_segments)
                             join_clause_fix_segments.append(
                                 BinaryOperatorSegment("AND")
                             )
 
-                    while join_clause_fix_segments and join_clause_fix_segments[
-                        0
-                    ].is_type("whitespace", "binary_operator"):
+                    while (
+                        join_clause_fix_segments
+                        and join_clause_fix_segments[0].is_type(
+                            "whitespace", "binary_operator"
+                        )
+                    ):
                         join_clause_fix_segments.popleft()
-                    while join_clause_fix_segments and join_clause_fix_segments[
-                        -1
-                    ].is_type("whitespace", "binary_operator"):
+                    while (
+                        join_clause_fix_segments
+                        and join_clause_fix_segments[-1].is_type(
+                            "whitespace", "binary_operator"
+                        )
+                    ):
                         join_clause_fix_segments.pop()
 
                     yield LintResult(
@@ -203,13 +221,13 @@ class Rule_CV12(BaseRule):
                 where_clause_fix_segments.extend(subexpr_segments)
                 where_clause_fix_segments.append(BinaryOperatorSegment("AND"))
 
-        while where_clause_fix_segments and where_clause_fix_segments[0].is_type(
-            "whitespace", "binary_operator"
-        ):
+        while where_clause_fix_segments and where_clause_fix_segments[
+            0
+        ].is_type("whitespace", "binary_operator"):
             where_clause_fix_segments.popleft()
-        while where_clause_fix_segments and where_clause_fix_segments[-1].is_type(
-            "whitespace", "binary_operator"
-        ):
+        while where_clause_fix_segments and where_clause_fix_segments[
+            -1
+        ].is_type("whitespace", "binary_operator"):
             where_clause_fix_segments.pop()
 
         if where_clause_fix_segments:
@@ -219,13 +237,16 @@ class Rule_CV12(BaseRule):
                 anchor=where_clause_expr,
                 fixes=[
                     LintFix.replace(
-                        where_clause_expr, edit_segments=[*where_clause_fix_segments]
+                        where_clause_expr,
+                        edit_segments=[*where_clause_fix_segments],
                     )
                 ],
             )
         else:
             assert select_statement.segments[-1].is_type("where_clause")
-            assert select_statement.segments[-2].is_type("whitespace", "newline")
+            assert select_statement.segments[-2].is_type(
+                "whitespace", "newline"
+            )
             yield LintResult(
                 anchor=where_clause,
                 fixes=[
@@ -235,7 +256,9 @@ class Rule_CV12(BaseRule):
             )
 
     @staticmethod
-    def _get_from_expression_element_alias(from_expr_element: BaseSegment) -> str:
+    def _get_from_expression_element_alias(
+        from_expr_element: BaseSegment,
+    ) -> str:
         if "alias_expression" in from_expr_element.direct_descendant_type_set:
             alias_seg = from_expr_element.get_child("alias_expression")
             assert alias_seg is not None
@@ -259,16 +282,26 @@ class Rule_CV12(BaseRule):
         return all(op.raw_upper == "AND" for op in ops)
 
     @staticmethod
-    def _get_subexpression_chunks(expr: BaseSegment) -> List[List[BaseSegment]]:
+    def _get_subexpression_chunks(
+        expr: BaseSegment,
+    ) -> List[List[BaseSegment]]:
         expr_segments = expr.segments
         bin_op_indices = [
-            i for i, e in enumerate(expr_segments) if e.is_type("binary_operator")
+            i
+            for i, e in enumerate(expr_segments)
+            if e.is_type("binary_operator")
         ]
-        split_segments = [None, *[expr_segments[i] for i in bin_op_indices], None]
+        split_segments = [
+            None,
+            *[expr_segments[i] for i in bin_op_indices],
+            None,
+        ]
         start_segments_iter = iter(split_segments)
         stop_segments_iter = iter(split_segments)
         _ = next(stop_segments_iter)
         return [
             expr.select_children(start_seg, stop_seg)
-            for start_seg, stop_seg in zip(start_segments_iter, stop_segments_iter)
+            for start_seg, stop_seg in zip(
+                start_segments_iter, stop_segments_iter
+            )
         ]

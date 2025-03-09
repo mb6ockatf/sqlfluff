@@ -15,7 +15,11 @@ import pytest
 
 from sqlfluff.cli.commands import lint
 from sqlfluff.core import FluffConfig, Lexer, Linter
-from sqlfluff.core.errors import SQLFluffSkipFile, SQLFluffUserError, SQLTemplaterError
+from sqlfluff.core.errors import (
+    SQLFluffSkipFile,
+    SQLFluffUserError,
+    SQLTemplaterError,
+)
 from sqlfluff.utils.testing.cli import invoke_assert_code
 from sqlfluff.utils.testing.logging import fluff_log_catcher
 from sqlfluff_templater_dbt.templater import DbtTemplater
@@ -30,7 +34,9 @@ def test__templater_dbt_missing(dbt_templater, project_dir, dbt_fluff_config):
     except ModuleNotFoundError:
         pass
 
-    with pytest.raises(ModuleNotFoundError, match=r"pip install sqlfluff\[dbt\]"):
+    with pytest.raises(
+        ModuleNotFoundError, match=r"pip install sqlfluff\[dbt\]"
+    ):
         dbt_templater.process(
             in_str="",
             fname=os.path.join(project_dir, "models/my_new_project/test.sql"),
@@ -116,9 +122,13 @@ def test_dbt_profiles_dir_env_var_uppercase(
     profiles_dir,
 ):
     """Tests specifying the dbt profile dir with env var."""
-    sub_profiles_dir = tmpdir.mkdir("SUBDIR")  # Use uppercase to test issue 2253
+    sub_profiles_dir = tmpdir.mkdir(
+        "SUBDIR"
+    )  # Use uppercase to test issue 2253
     monkeypatch.setenv("DBT_PROFILES_DIR", str(sub_profiles_dir))
-    shutil.copy(os.path.join(profiles_dir, "profiles.yml"), str(sub_profiles_dir))
+    shutil.copy(
+        os.path.join(profiles_dir, "profiles.yml"), str(sub_profiles_dir)
+    )
     _run_templater_and_verify_result(
         dbt_templater,
         project_dir,
@@ -153,11 +163,15 @@ def _run_templater_and_verify_result(
 
 
 def _get_fixture_path(template_output_folder_path, fname):
-    fixture_path: Path = template_output_folder_path / fname  # Default fixture location
+    fixture_path: Path = (
+        template_output_folder_path / fname
+    )  # Default fixture location
     dbt_version_specific_fixture_folder = "dbt_utils_0.8.0"
     # Determine where it would exist.
     version_specific_path = (
-        Path(template_output_folder_path) / dbt_version_specific_fixture_folder / fname
+        Path(template_output_folder_path)
+        / dbt_version_specific_fixture_folder
+        / fname
     )
     if version_specific_path.is_file():
         # Ok, it exists. Use this path instead.
@@ -254,7 +268,11 @@ def test__templater_dbt_slice_file_wrapped_test(
         loc = templated_file.find(raw_file)
         # Replace the new content at the previous position.
         # NOTE: Doing this allows the tracer logic to do what it needs to do.
-        return templated_file[:loc] + in_str + templated_file[loc + len(raw_file) :]
+        return (
+            templated_file[:loc]
+            + in_str
+            + templated_file[loc + len(raw_file) :]
+        )
 
     with caplog.at_level(logging.DEBUG, logger="sqlfluff.templater"):
         _, resp, _ = dbt_templater.slice_file(
@@ -286,9 +304,12 @@ def test__templater_dbt_templating_test_lex(
     config = FluffConfig(configs=dbt_fluff_config)
     source_dbt_sql = path.read_text()
     # Count the newlines.
-    n_trailing_newlines = len(source_dbt_sql) - len(source_dbt_sql.rstrip("\n"))
+    n_trailing_newlines = len(source_dbt_sql) - len(
+        source_dbt_sql.rstrip("\n")
+    )
     print(
-        f"Loaded {path!r} (n_newlines: {n_trailing_newlines}): " f"{source_dbt_sql!r}",
+        f"Loaded {path!r} (n_newlines: {n_trailing_newlines}): "
+        f"{source_dbt_sql!r}",
     )
 
     templated_file, _ = dbt_templater.process(
@@ -394,7 +415,8 @@ def _clean_path(glob_expression):
 
 
 @pytest.mark.parametrize(
-    "path", ["models/my_new_project/issue_1608.sql", "snapshots/issue_1771.sql"]
+    "path",
+    ["models/my_new_project/issue_1608.sql", "snapshots/issue_1771.sql"],
 )
 def test__dbt_templated_models_fix_does_not_corrupt_file(
     project_dir,
@@ -412,7 +434,9 @@ def test__dbt_templated_models_fix_does_not_corrupt_file(
         lnt.persist_changes(fixed_file_suffix="FIXED")
         with open(os.path.join(project_dir, path + ".after")) as f:
             comp_buff = f.read()
-        with open(os.path.join(project_dir, path.replace(".sql", "FIXED.sql"))) as f:
+        with open(
+            os.path.join(project_dir, path.replace(".sql", "FIXED.sql"))
+        ) as f:
             fixed_buff = f.read()
         assert fixed_buff == comp_buff
     finally:
@@ -559,7 +583,9 @@ def test__templater_dbt_handle_database_connection_failure(
     # Clear the adapter cache to force this test to create a new connection.
     DbtTemplater.adapters.clear()
 
-    set_relations_cache.side_effect = DbtFailedToConnectException("dummy error")
+    set_relations_cache.side_effect = DbtFailedToConnectException(
+        "dummy error"
+    )
 
     src_fpath = (
         "plugins/sqlfluff-templater-dbt/test/fixtures/dbt/error_models"
@@ -603,7 +629,8 @@ def test__project_dir_does_not_exist_error(dbt_templater):
     with fluff_log_catcher(logging.ERROR, "sqlfluff.templater") as caplog:
         dbt_project_dir = dbt_templater._get_project_dir()
     assert (
-        f"dbt_project_dir: {dbt_project_dir} could not be accessed. " "Check it exists."
+        f"dbt_project_dir: {dbt_project_dir} could not be accessed. "
+        "Check it exists."
     ) in caplog.text
 
 

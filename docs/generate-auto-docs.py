@@ -52,12 +52,16 @@ for plugin_rules in get_plugin_manager().hook.get_rules():
 
 # Write them into a json file for use by redirects.
 print("Rule Docs Generation: Writing Rule JSON...")
-with open(base_path / "source/_partials/rule_list.json", "w", encoding="utf8") as f:
+with open(
+    base_path / "source/_partials/rule_list.json", "w", encoding="utf8"
+) as f:
     json.dump(rule_list, f)
 
 # Write them into the table. Bundle by bundle.
 print("Rule Docs Generation: Writing Rule Table...")
-with open(base_path / "source/_partials/rule_table.rst", "w", encoding="utf8") as f:
+with open(
+    base_path / "source/_partials/rule_table.rst", "w", encoding="utf8"
+) as f:
     f.write(autogen_header)
     f.write(table_header)
     for bundle in sorted(rule_bundles.keys()):
@@ -83,7 +87,9 @@ with open(base_path / "source/_partials/rule_table.rst", "w", encoding="utf8") a
                 aliases = ", ".join(rule.aliases[j : j + step]) + (
                     "," if len(rule.aliases[j:]) > step else ""
                 )
-                f.write(f"|{' ' * 42}|{' ' * 50}|{' ' * 30}| {aliases : <18} |\n")
+                f.write(
+                    f"|{' ' * 42}|{' ' * 50}|{' ' * 30}| {aliases : <18} |\n"
+                )
                 j += step
 
             if idx + 1 < len(rule_bundles[bundle]):
@@ -97,7 +103,9 @@ with open(base_path / "source/_partials/rule_table.rst", "w", encoding="utf8") a
 
 # Write each of the summary files.
 print("Rule Docs Generation: Writing Rule Summaries...")
-with open(base_path / "source/_partials/rule_summaries.rst", "w", encoding="utf8") as f:
+with open(
+    base_path / "source/_partials/rule_summaries.rst", "w", encoding="utf8"
+) as f:
     f.write(autogen_header)
     for bundle in sorted(rule_bundles.keys()):
         if "sql" in bundle:
@@ -132,7 +140,9 @@ print("Dialect Docs Generation: Reading Dialects...")
 # one to be first.
 dialect_dict = {dialect.label: dialect for dialect in sqlfluff.list_dialects()}
 dialect_list = [dialect_dict["ansi"]] + [
-    dialect for dialect_name, dialect in dialect_dict.items() if dialect_name != "ansi"
+    dialect
+    for dialect_name, dialect in dialect_dict.items()
+    if dialect_name != "ansi"
 ]
 
 # Write each of the summary files.

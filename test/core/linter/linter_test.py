@@ -40,7 +40,9 @@ def normalise_paths(paths):
     return {pth.replace("/", ".").replace("\\", ".") for pth in paths}
 
 
-@pytest.mark.parametrize("filesize,raises_skip", [(0, False), (5, True), (2000, False)])
+@pytest.mark.parametrize(
+    "filesize,raises_skip", [(0, False), (5, True), (2000, False)]
+)
 def test__linter__skip_large_bytes(filesize, raises_skip):
     """Test extracting paths from a file path."""
     config = FluffConfig(
@@ -91,7 +93,8 @@ def test__linter__lint_string_vs_file(path):
         sql_str = f.read()
     lntr = Linter(dialect="ansi")
     assert (
-        lntr.lint_string(sql_str).check_tuples() == lntr.lint_path(path).check_tuples()
+        lntr.lint_string(sql_str).check_tuples()
+        == lntr.lint_path(path).check_tuples()
     )
 
 
@@ -277,7 +280,9 @@ def test__linter__linting_parallel_thread(force_error, monkeypatch):
 
             return ErrorPool()
 
-        monkeypatch.setattr(runner.MultiProcessRunner, "_create_pool", _create_pool)
+        monkeypatch.setattr(
+            runner.MultiProcessRunner, "_create_pool", _create_pool
+        )
 
     config = FluffConfig(overrides={"dialect": "ansi"})
     output_stream = make_output_stream(config, None, os.devnull)
@@ -529,7 +534,9 @@ def test__linter__encoding(fname, config_encoding, lexerror):
         )
     )
     result = lntr.lint_paths((fname,))
-    assert lexerror == (SQLLexError in [type(v) for v in result.get_violations()])
+    assert lexerror == (
+        SQLLexError in [type(v) for v in result.get_violations()]
+    )
 
 
 def test_delayed_exception():
@@ -604,7 +611,10 @@ def test_unparsable_fix_output(fix_even_unparsable):
     test case at some point so that we can actually see the difference.
     """
     config = FluffConfig(
-        overrides={"fix_even_unparsable": fix_even_unparsable, "dialect": "ansi"}
+        overrides={
+            "fix_even_unparsable": fix_even_unparsable,
+            "dialect": "ansi",
+        }
     )
     linter = Linter(config=config)
     # Attempt to fix it, capturing the logging output.

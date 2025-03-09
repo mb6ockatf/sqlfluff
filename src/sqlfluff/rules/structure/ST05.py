@@ -1,7 +1,17 @@
 """Implementation of Rule ST05."""
 
 from functools import partial
-from typing import Iterator, List, NamedTuple, Optional, Set, Tuple, Type, TypeVar, cast
+from typing import (
+    Iterator,
+    List,
+    NamedTuple,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    cast,
+)
 
 from sqlfluff.core.dialects.base import Dialect
 from sqlfluff.core.dialects.common import AliasInfo
@@ -123,7 +133,9 @@ class Rule_ST05(BaseRule):
 
         is_with = segment.all(is_type("with_compound_statement"))
         # TODO: consider if we can fix recursive CTEs
-        is_recursive = is_with and len(segment.children(is_keyword("recursive"))) > 0
+        is_recursive = (
+            is_with and len(segment.children(is_keyword("recursive"))) > 0
+        )
         case_preference = _get_case_preference(segment)
         output_select = segment
         if is_with:
@@ -154,7 +166,9 @@ class Rule_ST05(BaseRule):
             clone_map=clone_map,
         )
 
-        results_list: List[Tuple[LintResult, BaseSegment, str, BaseSegment, bool]] = []
+        results_list: List[
+            Tuple[LintResult, BaseSegment, str, BaseSegment, bool]
+        ] = []
         for result in results:
             (
                 lint_result,
@@ -164,7 +178,8 @@ class Rule_ST05(BaseRule):
                 is_fixable,
             ) = result
             assert any(
-                from_expression is seg for seg in subquery_parent.recursive_crawl_all()
+                from_expression is seg
+                for seg in subquery_parent.recursive_crawl_all()
             )
             results_list.append(result)
             if not is_fixable:
@@ -234,9 +249,13 @@ class Rule_ST05(BaseRule):
                     )
                     if not (
                         # The from_expression_element
-                        table_alias.from_expression_element.is_type(*parent_types)
+                        table_alias.from_expression_element.is_type(
+                            *parent_types
+                        )
                         # Or any of it's parents up to the selectable
-                        or any(ps.segment.is_type(*parent_types) for ps in path_to)
+                        or any(
+                            ps.segment.is_type(*parent_types) for ps in path_to
+                        )
                     ):
                         continue
                     if _is_correlated_subquery(
@@ -280,9 +299,9 @@ class Rule_ST05(BaseRule):
                 bracket_anchor = anchor
 
             # we can't create a CTE from a nested subquery here, ignore it.
-            if not bracket_anchor.is_type("bracketed") or bracket_anchor.get_child(
-                "table_expression"
-            ):
+            if not bracket_anchor.is_type(
+                "bracketed"
+            ) or bracket_anchor.get_child("table_expression"):
                 is_fixable = False
             if is_fixable:
                 new_cte = _create_cte_seg(  # 'prep_1 as (select ...)'
@@ -340,7 +359,9 @@ def _is_correlated_subquery(
     nested_select_info = get_select_statement_info(select_statement, dialect)
     if nested_select_info:
         for r in nested_select_info.reference_buffer:
-            for tr in r.extract_possible_references(level=r.ObjectReferenceLevel.TABLE):
+            for tr in r.extract_possible_references(
+                level=r.ObjectReferenceLevel.TABLE
+            ):
                 # Check for correlated subquery, as indicated by use of a
                 # parent reference.
                 if tr.part in select_source_names:
@@ -463,7 +484,9 @@ class _CTEBuilder:
                 # Case 2. from_segment is in the current parse tree, so we can't
                 # modify it directly. Create a LintFix to do it.
                 fixes.append(
-                    LintFix.create_after(from_segment[0], [WhitespaceSegment()])
+                    LintFix.create_after(
+                        from_segment[0], [WhitespaceSegment()]
+                    )
                 )
         return fixes
 
@@ -480,7 +503,12 @@ class _CTEBuilder:
                 start_seg=from_segment[0], loop_while=is_whitespace()
             ):
                 missing_space_after_from = True
-        return missing_space_after_from, from_clause, from_clause_children, from_segment
+        return (
+            missing_space_after_from,
+            from_clause,
+            from_clause_children,
+            from_segment,
+        )
 
     def replace_with_clone(self, segment, clone_map) -> None:
         for idx, cte in enumerate(self.ctes):
@@ -517,7 +545,10 @@ def _get_seg(class_def: S, dialect: Dialect) -> S:
 
 
 def _create_cte_seg(
-    alias_name: str, subquery: BaseSegment, case_preference: str, dialect: Dialect
+    alias_name: str,
+    subquery: BaseSegment,
+    case_preference: str,
+    dialect: Dialect,
 ) -> CTEDefinitionSegment:
     CTESegment = _get_seg(CTEDefinitionSegment, dialect)
     IdentifierSegment = cast(
@@ -539,7 +570,9 @@ def _create_cte_seg(
     return element
 
 
-def _create_table_ref(table_name: str, dialect: Dialect) -> TableExpressionSegment:
+def _create_table_ref(
+    table_name: str, dialect: Dialect
+) -> TableExpressionSegment:
     Seg = partial(_get_seg, dialect=dialect)
     TableExpressionSeg = Seg(TableExpressionSegment)
     TableReferenceSeg = Seg(TableReferenceSegment)

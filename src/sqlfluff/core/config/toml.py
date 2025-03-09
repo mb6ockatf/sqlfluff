@@ -56,7 +56,9 @@ def load_toml_file_config(filepath: str) -> ConfigMappingType:
     """
     with open(filepath, mode="r") as file:
         toml_dict = tomllib.loads(file.read())
-    config_dict = _validate_structure(toml_dict.get("tool", {}).get("sqlfluff", {}))
+    config_dict = _validate_structure(
+        toml_dict.get("tool", {}).get("sqlfluff", {})
+    )
 
     # NOTE: For the "rules" section of the sqlfluff config,
     # rule names are often qualified with a dot ".". In the

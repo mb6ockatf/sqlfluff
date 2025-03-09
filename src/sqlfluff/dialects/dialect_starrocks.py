@@ -188,15 +188,27 @@ class PartitionSegment(BaseSegment):
                                         "THAN",
                                         OneOf(
                                             "MAXVALUE",
-                                            Bracketed(Delimited(Ref("LiteralGrammar"))),
+                                            Bracketed(
+                                                Delimited(
+                                                    Ref("LiteralGrammar")
+                                                )
+                                            ),
                                         ),
                                     ),
                                     # Fixed range syntax
                                     Sequence(
                                         Bracketed(
-                                            Bracketed(Delimited(Ref("LiteralGrammar"))),
+                                            Bracketed(
+                                                Delimited(
+                                                    Ref("LiteralGrammar")
+                                                )
+                                            ),
                                             ",",
-                                            Bracketed(Delimited(Ref("LiteralGrammar"))),
+                                            Bracketed(
+                                                Delimited(
+                                                    Ref("LiteralGrammar")
+                                                )
+                                            ),
                                         )
                                     ),
                                 ),
@@ -244,11 +256,15 @@ class DistributionSegment(BaseSegment):
             Sequence(
                 "HASH",
                 Bracketed(Delimited(Ref("ColumnReferenceSegment"))),
-                Sequence("BUCKETS", Ref("NumericLiteralSegment"), optional=True),
+                Sequence(
+                    "BUCKETS", Ref("NumericLiteralSegment"), optional=True
+                ),
             ),
             Sequence(
                 "RANDOM",
-                Sequence("BUCKETS", Ref("NumericLiteralSegment"), optional=True),
+                Sequence(
+                    "BUCKETS", Ref("NumericLiteralSegment"), optional=True
+                ),
             ),
         ),
     )
@@ -308,7 +324,9 @@ class CreateRoutineLoadStatementSegment(BaseSegment):
         # Data Source section using dedicated data source properties segment
         "FROM",
         "KAFKA",
-        Bracketed(Delimited(Ref("CreateRoutineLoadDataSourcePropertiesSegment"))),
+        Bracketed(
+            Delimited(Ref("CreateRoutineLoadDataSourcePropertiesSegment"))
+        ),
     )
 
 
@@ -317,7 +335,9 @@ class CreateRoutineLoadPropertiesSegment(BaseSegment):
 
     type = "routine_load_properties"
     match_grammar = Sequence(
-        Ref("QuotedLiteralSegment"), Ref("EqualsSegment"), Ref("QuotedLiteralSegment")
+        Ref("QuotedLiteralSegment"),
+        Ref("EqualsSegment"),
+        Ref("QuotedLiteralSegment"),
     )
 
 
@@ -326,7 +346,9 @@ class CreateRoutineLoadDataSourcePropertiesSegment(BaseSegment):
 
     type = "routine_load_data_source_properties"
     match_grammar = Sequence(
-        Ref("QuotedLiteralSegment"), Ref("EqualsSegment"), Ref("QuotedLiteralSegment")
+        Ref("QuotedLiteralSegment"),
+        Ref("EqualsSegment"),
+        Ref("QuotedLiteralSegment"),
     )
 
 

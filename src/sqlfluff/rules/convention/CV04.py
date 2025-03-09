@@ -85,7 +85,10 @@ class Rule_CV04(BaseRule):
                         sp.not_(sp.is_meta()),
                         sp.not_(
                             sp.is_type(
-                                "start_bracket", "end_bracket", "whitespace", "newline"
+                                "start_bracket",
+                                "end_bracket",
+                                "whitespace",
+                                "newline",
                             )
                         ),
                     )
@@ -103,7 +106,9 @@ class Rule_CV04(BaseRule):
             if f_content[0].is_type("star") and (
                 self.prefer_count_1 or self.prefer_count_0
             ):
-                new_segment = LiteralSegment(raw=preferred, type="numeric_literal")
+                new_segment = LiteralSegment(
+                    raw=preferred, type="numeric_literal"
+                )
                 return LintResult(
                     anchor=context.segment,
                     fixes=[
@@ -139,7 +144,8 @@ class Rule_CV04(BaseRule):
                                 [
                                     expression_content[0].edit(
                                         expression_content[0].raw.replace(
-                                            expression_content[0].raw, preferred
+                                            expression_content[0].raw,
+                                            preferred,
                                         )
                                     ),
                                 ],

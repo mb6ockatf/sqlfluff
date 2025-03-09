@@ -69,20 +69,36 @@ athena_dialect.add(
     StartAngleBracketSegment=StringParser(
         "<", SymbolSegment, type="start_angle_bracket"
     ),
-    EndAngleBracketSegment=StringParser(">", SymbolSegment, type="end_angle_bracket"),
-    RightArrowOperator=StringParser("->", SymbolSegment, type="binary_operator"),
-    JsonfileKeywordSegment=StringParser("JSONFILE", KeywordSegment, type="file_format"),
-    RcfileKeywordSegment=StringParser("RCFILE", KeywordSegment, type="file_format"),
-    OrcKeywordSegment=StringParser("ORCFILE", KeywordSegment, type="file_format"),
+    EndAngleBracketSegment=StringParser(
+        ">", SymbolSegment, type="end_angle_bracket"
+    ),
+    RightArrowOperator=StringParser(
+        "->", SymbolSegment, type="binary_operator"
+    ),
+    JsonfileKeywordSegment=StringParser(
+        "JSONFILE", KeywordSegment, type="file_format"
+    ),
+    RcfileKeywordSegment=StringParser(
+        "RCFILE", KeywordSegment, type="file_format"
+    ),
+    OrcKeywordSegment=StringParser(
+        "ORCFILE", KeywordSegment, type="file_format"
+    ),
     ParquetKeywordSegment=StringParser(
         "PARQUETFILE", KeywordSegment, type="file_format"
     ),
-    AvroKeywordSegment=StringParser("AVROFILE", KeywordSegment, type="file_format"),
-    IonKeywordSegment=StringParser("IONFILE", KeywordSegment, type="file_format"),
+    AvroKeywordSegment=StringParser(
+        "AVROFILE", KeywordSegment, type="file_format"
+    ),
+    IonKeywordSegment=StringParser(
+        "IONFILE", KeywordSegment, type="file_format"
+    ),
     SequencefileKeywordSegment=StringParser(
         "SEQUENCEFILE", KeywordSegment, type="file_format"
     ),
-    TextfileKeywordSegment=StringParser("TEXTFILE", KeywordSegment, type="file_format"),
+    TextfileKeywordSegment=StringParser(
+        "TEXTFILE", KeywordSegment, type="file_format"
+    ),
     PropertyGrammar=Sequence(
         Ref("QuotedLiteralSegment"),
         Ref("EqualsSegment"),
@@ -154,14 +170,18 @@ athena_dialect.add(
         Ref("EqualsSegment"),
         Ref("LiteralGrammar"),
     ),
-    BracketedUnloadPropertyGrammar=Bracketed(Delimited(Ref("UnloadPropertyGrammar"))),
+    BracketedUnloadPropertyGrammar=Bracketed(
+        Delimited(Ref("UnloadPropertyGrammar"))
+    ),
     TablePropertiesGrammar=Sequence(
         "TBLPROPERTIES", Ref("BracketedPropertyListGrammar")
     ),
     SerdePropertiesGrammar=Sequence(
         "WITH", "SERDEPROPERTIES", Ref("BracketedPropertyListGrammar")
     ),
-    TerminatedByGrammar=Sequence("TERMINATED", "BY", Ref("QuotedLiteralSegment")),
+    TerminatedByGrammar=Sequence(
+        "TERMINATED", "BY", Ref("QuotedLiteralSegment")
+    ),
     FileFormatGrammar=OneOf(
         "SEQUENCEFILE",
         "TEXTFILE",
@@ -247,14 +267,21 @@ athena_dialect.replace(
             r"[A-Z0-9_]*[A-Z_][A-Z0-9_]*",
             IdentifierSegment,
             type="naked_identifier",
-            anti_template=r"^(" + r"|".join(dialect.sets("reserved_keywords")) + r")$",
+            anti_template=r"^("
+            + r"|".join(dialect.sets("reserved_keywords"))
+            + r")$",
             casefold=str.lower,
         )
     ),
     QuotedIdentifierSegment=TypedParser(
-        "double_quote", IdentifierSegment, type="quoted_identifier", casefold=str.lower
+        "double_quote",
+        IdentifierSegment,
+        type="quoted_identifier",
+        casefold=str.lower,
     ),
-    SingleIdentifierGrammar=ansi_dialect.get_grammar("SingleIdentifierGrammar").copy(
+    SingleIdentifierGrammar=ansi_dialect.get_grammar(
+        "SingleIdentifierGrammar"
+    ).copy(
         insert=[
             Ref("BackQuotedIdentifierSegment"),
         ]
@@ -514,7 +541,9 @@ class CreateTableStatementSegment(BaseSegment):
                 Ref("CommentGrammar", optional=True),
             ),
             Sequence(
-                Sequence("WITH", Ref("BracketedCTASPropertyGrammar"), optional=True),
+                Sequence(
+                    "WITH", Ref("BracketedCTASPropertyGrammar"), optional=True
+                ),
                 "AS",
                 OptionallyBracketed(
                     Ref("SelectableGrammar"),
@@ -559,17 +588,29 @@ class RowFormatClauseSegment(BaseSegment):
                     "FIELDS",
                     Ref("TerminatedByGrammar"),
                     Sequence(
-                        "ESCAPED", "BY", Ref("QuotedLiteralSegment"), optional=True
+                        "ESCAPED",
+                        "BY",
+                        Ref("QuotedLiteralSegment"),
+                        optional=True,
                     ),
                     optional=True,
                 ),
                 Sequence(
-                    "COLLECTION", "ITEMS", Ref("TerminatedByGrammar"), optional=True
+                    "COLLECTION",
+                    "ITEMS",
+                    Ref("TerminatedByGrammar"),
+                    optional=True,
                 ),
-                Sequence("MAP", "KEYS", Ref("TerminatedByGrammar"), optional=True),
+                Sequence(
+                    "MAP", "KEYS", Ref("TerminatedByGrammar"), optional=True
+                ),
                 Sequence("LINES", Ref("TerminatedByGrammar"), optional=True),
                 Sequence(
-                    "NULL", "DEFINED", "AS", Ref("QuotedLiteralSegment"), optional=True
+                    "NULL",
+                    "DEFINED",
+                    "AS",
+                    Ref("QuotedLiteralSegment"),
+                    optional=True,
                 ),
             ),
             Sequence(
@@ -739,7 +780,8 @@ class ShowStatementSegment(BaseSegment):
                 OneOf("FROM", "IN"),
                 OneOf(
                     Sequence(
-                        Ref("DatabaseReferenceSegment"), Ref("TableReferenceSegment")
+                        Ref("DatabaseReferenceSegment"),
+                        Ref("TableReferenceSegment"),
                     ),
                     Sequence(
                         Ref("TableReferenceSegment"),

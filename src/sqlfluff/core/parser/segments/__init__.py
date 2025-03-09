@@ -23,7 +23,10 @@ from sqlfluff.core.parser.segments.common import (
 )
 from sqlfluff.core.parser.segments.file import BaseFileSegment
 from sqlfluff.core.parser.segments.generator import SegmentGenerator
-from sqlfluff.core.parser.segments.keyword import KeywordSegment, LiteralKeywordSegment
+from sqlfluff.core.parser.segments.keyword import (
+    KeywordSegment,
+    LiteralKeywordSegment,
+)
 from sqlfluff.core.parser.segments.meta import (
     Dedent,
     EndOfFile,

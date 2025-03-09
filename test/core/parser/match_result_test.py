@@ -72,7 +72,11 @@ def _recursive_assert_pos(segment):
     ],
 )
 def test__parser__matchresult2_apply(
-    segment_seed, match_result, match_len, serialised_result, generate_test_segments
+    segment_seed,
+    match_result,
+    match_len,
+    serialised_result,
+    generate_test_segments,
 ):
     """Test MatchResult.apply().
 

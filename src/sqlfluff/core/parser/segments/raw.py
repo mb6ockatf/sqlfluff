@@ -4,7 +4,17 @@ This is designed to be the root segment, without
 any children, and the output of the lexer.
 """
 
-from typing import Any, Callable, Dict, FrozenSet, List, Optional, Tuple, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    FrozenSet,
+    List,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+)
 from uuid import uuid4
 
 import regex as re
@@ -60,7 +70,9 @@ class RawSegment(BaseSegment):
         self.segments = ()
         self.instance_types: Tuple[str, ...]
         if type:
-            assert not instance_types, "Cannot set `type` and `instance_types`."
+            assert (
+                not instance_types
+            ), "Cannot set `type` and `instance_types`."
             self.instance_types = (type,)
         else:
             self.instance_types = instance_types
@@ -242,7 +254,9 @@ class RawSegment(BaseSegment):
         return f"{self.raw!r}"
 
     def edit(
-        self, raw: Optional[str] = None, source_fixes: Optional[List[SourceFix]] = None
+        self,
+        raw: Optional[str] = None,
+        source_fixes: Optional[List[SourceFix]] = None,
     ) -> "RawSegment":
         """Create a new segment, with exactly the same position but different content.
 

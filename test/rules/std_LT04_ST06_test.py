@@ -106,7 +106,10 @@ rules = LT04, ST06
     linted_file = linter.lint_string(in_sql, fix=True)
 
     # Check expected lint errors are raised.
-    assert set([v.rule.code for v in linted_file.violations]) == {"LT04", "ST06"}
+    assert set([v.rule.code for v in linted_file.violations]) == {
+        "LT04",
+        "ST06",
+    }
 
     # Check file is fixed.
     assert linted_file.fix_string()[0] == out_sql

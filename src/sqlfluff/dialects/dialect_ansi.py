@@ -13,7 +13,16 @@ https://www.cockroachlabs.com/docs/stable/sql-grammar.html#select_stmt
 """
 
 from enum import Enum
-from typing import Generator, List, NamedTuple, Optional, Set, Tuple, Union, cast
+from typing import (
+    Generator,
+    List,
+    NamedTuple,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+    cast,
+)
 
 from sqlfluff.core.dialects.base import Dialect
 from sqlfluff.core.dialects.common import AliasInfo, ColumnAliasInfo
@@ -249,7 +258,12 @@ ansi_dialect.update_keywords_set_from_multiline_string(
 ansi_dialect.bracket_sets("bracket_pairs").update(
     [
         ("round", "StartBracketSegment", "EndBracketSegment", True),
-        ("square", "StartSquareBracketSegment", "EndSquareBracketSegment", False),
+        (
+            "square",
+            "StartSquareBracketSegment",
+            "EndSquareBracketSegment",
+            False,
+        ),
         ("curly", "StartCurlyBracketSegment", "EndCurlyBracketSegment", False),
     ]
 )
@@ -267,28 +281,38 @@ ansi_dialect.sets("value_table_functions").update([])
 ansi_dialect.add(
     # Real segments
     DelimiterGrammar=Ref("SemicolonSegment"),
-    SemicolonSegment=StringParser(";", SymbolSegment, type="statement_terminator"),
+    SemicolonSegment=StringParser(
+        ";", SymbolSegment, type="statement_terminator"
+    ),
     ColonSegment=StringParser(":", SymbolSegment, type="colon"),
     SliceSegment=StringParser(":", SymbolSegment, type="slice"),
     # NOTE: The purpose of the colon_delimiter is that it has different layout rules.
     # It assumes no whitespace on either side.
-    ColonDelimiterSegment=StringParser(":", SymbolSegment, type="colon_delimiter"),
+    ColonDelimiterSegment=StringParser(
+        ":", SymbolSegment, type="colon_delimiter"
+    ),
     StartBracketSegment=StringParser("(", SymbolSegment, type="start_bracket"),
     EndBracketSegment=StringParser(")", SymbolSegment, type="end_bracket"),
     StartSquareBracketSegment=StringParser(
         "[", SymbolSegment, type="start_square_bracket"
     ),
-    EndSquareBracketSegment=StringParser("]", SymbolSegment, type="end_square_bracket"),
+    EndSquareBracketSegment=StringParser(
+        "]", SymbolSegment, type="end_square_bracket"
+    ),
     StartCurlyBracketSegment=StringParser(
         "{", SymbolSegment, type="start_curly_bracket"
     ),
-    EndCurlyBracketSegment=StringParser("}", SymbolSegment, type="end_curly_bracket"),
+    EndCurlyBracketSegment=StringParser(
+        "}", SymbolSegment, type="end_curly_bracket"
+    ),
     CommaSegment=StringParser(",", SymbolSegment, type="comma"),
     DotSegment=StringParser(".", SymbolSegment, type="dot"),
     StarSegment=StringParser("*", SymbolSegment, type="star"),
     TildeSegment=StringParser("~", SymbolSegment, type="tilde"),
     ParameterSegment=StringParser("?", SymbolSegment, type="parameter"),
-    CastOperatorSegment=StringParser("::", SymbolSegment, type="casting_operator"),
+    CastOperatorSegment=StringParser(
+        "::", SymbolSegment, type="casting_operator"
+    ),
     PlusSegment=StringParser("+", SymbolSegment, type="binary_operator"),
     MinusSegment=StringParser("-", SymbolSegment, type="binary_operator"),
     PositiveSegment=StringParser("+", SymbolSegment, type="sign_indicator"),
@@ -303,12 +327,18 @@ ansi_dialect.add(
     LikeOperatorSegment=TypedParser(
         "like_operator", ComparisonOperatorSegment, type="like_operator"
     ),
-    RawNotSegment=StringParser("!", SymbolSegment, type="raw_comparison_operator"),
-    RawEqualsSegment=StringParser("=", SymbolSegment, type="raw_comparison_operator"),
+    RawNotSegment=StringParser(
+        "!", SymbolSegment, type="raw_comparison_operator"
+    ),
+    RawEqualsSegment=StringParser(
+        "=", SymbolSegment, type="raw_comparison_operator"
+    ),
     RawGreaterThanSegment=StringParser(
         ">", SymbolSegment, type="raw_comparison_operator"
     ),
-    RawLessThanSegment=StringParser("<", SymbolSegment, type="raw_comparison_operator"),
+    RawLessThanSegment=StringParser(
+        "<", SymbolSegment, type="raw_comparison_operator"
+    ),
     # The following functions can be called without parentheses per ANSI specification
     BareFunctionSegment=SegmentGenerator(
         lambda dialect: MultiStringParser(
@@ -325,7 +355,9 @@ ansi_dialect.add(
             r"[A-Z0-9_]*[A-Z][A-Z0-9_]*",
             IdentifierSegment,
             type="naked_identifier",
-            anti_template=r"^(" + r"|".join(dialect.sets("reserved_keywords")) + r")$",
+            anti_template=r"^("
+            + r"|".join(dialect.sets("reserved_keywords"))
+            + r")$",
             casefold=str.upper,
         )
     ),
@@ -346,7 +378,10 @@ ansi_dialect.add(
                 anti_template=r"^(NOT)$",
                 # TODO - this is a stopgap until we implement explicit data types
             ),
-            Ref("SingleIdentifierGrammar", exclude=Ref("NakedIdentifierSegment")),
+            Ref(
+                "SingleIdentifierGrammar",
+                exclude=Ref("NakedIdentifierSegment"),
+            ),
         ),
     ),
     # Ansi Intervals
@@ -378,12 +413,20 @@ ansi_dialect.add(
     ),
     # NullSegment is defined separately to the keyword, so we can give it a different
     # type
-    NullLiteralSegment=StringParser("null", LiteralKeywordSegment, type="null_literal"),
-    NanLiteralSegment=StringParser("nan", LiteralKeywordSegment, type="null_literal"),
+    NullLiteralSegment=StringParser(
+        "null", LiteralKeywordSegment, type="null_literal"
+    ),
+    NanLiteralSegment=StringParser(
+        "nan", LiteralKeywordSegment, type="null_literal"
+    ),
     UnknownLiteralSegment=Nothing(),
     NormalizedGrammar=Nothing(),
-    TrueSegment=StringParser("true", LiteralKeywordSegment, type="boolean_literal"),
-    FalseSegment=StringParser("false", LiteralKeywordSegment, type="boolean_literal"),
+    TrueSegment=StringParser(
+        "true", LiteralKeywordSegment, type="boolean_literal"
+    ),
+    FalseSegment=StringParser(
+        "false", LiteralKeywordSegment, type="boolean_literal"
+    ),
     # We use a GRAMMAR here not a Segment. Otherwise, we get an unnecessary layer
     SingleIdentifierGrammar=OneOf(
         Ref("NakedIdentifierSegment"),
@@ -429,7 +472,9 @@ ansi_dialect.add(
     # should not be changed by rules (e.g. rule CV10)
     DateTimeLiteralGrammar=Sequence(
         OneOf("DATE", "TIME", "TIMESTAMP", "INTERVAL"),
-        TypedParser("single_quote", LiteralSegment, type="date_constructor_literal"),
+        TypedParser(
+            "single_quote", LiteralSegment, type="date_constructor_literal"
+        ),
     ),
     # Hookpoint for other dialects
     # e.g. INTO is optional in BIGQUERY
@@ -734,7 +779,9 @@ ansi_dialect.add(
             Ref.keyword("COLUMN", optional=True),
             Ref("ColumnDefinitionSegment"),
             OneOf(
-                Sequence(OneOf("FIRST", "AFTER"), Ref("ColumnReferenceSegment")),
+                Sequence(
+                    OneOf("FIRST", "AFTER"), Ref("ColumnReferenceSegment")
+                ),
                 # Bracketed Version of the same
                 Ref("BracketedColumnReferenceListGrammar"),
                 optional=True,
@@ -1064,13 +1111,17 @@ class ObjectReferenceSegment(BaseSegment):
         segments: List[BaseSegment]
 
     @classmethod
-    def _iter_reference_parts(cls, elem) -> Generator[ObjectReferencePart, None, None]:
+    def _iter_reference_parts(
+        cls, elem
+    ) -> Generator[ObjectReferencePart, None, None]:
         """Extract the elements of a reference and yield."""
         # trim on quotes and split out any dots.
         for part in elem.raw_trimmed().split("."):
             yield cls.ObjectReferencePart(part, [elem])
 
-    def iter_raw_references(self) -> Generator[ObjectReferencePart, None, None]:
+    def iter_raw_references(
+        self,
+    ) -> Generator[ObjectReferencePart, None, None]:
         """Generate a list of reference strings and elements.
 
         Each reference is an ObjectReferencePart. If some are split, then a
@@ -1348,7 +1399,9 @@ ansi_dialect.add(
         # Trim function
         Sequence(
             Ref("TrimParametersGrammar"),
-            Ref("ExpressionSegment", optional=True, exclude=Ref.keyword("FROM")),
+            Ref(
+                "ExpressionSegment", optional=True, exclude=Ref.keyword("FROM")
+            ),
             "FROM",
             Ref("ExpressionSegment"),
         ),
@@ -1587,7 +1640,10 @@ class FrameClauseSegment(BaseSegment):
 
     match_grammar: Matchable = Sequence(
         Ref("FrameClauseUnitGrammar"),
-        OneOf(_frame_extent, Sequence("BETWEEN", _frame_extent, "AND", _frame_extent)),
+        OneOf(
+            _frame_extent,
+            Sequence("BETWEEN", _frame_extent, "AND", _frame_extent),
+        ),
     )
 
 
@@ -1617,7 +1673,9 @@ class FromExpressionElementSegment(BaseSegment):
             optional=True,
         ),
         # https://cloud.google.com/bigquery/docs/reference/standard-sql/arrays#flattening_arrays
-        Sequence("WITH", "OFFSET", Ref("AliasExpressionSegment"), optional=True),
+        Sequence(
+            "WITH", "OFFSET", Ref("AliasExpressionSegment"), optional=True
+        ),
         Ref("SamplingExpressionSegment", optional=True),
         Ref("PostTableExpressionGrammar", optional=True),
     )
@@ -1722,7 +1780,9 @@ class FromExpressionSegment(BaseSegment):
             Conditional(Indent, indented_joins=True),
             AnyNumberOf(
                 Sequence(
-                    OneOf(Ref("JoinClauseSegment"), Ref("JoinLikeClauseGrammar")),
+                    OneOf(
+                        Ref("JoinClauseSegment"), Ref("JoinLikeClauseGrammar")
+                    ),
                 ),
                 optional=True,
                 terminators=[Sequence("ORDER", "BY"), Sequence("GROUP", "BY")],
@@ -1818,13 +1878,19 @@ class SelectClauseElementSegment(BaseSegment):
 
     def get_alias(self) -> Optional[ColumnAliasInfo]:
         """Get info on alias within SELECT clause element."""
-        alias_expression_segment = next(self.recursive_crawl("alias_expression"), None)
+        alias_expression_segment = next(
+            self.recursive_crawl("alias_expression"), None
+        )
         if alias_expression_segment is None:
             # Return None if no alias expression is found.
             return None
 
         alias_identifier_segment = next(
-            (s for s in alias_expression_segment.segments if s.is_type("identifier")),
+            (
+                s
+                for s in alias_expression_segment.segments
+                if s.is_type("identifier")
+            ),
             None,
         )
 
@@ -1837,7 +1903,9 @@ class SelectClauseElementSegment(BaseSegment):
         aliased_segment = next(
             s
             for s in self.segments
-            if not s.is_whitespace and not s.is_meta and s != alias_expression_segment
+            if not s.is_whitespace
+            and not s.is_meta
+            and s != alias_expression_segment
         )
 
         # Find all the columns being aliased.
@@ -2298,14 +2366,18 @@ ansi_dialect.add(
                     Ref("ExpressionSegment"),
                     Ref("SelectableGrammar"),
                     Delimited(
-                        Ref("LiteralGrammar"),  # WHERE (a, 2) IN (SELECT b, c FROM ...)
+                        Ref(
+                            "LiteralGrammar"
+                        ),  # WHERE (a, 2) IN (SELECT b, c FROM ...)
                         Ref(
                             "ColumnReferenceSegment"
                         ),  # WHERE (a,b,c) IN (select a,b,c FROM...)
                         Ref(
                             "FunctionSegment"
                         ),  # WHERE (a, substr(b,1,3)) IN (select c,d FROM...)
-                        Ref("LocalAliasSegment"),  # WHERE (LOCAL.a, LOCAL.b) IN (...)
+                        Ref(
+                            "LocalAliasSegment"
+                        ),  # WHERE (LOCAL.a, LOCAL.b) IN (...)
                         Ref(
                             "ExpressionSegment"
                         ),  # SELECT (1*1, 2) IN (STRUCT(1 AS a, 2 AS b));
@@ -2389,9 +2461,13 @@ class NotEqualToSegment(CompositeComparisonOperatorSegment):
     """Not equal to operator."""
 
     match_grammar: Matchable = OneOf(
-        Sequence(Ref("RawNotSegment"), Ref("RawEqualsSegment"), allow_gaps=False),
         Sequence(
-            Ref("RawLessThanSegment"), Ref("RawGreaterThanSegment"), allow_gaps=False
+            Ref("RawNotSegment"), Ref("RawEqualsSegment"), allow_gaps=False
+        ),
+        Sequence(
+            Ref("RawLessThanSegment"),
+            Ref("RawGreaterThanSegment"),
+            allow_gaps=False,
         ),
     )
 
@@ -2428,7 +2504,9 @@ class BitwiseRShiftSegment(CompositeBinaryOperatorSegment):
     """Bitwise right-shift operator."""
 
     match_grammar: Matchable = Sequence(
-        Ref("RawGreaterThanSegment"), Ref("RawGreaterThanSegment"), allow_gaps=False
+        Ref("RawGreaterThanSegment"),
+        Ref("RawGreaterThanSegment"),
+        allow_gaps=False,
     )
 
 
@@ -2574,7 +2652,9 @@ class CubeRollupClauseSegment(BaseSegment):
 
     type = "cube_rollup_clause"
     match_grammar = Sequence(
-        OneOf(Ref("CubeFunctionNameSegment"), Ref("RollupFunctionNameSegment")),
+        OneOf(
+            Ref("CubeFunctionNameSegment"), Ref("RollupFunctionNameSegment")
+        ),
         Bracketed(
             Ref("GroupingExpressionList"),
         ),
@@ -2850,7 +2930,9 @@ ansi_dialect.add(
     ),
     # Added as part of `NonSetSelectableGrammar` where a nested `SetExpressionSegment`
     # could be used. Some dialects don't support an "ordered" set, but some may.
-    BracketedSetExpressionGrammar=Bracketed(Ref("UnorderedSetExpressionSegment")),
+    BracketedSetExpressionGrammar=Bracketed(
+        Ref("UnorderedSetExpressionSegment")
+    ),
 )
 
 
@@ -2978,12 +3060,14 @@ class SetExpressionSegment(BaseSegment):
 
     type = "set_expression"
     # match grammar
-    match_grammar: Matchable = UnorderedSetExpressionSegment.match_grammar.copy(
-        insert=[
-            Ref("OrderByClauseSegment", optional=True),
-            Ref("LimitClauseSegment", optional=True),
-            Ref("NamedWindowSegment", optional=True),
-        ],
+    match_grammar: Matchable = (
+        UnorderedSetExpressionSegment.match_grammar.copy(
+            insert=[
+                Ref("OrderByClauseSegment", optional=True),
+                Ref("LimitClauseSegment", optional=True),
+                Ref("NamedWindowSegment", optional=True),
+            ],
+        )
     )
 
 
@@ -3141,7 +3225,9 @@ class TransactionStatementSegment(BaseSegment):
         OneOf("START", "BEGIN", "COMMIT", "ROLLBACK", "END"),
         OneOf("TRANSACTION", "WORK", optional=True),
         Sequence("NAME", Ref("SingleIdentifierGrammar"), optional=True),
-        Sequence("AND", Ref.keyword("NO", optional=True), "CHAIN", optional=True),
+        Sequence(
+            "AND", Ref.keyword("NO", optional=True), "CHAIN", optional=True
+        ),
     )
 
 
@@ -3158,14 +3244,17 @@ class ColumnConstraintSegment(BaseSegment):
             optional=True,
         ),
         OneOf(
-            Sequence(Ref.keyword("NOT", optional=True), "NULL"),  # NOT NULL or NULL
+            Sequence(
+                Ref.keyword("NOT", optional=True), "NULL"
+            ),  # NOT NULL or NULL
             Sequence("CHECK", Bracketed(Ref("ExpressionSegment"))),
             Sequence(  # DEFAULT <value>
                 "DEFAULT",
                 Ref("ColumnConstraintDefaultGrammar"),
             ),
             Sequence(
-                Ref("PrimaryKeyGrammar"), Ref("NotEnforcedGrammar", optional=True)
+                Ref("PrimaryKeyGrammar"),
+                Ref("NotEnforcedGrammar", optional=True),
             ),
             Ref("UniqueKeyGrammar"),  # UNIQUE
             Ref("AutoIncrementGrammar"),
@@ -3680,7 +3769,9 @@ class AccessStatementSegment(BaseSegment):
                     _objects,
                 ),
                 Sequence("ROLE", Ref("ObjectReferenceSegment")),
-                Sequence("OWNERSHIP", "ON", "USER", Ref("ObjectReferenceSegment")),
+                Sequence(
+                    "OWNERSHIP", "ON", "USER", Ref("ObjectReferenceSegment")
+                ),
                 # In the case where a role is granted non-explicitly,
                 # e.g. GRANT ROLE_NAME TO OTHER_ROLE_NAME
                 # See https://www.postgresql.org/docs/current/sql-grant.html
@@ -3689,7 +3780,11 @@ class AccessStatementSegment(BaseSegment):
             "TO",
             OneOf("GROUP", "USER", "ROLE", "SHARE", optional=True),
             Delimited(
-                OneOf(Ref("RoleReferenceSegment"), Ref("FunctionSegment"), "PUBLIC"),
+                OneOf(
+                    Ref("RoleReferenceSegment"),
+                    Ref("FunctionSegment"),
+                    "PUBLIC",
+                ),
             ),
             OneOf(
                 Sequence("WITH", "GRANT", "OPTION"),
@@ -3722,7 +3817,9 @@ class AccessStatementSegment(BaseSegment):
                     _objects,
                 ),
                 Sequence("ROLE", Ref("ObjectReferenceSegment")),
-                Sequence("OWNERSHIP", "ON", "USER", Ref("ObjectReferenceSegment")),
+                Sequence(
+                    "OWNERSHIP", "ON", "USER", Ref("ObjectReferenceSegment")
+                ),
                 Ref("ObjectReferenceSegment"),
             ),
             "FROM",
@@ -3764,7 +3861,9 @@ class UpdateStatementSegment(BaseSegment):
         Ref("TableReferenceSegment"),
         # SET is not a reserved word in all dialects (e.g. RedShift)
         # So specifically exclude as an allowed implicit alias to avoid parsing errors
-        Ref("AliasExpressionSegment", exclude=Ref.keyword("SET"), optional=True),
+        Ref(
+            "AliasExpressionSegment", exclude=Ref.keyword("SET"), optional=True
+        ),
         Dedent,
         Ref("SetClauseListSegment"),
         Ref("FromClauseSegment", optional=True),
@@ -4156,7 +4255,9 @@ class WithDataClauseSegment(BaseSegment):
     """
 
     type = "with_data_clause"
-    match_grammar: Matchable = Sequence("WITH", Sequence("NO", optional=True), "DATA")
+    match_grammar: Matchable = Sequence(
+        "WITH", Sequence("NO", optional=True), "DATA"
+    )
 
 
 class DescribeStatementSegment(BaseSegment):
@@ -4215,7 +4316,9 @@ class CreateSequenceOptionsSegment(BaseSegment):
     match_grammar: Matchable = OneOf(
         Sequence("INCREMENT", "BY", Ref("NumericLiteralSegment")),
         Sequence(
-            "START", Ref.keyword("WITH", optional=True), Ref("NumericLiteralSegment")
+            "START",
+            Ref.keyword("WITH", optional=True),
+            Ref("NumericLiteralSegment"),
         ),
         Ref("SequenceMinValueGrammar"),
         Ref("SequenceMaxValueGrammar"),
@@ -4353,7 +4456,9 @@ class CreateTriggerStatementSegment(BaseSegment):
                 ),
             ),
             Sequence(
-                "FOR", Ref.keyword("EACH", optional=True), OneOf("ROW", "STATEMENT")
+                "FOR",
+                Ref.keyword("EACH", optional=True),
+                OneOf("ROW", "STATEMENT"),
             ),
             Sequence("WHEN", Bracketed(Ref("ExpressionSegment"))),
         ),

@@ -114,7 +114,9 @@ materialize_dialect.add(
         MultiStringParser(
             [
                 f"'{compression}'"
-                for compression in materialize_dialect.sets("materialize_sizes")
+                for compression in materialize_dialect.sets(
+                    "materialize_sizes"
+                )
             ],
             KeywordSegment,
             type="compression_type",
@@ -1169,7 +1171,13 @@ class GrantStatementSegment(BaseSegment):
                         ),
                     ),
                     Sequence(
-                        OneOf("TABLES", "TYPES", "SECRETS", "CONNECTIONS", "SCHEMAS"),
+                        OneOf(
+                            "TABLES",
+                            "TYPES",
+                            "SECRETS",
+                            "CONNECTIONS",
+                            "SCHEMAS",
+                        ),
                         "IN",
                         "DATABASE",
                         Delimited(

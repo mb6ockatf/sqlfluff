@@ -2,7 +2,12 @@
 
 from typing import Iterator, Tuple
 
-from sqlfluff.core.rules import BaseRule, EvalResultType, LintResult, RuleContext
+from sqlfluff.core.rules import (
+    BaseRule,
+    EvalResultType,
+    LintResult,
+    RuleContext,
+)
 from sqlfluff.core.rules.crawlers import SegmentSeekerCrawler
 
 
@@ -68,13 +73,17 @@ class Rule_ST10(BaseRule):
                 has_other_operators_on_lhs = any(
                     subsegments[i]
                     for i in range(idx - 1, -1, -1)
-                    if subsegments[i].is_type("comparison_operator", "binary_operator")
+                    if subsegments[i].is_type(
+                        "comparison_operator", "binary_operator"
+                    )
                 )
 
                 has_other_operators_on_rhs = any(
                     subsegments[i]
                     for i in range(idx - 1, -1, -1)
-                    if subsegments[i].is_type("comparison_operator", "binary_operator")
+                    if subsegments[i].is_type(
+                        "comparison_operator", "binary_operator"
+                    )
                 )
 
                 if has_other_operators_on_lhs or has_other_operators_on_rhs:

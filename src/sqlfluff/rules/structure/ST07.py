@@ -118,7 +118,9 @@ class Rule_ST07(BaseRule):
         if len(table_aliases) < 2:
             return unfixable_result
 
-        to_delete, insert_after_anchor = _extract_deletion_sequence_and_anchor(segment)
+        to_delete, insert_after_anchor = _extract_deletion_sequence_and_anchor(
+            segment
+        )
 
         table_a, table_b = table_aliases[:2]
         edit_segments = [
@@ -147,7 +149,9 @@ class Rule_ST07(BaseRule):
         )
 
 
-def _extract_cols_from_using(join_clause: Segments, using_segs: Segments) -> List[str]:
+def _extract_cols_from_using(
+    join_clause: Segments, using_segs: Segments
+) -> List[str]:
     # First bracket after the USING keyword, then find ids
     using_cols: List[str] = (
         join_clause.children()
@@ -214,7 +218,9 @@ def _extract_deletion_sequence_and_anchor(
     return to_delete, insert_anchor
 
 
-def _create_col_reference(table_ref: str, column_name: str) -> ColumnReferenceSegment:
+def _create_col_reference(
+    table_ref: str, column_name: str
+) -> ColumnReferenceSegment:
     segments = (
         IdentifierSegment(raw=table_ref, type="naked_identifier"),
         SymbolSegment(raw=".", type="symbol"),

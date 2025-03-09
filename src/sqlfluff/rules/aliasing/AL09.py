@@ -109,7 +109,9 @@ class Rule_AL09(BaseRule):
 
         children: Segments = FunctionalContext(context).segment.children()
 
-        for clause_element in children.select(sp.is_type("select_clause_element")):
+        for clause_element in children.select(
+            sp.is_type("select_clause_element")
+        ):
             clause_element_raw_segments = (
                 clause_element.get_raw_segments()
             )  # col_a as col_a

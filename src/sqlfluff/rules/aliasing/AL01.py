@@ -44,7 +44,9 @@ class Rule_AL01(BaseRule):
     aliases = ("L011",)
     groups: Tuple[str, ...] = ("all", "aliasing")
     config_keywords = ["aliasing"]
-    crawl_behaviour = SegmentSeekerCrawler({"alias_expression"}, provide_raw_stack=True)
+    crawl_behaviour = SegmentSeekerCrawler(
+        {"alias_expression"}, provide_raw_stack=True
+    )
     is_fix_compatible = True
 
     _target_parent_types: Tuple[str, ...] = (

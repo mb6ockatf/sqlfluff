@@ -44,7 +44,9 @@ def test__config__load_from_string():
     """Test loading config from a string."""
     # Load a string
     with open(
-        os.path.join("test", "fixtures", "config", "inheritance_a", ".sqlfluff")
+        os.path.join(
+            "test", "fixtures", "config", "inheritance_a", ".sqlfluff"
+        )
     ) as f:
         config_string = f.read()
     cfg = load_config_string(config_string)
@@ -54,7 +56,9 @@ def test__config__load_from_string():
 def test__config__load_file_f():
     """Test loading config from a file path."""
     cfg = load_config_at_path(
-        os.path.join("test", "fixtures", "config", "inheritance_a", "testing.sql")
+        os.path.join(
+            "test", "fixtures", "config", "inheritance_a", "testing.sql"
+        )
     )
     assert cfg == config_a
 
@@ -63,7 +67,9 @@ def test__config__load_file_missing_extra():
     """Test loading config from a file path if extra path is not found."""
     with pytest.raises(SQLFluffUserError):
         load_config_up_to_path(
-            os.path.join("test", "fixtures", "config", "inheritance_a", "testing.sql"),
+            os.path.join(
+                "test", "fixtures", "config", "inheritance_a", "testing.sql"
+            ),
             extra_config_path="non/existent/path",
         )
 
@@ -152,7 +158,9 @@ def test__config__load_toml():
         },
         "bar": {"foo": "foobar"},
         "fnarr": {"fnarr": {"foo": "foobar"}},
-        "rules": {"capitalisation.keywords": {"capitalisation_policy": "upper"}},
+        "rules": {
+            "capitalisation.keywords": {"capitalisation_policy": "upper"}
+        },
     }
 
 
@@ -179,7 +187,9 @@ def test__config__load_placeholder_cfg():
 
 @patch("os.path.exists")
 @patch("os.listdir")
-@pytest.mark.skipif(sys.platform == "win32", reason="Not applicable on Windows")
+@pytest.mark.skipif(
+    sys.platform == "win32", reason="Not applicable on Windows"
+)
 @pytest.mark.parametrize(
     "sys_platform,xdg_exists,default_exists,resolved_config_path,paths_checked",
     [
@@ -233,7 +243,9 @@ def test__config__get_user_config_dir_path(
 ):
     """Test loading config from user appdir."""
     xdg_home = os.environ.get("XDG_CONFIG_HOME")
-    assert xdg_home, "XDG HOME should be set by the mock. Something has gone wrong."
+    assert (
+        xdg_home
+    ), "XDG HOME should be set by the mock. Something has gone wrong."
     xdg_config_path = xdg_home + "/sqlfluff"
 
     def path_exists(check_path):
@@ -250,7 +262,10 @@ def test__config__get_user_config_dir_path(
             and not default_exists
         ):
             return False
-        if resolved_path == os.path.expanduser(xdg_config_path) and not xdg_exists:
+        if (
+            resolved_path == os.path.expanduser(xdg_config_path)
+            and not xdg_exists
+        ):
             return False
         return True
 
@@ -258,7 +273,9 @@ def test__config__get_user_config_dir_path(
 
     # Get the config path as though we are on macOS.
     resolved_path = _get_user_config_dir_path(sys_platform)
-    assert os.path.expanduser(resolved_path) == os.path.expanduser(resolved_config_path)
+    assert os.path.expanduser(resolved_path) == os.path.expanduser(
+        resolved_config_path
+    )
     mock_path_exists.assert_has_calls(
         [call(os.path.expanduser(path)) for path in paths_checked]
     )
@@ -276,9 +293,13 @@ def test__config__load_user_appdir_config(mock_load_config, mock_path_exists):
     mock_path_exists.side_effect = lambda x: True
     _load_user_appdir_config()
     # It will check that the default config path exists...
-    mock_path_exists.assert_has_calls([call(os.path.expanduser("~/.config/sqlfluff"))])
+    mock_path_exists.assert_has_calls(
+        [call(os.path.expanduser("~/.config/sqlfluff"))]
+    )
     # ...and assuming it does, it will try and load config files at that path.
-    mock_load_config.assert_has_calls([call(os.path.expanduser("~/.config/sqlfluff"))])
+    mock_load_config.assert_has_calls(
+        [call(os.path.expanduser("~/.config/sqlfluff"))]
+    )
 
 
 def test__config__toml_list_config():

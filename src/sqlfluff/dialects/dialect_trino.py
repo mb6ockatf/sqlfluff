@@ -49,7 +49,13 @@ The dialect for `Trino <https://trino.io/docs/current/>`_.""",
 
 # Set the bare functions: https://trino.io/docs/current/functions/datetime.html
 trino_dialect.sets("bare_functions").update(
-    ["current_date", "current_time", "current_timestamp", "localtime", "localtimestamp"]
+    [
+        "current_date",
+        "current_time",
+        "current_timestamp",
+        "localtime",
+        "localtimestamp",
+    ]
 )
 
 # Set keywords
@@ -72,12 +78,16 @@ trino_dialect.insert_lexer_matchers(
 )
 
 trino_dialect.add(
-    RightArrowOperator=StringParser("->", SymbolSegment, type="binary_operator"),
+    RightArrowOperator=StringParser(
+        "->", SymbolSegment, type="binary_operator"
+    ),
     LambdaArrowSegment=StringParser("->", SymbolSegment, type="lambda_arrow"),
     StartAngleBracketSegment=StringParser(
         "<", SymbolSegment, type="start_angle_bracket"
     ),
-    EndAngleBracketSegment=StringParser(">", SymbolSegment, type="end_angle_bracket"),
+    EndAngleBracketSegment=StringParser(
+        ">", SymbolSegment, type="end_angle_bracket"
+    ),
     FormatJsonEncodingGrammar=Sequence(
         "FORMAT",
         "JSON",
@@ -189,7 +199,9 @@ trino_dialect.replace(
         # Trim function
         Sequence(
             Ref("TrimParametersGrammar"),
-            Ref("ExpressionSegment", optional=True, exclude=Ref.keyword("FROM")),
+            Ref(
+                "ExpressionSegment", optional=True, exclude=Ref.keyword("FROM")
+            ),
             "FROM",
             Ref("ExpressionSegment"),
         ),
@@ -235,7 +247,9 @@ trino_dialect.replace(
             Ref("CommaSegment"),
             Ref("ExpressionSegment"),  # json_path
             OneOf(
-                Sequence("WITHOUT", Ref.keyword("ARRAY", optional=True), "WRAPPER"),
+                Sequence(
+                    "WITHOUT", Ref.keyword("ARRAY", optional=True), "WRAPPER"
+                ),
                 Sequence(
                     "WITH",
                     OneOf("CONDITIONAL", "UNCONDITIONAL", optional=True),
@@ -265,7 +279,10 @@ trino_dialect.replace(
     ),
     # match ANSI's naked identifier casefold, trino is case-insensitive.
     QuotedIdentifierSegment=TypedParser(
-        "double_quote", IdentifierSegment, type="quoted_identifier", casefold=str.upper
+        "double_quote",
+        IdentifierSegment,
+        type="quoted_identifier",
+        casefold=str.upper,
     ),
     FunctionContentsExpressionGrammar=OneOf(
         Ref("LambdaExpressionSegment"),
@@ -427,7 +444,9 @@ class FrameClauseSegment(BaseSegment):
         Sequence("CURRENT", "ROW"),
         Sequence(
             OneOf(
-                Ref("NumericLiteralSegment"), Ref("DateTimeLiteralGrammar"), "UNBOUNDED"
+                Ref("NumericLiteralSegment"),
+                Ref("DateTimeLiteralGrammar"),
+                "UNBOUNDED",
             ),
             OneOf("PRECEDING", "FOLLOWING"),
         ),
@@ -435,7 +454,10 @@ class FrameClauseSegment(BaseSegment):
 
     match_grammar: Matchable = Sequence(
         Ref("FrameClauseUnitGrammar"),
-        OneOf(_frame_extent, Sequence("BETWEEN", _frame_extent, "AND", _frame_extent)),
+        OneOf(
+            _frame_extent,
+            Sequence("BETWEEN", _frame_extent, "AND", _frame_extent),
+        ),
     )
 
 

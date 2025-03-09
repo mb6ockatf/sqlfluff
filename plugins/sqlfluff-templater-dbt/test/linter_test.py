@@ -24,7 +24,9 @@ def test__linter__skip_file(path, project_dir, dbt_fluff_config):  # noqa
     assert len(linted_path.files) == 1
     linted_file = linted_path.files[0]
     # Normalise paths to control for OS variance
-    assert os.path.normpath(linted_file.path) == os.path.normpath(model_file_path)
+    assert os.path.normpath(linted_file.path) == os.path.normpath(
+        model_file_path
+    )
     assert not linted_file.templated_file
     assert not linted_file.tree
 

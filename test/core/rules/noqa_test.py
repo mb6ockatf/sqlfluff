@@ -102,7 +102,9 @@ def test__linter__raises_malformed_noqa():
         # Test selection with names.
         (
             "noqa:capitalisation.keywords",
-            NoQaDirective(0, 0, ("CP01",), None, "noqa:capitalisation.keywords"),
+            NoQaDirective(
+                0, 0, ("CP01",), None, "noqa:capitalisation.keywords"
+            ),
         ),
         # Test selection with groups.
         (
@@ -130,7 +132,10 @@ def test_parse_noqa(input, expected):
 def test_parse_noqa_no_dups():
     """Test overlapping glob expansions don't return duplicate rules in noqa."""
     result = IgnoreMask._parse_noqa(
-        comment="noqa:L0*5,L01*", line_no=0, line_pos=0, reference_map=dummy_rule_map
+        comment="noqa:L0*5,L01*",
+        line_no=0,
+        line_pos=0,
+        reference_map=dummy_rule_map,
     )
     assert len(result.rules) == len(set(result.rules))
 
@@ -369,10 +374,14 @@ def test_linted_file_ignore_masked_violations(
         for c in noqa
     ]
     result = IgnoreMask(ignore_mask).ignore_masked_violations(violations)
-    expected_violations = [v for i, v in enumerate(violations) if i in expected]
+    expected_violations = [
+        v for i, v in enumerate(violations) if i in expected
+    ]
     assert expected_violations == result
     # Check whether "used" evaluation works
-    expected_used = [ignore_mask[i] for i, _ in enumerate(noqa) if i in used_noqas]
+    expected_used = [
+        ignore_mask[i] for i, _ in enumerate(noqa) if i in used_noqas
+    ]
     actually_used = [i for i in ignore_mask if i.used]
     assert actually_used == expected_used
 
@@ -418,7 +427,9 @@ def test_linter_noqa():
         """
     result = lntr.lint_string(sql)
     violations = result.get_violations()
-    assert {3, 6, 7, 8, 10, 12, 13, 14, 15, 18} == {v.line_no for v in violations}
+    assert {3, 6, 7, 8, 10, 12, 13, 14, 15, 18} == {
+        v.line_no for v in violations
+    }
 
 
 def test_linter_noqa_with_templating():
@@ -470,7 +481,8 @@ where
 
 @pytest.mark.parametrize("disable_noqa", [True, False])
 @pytest.mark.parametrize(
-    "sql", ["SELEC * FROM foo -- noqa: PRS\n", "{% if 1 > '2' %} -- noqa: TMP\n"]
+    "sql",
+    ["SELEC * FROM foo -- noqa: PRS\n", "{% if 1 > '2' %} -- noqa: TMP\n"],
 )
 def test_linter_noqa_prs(sql, disable_noqa, caplog):
     """Test "noqa" feature to ignore PRS or TMP at the higher "Linter" level.
@@ -590,7 +602,9 @@ def test_linter_disable_noqa_except():
 
     # Verify that noqa comment is ignored with
     # disable_noqa_except = AL02 (base rule name).
-    result_disable_noqa_except_al02 = lntr_disable_noqa_except_al02.lint_string(sql)
+    result_disable_noqa_except_al02 = (
+        lntr_disable_noqa_except_al02.lint_string(sql)
+    )
     violations_disable_noqa_except_al02 = (
         result_disable_noqa_except_al02.get_violations()
     )
@@ -598,7 +612,9 @@ def test_linter_disable_noqa_except():
     assert violations_disable_noqa_except_al02[0].rule.code == "CP01"
 
     # Verify that noqa works as expected with disable_noqa_except = core (rule alias).
-    result_disable_noqa_except_core = lntr_disable_noqa_except_core.lint_string(sql)
+    result_disable_noqa_except_core = (
+        lntr_disable_noqa_except_core.lint_string(sql)
+    )
     violations_disable_noqa_except_core = (
         result_disable_noqa_except_core.get_violations()
     )

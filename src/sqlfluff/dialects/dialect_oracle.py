@@ -71,7 +71,14 @@ oracle_dialect.sets("reserved_keywords").update(
 )
 
 oracle_dialect.sets("unreserved_keywords").update(
-    ["EDITIONABLE", "EDITIONING", "NONEDITIONABLE", "KEEP", "NOMINVALUE", "NOMAXVALUE"]
+    [
+        "EDITIONABLE",
+        "EDITIONING",
+        "NONEDITIONABLE",
+        "KEEP",
+        "NOMINVALUE",
+        "NOMAXVALUE",
+    ]
 )
 
 oracle_dialect.sets("bare_functions").clear()
@@ -143,7 +150,9 @@ oracle_dialect.add(
             Sequence(OneOf("DELETE", "PRESERVE"), Ref.keyword("ROWS")),
         ),
     ),
-    ConnectByRootGrammar=Sequence("CONNECT_BY_ROOT", Ref("NakedIdentifierSegment")),
+    ConnectByRootGrammar=Sequence(
+        "CONNECT_BY_ROOT", Ref("NakedIdentifierSegment")
+    ),
     PlusJoinSegment=Bracketed(
         StringParser("+", SymbolSegment, type="plus_join_symbol")
     ),
@@ -161,7 +170,9 @@ oracle_dialect.add(
             OneOf(Ref("ColumnReferenceSegment"), Ref("FunctionSegment")),
         ),
     ),
-    IntervalUnitsGrammar=OneOf("YEAR", "MONTH", "DAY", "HOUR", "MINUTE", "SECOND"),
+    IntervalUnitsGrammar=OneOf(
+        "YEAR", "MONTH", "DAY", "HOUR", "MINUTE", "SECOND"
+    ),
     PivotForInGrammar=Sequence(
         "FOR",
         OptionallyBracketed(Delimited(Ref("ColumnReferenceSegment"))),
@@ -194,7 +205,9 @@ oracle_dialect.replace(
             r"[A-Z0-9_]*[A-Z][A-Z0-9_#$]*",
             IdentifierSegment,
             type="naked_identifier",
-            anti_template=r"^(" + r"|".join(dialect.sets("reserved_keywords")) + r")$",
+            anti_template=r"^("
+            + r"|".join(dialect.sets("reserved_keywords"))
+            + r")$",
             casefold=str.upper,
         )
     ),
@@ -207,7 +220,9 @@ oracle_dialect.replace(
         Ref("ExpressionSegment"),
         Ref("NamedArgumentSegment"),
     ),
-    FunctionContentsGrammar=ansi_dialect.get_grammar("FunctionContentsGrammar").copy(
+    FunctionContentsGrammar=ansi_dialect.get_grammar(
+        "FunctionContentsGrammar"
+    ).copy(
         insert=[
             Ref("ListaggOverflowClauseSegment"),
         ]
@@ -252,8 +267,12 @@ oracle_dialect.replace(
                         Ref(
                             "FunctionSegment"
                         ),  # WHERE (a, substr(b,1,3)) IN (select c,d FROM...)
-                        Ref("LiteralGrammar"),  # WHERE (a, 2) IN (SELECT b, c FROM ...)
-                        Ref("LocalAliasSegment"),  # WHERE (LOCAL.a, LOCAL.b) IN (...)
+                        Ref(
+                            "LiteralGrammar"
+                        ),  # WHERE (a, 2) IN (SELECT b, c FROM ...)
+                        Ref(
+                            "LocalAliasSegment"
+                        ),  # WHERE (LOCAL.a, LOCAL.b) IN (...)
                     ),
                 ),
                 parse_mode=ParseMode.GREEDY,
@@ -299,7 +318,9 @@ oracle_dialect.replace(
     ),
     DateTimeLiteralGrammar=Sequence(
         OneOf("DATE", "TIME", "TIMESTAMP", "INTERVAL"),
-        TypedParser("single_quote", LiteralSegment, type="date_constructor_literal"),
+        TypedParser(
+            "single_quote", LiteralSegment, type="date_constructor_literal"
+        ),
         Sequence(
             Ref("IntervalUnitsGrammar"),
             Sequence("TO", Ref("IntervalUnitsGrammar"), optional=True),
@@ -308,7 +329,9 @@ oracle_dialect.replace(
     PreTableFunctionKeywordsGrammar=OneOf("LATERAL"),
     ConditionalCrossJoinKeywordsGrammar=Nothing(),
     UnconditionalCrossJoinKeywordsGrammar=Ref.keyword("CROSS"),
-    SingleIdentifierGrammar=ansi_dialect.get_grammar("SingleIdentifierGrammar").copy(
+    SingleIdentifierGrammar=ansi_dialect.get_grammar(
+        "SingleIdentifierGrammar"
+    ).copy(
         insert=[
             Ref("SqlplusSubstitutionVariableSegment"),
         ]
@@ -343,7 +366,10 @@ class AlterTableStatementSegment(ansi.AlterTableStatementSegment):
                     Sequence(
                         Ref("ParameterNameSegment"),
                         Ref("EqualsSegment", optional=True),
-                        OneOf(Ref("LiteralGrammar"), Ref("NakedIdentifierSegment")),
+                        OneOf(
+                            Ref("LiteralGrammar"),
+                            Ref("NakedIdentifierSegment"),
+                        ),
                     ),
                 ),
             ),
@@ -836,7 +862,8 @@ class OrderByClauseSegment(ansi.OrderByClauseSegment):
     """A `ORDER BY` clause like in `SELECT`."""
 
     match_grammar: Matchable = ansi.OrderByClauseSegment.match_grammar.copy(
-        insert=[Ref.keyword("SIBLINGS", optional=True)], before=Ref("ByKeywordSegment")
+        insert=[Ref.keyword("SIBLINGS", optional=True)],
+        before=Ref("ByKeywordSegment"),
     )
 
 
@@ -866,17 +893,19 @@ class UnorderedSelectStatementSegment(ansi.UnorderedSelectStatementSegment):
 class SelectStatementSegment(ansi.SelectStatementSegment):
     """A `SELECT` statement."""
 
-    match_grammar: Matchable = UnorderedSelectStatementSegment.match_grammar.copy(
-        insert=[
-            Ref("OrderByClauseSegment", optional=True),
-            Ref("FetchClauseSegment", optional=True),
-            Ref("LimitClauseSegment", optional=True),
-            Ref("NamedWindowSegment", optional=True),
-        ],
-        replace_terminators=True,
-        terminators=cast(
-            Sequence, ansi.SelectStatementSegment.match_grammar
-        ).terminators,
+    match_grammar: Matchable = (
+        UnorderedSelectStatementSegment.match_grammar.copy(
+            insert=[
+                Ref("OrderByClauseSegment", optional=True),
+                Ref("FetchClauseSegment", optional=True),
+                Ref("LimitClauseSegment", optional=True),
+                Ref("NamedWindowSegment", optional=True),
+            ],
+            replace_terminators=True,
+            terminators=cast(
+                Sequence, ansi.SelectStatementSegment.match_grammar
+            ).terminators,
+        )
     )
 
 
@@ -932,7 +961,8 @@ class PivotSegment(BaseSegment):
         Ref.keyword("XML", optional=True),
         Bracketed(
             Delimited(
-                Ref("FunctionSegment"), Ref("AliasExpressionSegment", optional=True)
+                Ref("FunctionSegment"),
+                Ref("AliasExpressionSegment", optional=True),
             ),
             Ref("PivotForInGrammar"),
         ),

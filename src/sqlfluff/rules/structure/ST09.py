@@ -122,7 +122,9 @@ class Rule_ST09(BaseRule):
 
         # the rest of the aliases come from the different join clauses
         join_clause_aliases: List[str] = [
-            cast(JoinClauseSegment, join_clause).get_eventual_aliases()[0][1].ref_str
+            cast(JoinClauseSegment, join_clause)
+            .get_eventual_aliases()[0][1]
+            .ref_str
             for join_clause in [clause for clause in join_clauses]
         ]
 
@@ -133,8 +135,8 @@ class Rule_ST09(BaseRule):
         # STEP 1.
         conditions: List[List[BaseSegment]] = []
 
-        join_on_condition__expressions = join_on_conditions.children().recursive_crawl(
-            "expression"
+        join_on_condition__expressions = (
+            join_on_conditions.children().recursive_crawl("expression")
         )
 
         for expression in join_on_condition__expressions:
@@ -196,14 +198,19 @@ class Rule_ST09(BaseRule):
 
             # there seem to be edge cases where either the first table or the second
             # table is not in table_aliases, in which case we cannot provide any fix
-            if first_table not in table_aliases or second_table not in table_aliases:
+            if (
+                first_table not in table_aliases
+                or second_table not in table_aliases
+            ):
                 continue
 
             if (
-                table_aliases.index(first_table) > table_aliases.index(second_table)
+                table_aliases.index(first_table)
+                > table_aliases.index(second_table)
                 and self.preferred_first_table_in_join_clause == "earlier"
             ) or (
-                table_aliases.index(first_table) < table_aliases.index(second_table)
+                table_aliases.index(first_table)
+                < table_aliases.index(second_table)
                 and self.preferred_first_table_in_join_clause == "later"
             ):
                 fixes = (
@@ -237,7 +244,8 @@ class Rule_ST09(BaseRule):
                         if raw_comparison_operators
                         and raw_comparison_operators[0].raw
                         in raw_comparison_operator_opposites
-                        and [r.raw for r in raw_comparison_operators] != ["<", ">"]
+                        and [r.raw for r in raw_comparison_operators]
+                        != ["<", ">"]
                         else []
                     )
                 )
@@ -259,7 +267,9 @@ class Rule_ST09(BaseRule):
 
     @staticmethod
     def _split_list_by_segment_type(
-        segment_list: List[BaseSegment], delimiter_type: str, delimiters: List[str]
+        segment_list: List[BaseSegment],
+        delimiter_type: str,
+        delimiters: List[str],
     ) -> List:
         # Break down a list into multiple sub-lists using a set of delimiters
         delimiters = [delimiter.upper() for delimiter in delimiters]

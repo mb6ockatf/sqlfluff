@@ -102,7 +102,9 @@ class AnchorEditInfo:
         return False  # pragma: no cover
 
 
-def compute_anchor_edit_info(fixes: List["LintFix"]) -> Dict[int, AnchorEditInfo]:
+def compute_anchor_edit_info(
+    fixes: List["LintFix"],
+) -> Dict[int, AnchorEditInfo]:
     """Group and count fixes by anchor, return dictionary."""
     anchor_info = defaultdict(AnchorEditInfo)  # type: ignore
     for fix in fixes:
@@ -219,7 +221,11 @@ def apply_fixes(
                 # If one of them has the same raw representation
                 # then the first that matches gets to take the
                 # original position marker.
-                if f.edit_type == "replace" and s.raw == seg.raw and not consumed_pos:
+                if (
+                    f.edit_type == "replace"
+                    and s.raw == seg.raw
+                    and not consumed_pos
+                ):
                     seg_buffer[-1].pos_marker = seg.pos_marker
                     consumed_pos = True
 
@@ -250,7 +256,9 @@ def apply_fixes(
     if fixes_applied:
         assert segment.pos_marker
         seg_buffer = list(
-            segment._position_segments(tuple(seg_buffer), parent_pos=segment.pos_marker)
+            segment._position_segments(
+                tuple(seg_buffer), parent_pos=segment.pos_marker
+            )
         )
 
     # Then recurse (i.e. deal with the children) (Requeueing)

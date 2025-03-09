@@ -116,7 +116,14 @@ tsql_dialect.sets("datetime_units").update(
 
 tsql_dialect.sets("date_part_function_name").clear()
 tsql_dialect.sets("date_part_function_name").update(
-    ["DATEADD", "DATEDIFF", "DATEDIFF_BIG", "DATENAME", "DATEPART", "DATETRUNC"]
+    [
+        "DATEADD",
+        "DATEDIFF",
+        "DATEDIFF_BIG",
+        "DATENAME",
+        "DATEPART",
+        "DATETRUNC",
+    ]
 )
 
 tsql_dialect.sets("date_format").clear()
@@ -313,7 +320,9 @@ tsql_dialect.add(
         Ref.keyword("PERCENT", optional=True),
     ),
     CursorNameGrammar=OneOf(
-        Sequence(Ref.keyword("GLOBAL", optional=True), Ref("NakedIdentifierSegment")),
+        Sequence(
+            Ref.keyword("GLOBAL", optional=True), Ref("NakedIdentifierSegment")
+        ),
         Ref("ParameterNameSegment"),
     ),
     CredentialGrammar=Sequence(
@@ -378,7 +387,9 @@ tsql_dialect.add(
         Sequence("AS", optional=True),
         Ref("DatatypeSegment"),
         AnySetOf("VARYING", Sequence("NOT", optional=True), "NULL"),
-        Sequence(Ref("EqualsSegment"), Ref("ExpressionSegment"), optional=True),
+        Sequence(
+            Ref("EqualsSegment"), Ref("ExpressionSegment"), optional=True
+        ),
     ),
     DateFormatSegment=SegmentGenerator(
         lambda dialect: MultiStringParser(
@@ -454,13 +465,17 @@ tsql_dialect.replace(
             Ref("SystemVariableSegment"),
         ],
     ),
-    ParameterNameSegment=RegexParser(r"@[A-Za-z0-9_]+", CodeSegment, type="parameter"),
+    ParameterNameSegment=RegexParser(
+        r"@[A-Za-z0-9_]+", CodeSegment, type="parameter"
+    ),
     FunctionParameterGrammar=Sequence(
         Ref("ParameterNameSegment", optional=True),
         Sequence("AS", optional=True),
         Ref("DatatypeSegment"),
         Sequence("NULL", optional=True),
-        Sequence(Ref("EqualsSegment"), Ref("ExpressionSegment"), optional=True),
+        Sequence(
+            Ref("EqualsSegment"), Ref("ExpressionSegment"), optional=True
+        ),
     ),
     FunctionNameIdentifierSegment=SegmentGenerator(
         # Generate the anti template from the set of reserved keywords
@@ -494,7 +509,10 @@ tsql_dialect.replace(
                 + r")$",
                 # TODO - this is a stopgap until we implement explicit data types
             ),
-            Ref("SingleIdentifierGrammar", exclude=Ref("NakedIdentifierSegment")),
+            Ref(
+                "SingleIdentifierGrammar",
+                exclude=Ref("NakedIdentifierSegment"),
+            ),
         ),
     ),
     PrimaryKeyGrammar=Sequence(
@@ -612,7 +630,9 @@ tsql_dialect.replace(
                         Ref(
                             "FunctionSegment"
                         ),  # WHERE (a, substr(b,1,3)) IN (select c,d FROM...)
-                        Ref("LiteralGrammar"),  # WHERE (a, 2) IN (SELECT b, c FROM ...)
+                        Ref(
+                            "LiteralGrammar"
+                        ),  # WHERE (a, 2) IN (SELECT b, c FROM ...)
                     ),
                 ),
                 parse_mode=ParseMode.GREEDY,
@@ -1763,7 +1783,9 @@ class TableOptionSegment(BaseSegment):
                                         Sequence(
                                             "MIGRATION_STATE",
                                             Ref("EqualsSegment"),
-                                            OneOf("OUTBOUND", "INBOUND", "PAUSED"),
+                                            OneOf(
+                                                "OUTBOUND", "INBOUND", "PAUSED"
+                                            ),
                                         ),
                                     ),
                                     optional=True,
@@ -1807,7 +1829,8 @@ class TableOptionSegment(BaseSegment):
                                             Ref("EqualsSegment"),
                                             Ref("TableReferenceSegment"),
                                             Bracketed(
-                                                _ledger_view_option, optional=True
+                                                _ledger_view_option,
+                                                optional=True,
                                             ),
                                             optional=True,
                                         ),
@@ -2189,7 +2212,9 @@ class PivotUnpivotStatementSegment(BaseSegment):
                         "FOR",
                         Ref("ColumnReferenceSegment"),
                         "IN",
-                        Bracketed(Delimited(Ref("PivotColumnReferenceSegment"))),
+                        Bracketed(
+                            Delimited(Ref("PivotColumnReferenceSegment"))
+                        ),
                     )
                 ),
             ),
@@ -2201,7 +2226,9 @@ class PivotUnpivotStatementSegment(BaseSegment):
                         "FOR",
                         Ref("ColumnReferenceSegment"),
                         "IN",
-                        Bracketed(Delimited(Ref("PivotColumnReferenceSegment"))),
+                        Bracketed(
+                            Delimited(Ref("PivotColumnReferenceSegment"))
+                        ),
                     )
                 ),
             ),
@@ -2508,7 +2535,9 @@ class ColumnConstraintSegment(BaseSegment):
                 Sequence(
                     "MASKED",
                     "WITH",
-                    Bracketed("FUNCTION", Ref("EqualsSegment"), Ref("LiteralGrammar")),
+                    Bracketed(
+                        "FUNCTION", Ref("EqualsSegment"), Ref("LiteralGrammar")
+                    ),
                 ),
                 Sequence(
                     Sequence(
@@ -2520,7 +2549,9 @@ class ColumnConstraintSegment(BaseSegment):
                     "DEFAULT",
                     OptionallyBracketed(
                         OneOf(
-                            OptionallyBracketed(Ref("LiteralGrammar")),  # ((-1))
+                            OptionallyBracketed(
+                                Ref("LiteralGrammar")
+                            ),  # ((-1))
                             Ref("BareFunctionSegment"),
                             Ref("FunctionSegment"),
                             Ref("NextValueSequenceSegment"),
@@ -2536,7 +2567,9 @@ class ColumnConstraintSegment(BaseSegment):
                     OneOf("START", "END"),
                     Ref.keyword("HIDDEN", optional=True),
                 ),
-                Sequence(Ref.keyword("NOT", optional=True), "NULL"),  # NOT NULL or NULL
+                Sequence(
+                    Ref.keyword("NOT", optional=True), "NULL"
+                ),  # NOT NULL or NULL
                 "ROWGUIDCOL",
                 Ref("EncryptedWithGrammar"),
                 # Primary Key without a column list
@@ -2766,7 +2799,9 @@ class SetStatementSegment(BaseSegment):
                         "CONCAT_NULL_YIELDS_NULL",
                         "CURSOR_CLOSE_ON_COMMIT",
                         "FIPS_FLAGGER",
-                        Sequence("IDENTITY_INSERT", Ref("TableReferenceSegment")),
+                        Sequence(
+                            "IDENTITY_INSERT", Ref("TableReferenceSegment")
+                        ),
                         "LANGUAGE",
                         "OFFSETS",
                         "QUOTED_IDENTIFIER",
@@ -3160,7 +3195,9 @@ class OnPartitionsSegment(BaseSegment):
                 OneOf(
                     Ref("NumericLiteralSegment"),
                     Sequence(
-                        Ref("NumericLiteralSegment"), "TO", Ref("NumericLiteralSegment")
+                        Ref("NumericLiteralSegment"),
+                        "TO",
+                        Ref("NumericLiteralSegment"),
                     ),
                 )
             )
@@ -3214,7 +3251,11 @@ class ConvertFunctionContentsSegment(BaseSegment):
             Bracketed(Ref("NumericLiteralSegment"), optional=True),
             Ref("CommaSegment"),
             Ref("ExpressionSegment"),
-            Sequence(Ref("CommaSegment"), Ref("NumericLiteralSegment"), optional=True),
+            Sequence(
+                Ref("CommaSegment"),
+                Ref("NumericLiteralSegment"),
+                optional=True,
+            ),
         ),
     )
 
@@ -3381,7 +3422,9 @@ class AlterTableStatementSegment(BaseSegment):
                 Sequence(
                     Ref("ParameterNameSegment"),
                     Ref("EqualsSegment", optional=True),
-                    OneOf(Ref("LiteralGrammar"), Ref("NakedIdentifierSegment")),
+                    OneOf(
+                        Ref("LiteralGrammar"), Ref("NakedIdentifierSegment")
+                    ),
                 ),
                 Sequence(
                     "ALTER",
@@ -3443,7 +3486,9 @@ class AlterTableStatementSegment(BaseSegment):
                                     Ref("PartitionSchemeNameSegment"),
                                     OneOf(
                                         "NULL",
-                                        Ref("LiteralGrammar"),  # for "default" value
+                                        Ref(
+                                            "LiteralGrammar"
+                                        ),  # for "default" value
                                     ),
                                 ),
                             )
@@ -3469,7 +3514,10 @@ class AlterTableStatementSegment(BaseSegment):
                                             Ref("CommaSegment"),
                                             "HISTORY_RETENTION_PERIOD",
                                             Ref("EqualsSegment"),
-                                            Ref("NumericLiteralSegment", optional=True),
+                                            Ref(
+                                                "NumericLiteralSegment",
+                                                optional=True,
+                                            ),
                                             Ref("DatetimeUnitSegment"),
                                             optional=True,
                                         ),
@@ -3492,7 +3540,10 @@ class AlterTableStatementSegment(BaseSegment):
                                             Ref("CommaSegment"),
                                             "RETENTION_PERIOD",
                                             Ref("EqualsSegment"),
-                                            Ref("NumericLiteralSegment", optional=True),
+                                            Ref(
+                                                "NumericLiteralSegment",
+                                                optional=True,
+                                            ),
                                             Ref("DatetimeUnitSegment"),
                                             optional=True,
                                         ),
@@ -3841,7 +3892,9 @@ class TransactionStatementSegment(BaseSegment):
             Sequence("DISTRIBUTED", optional=True),
             Ref("TransactionGrammar"),
             Ref("SingleIdentifierGrammar", optional=True),
-            Sequence("WITH", "MARK", Ref("QuotedIdentifierSegment"), optional=True),
+            Sequence(
+                "WITH", "MARK", Ref("QuotedIdentifierSegment"), optional=True
+            ),
             Ref("DelimiterGrammar", optional=True),
         ),
         Sequence(
@@ -4011,7 +4064,8 @@ class FileSegment(BaseFileSegment):
             Ref("BatchSegment"),
             delimiter=AnyNumberOf(
                 Sequence(
-                    Ref("DelimiterGrammar", optional=True), Ref("BatchDelimiterGrammar")
+                    Ref("DelimiterGrammar", optional=True),
+                    Ref("BatchDelimiterGrammar"),
                 ),
                 min_times=1,
             ),
@@ -4241,7 +4295,9 @@ class TableExpressionSegment(BaseSegment):
     type = "table_expression"
     match_grammar: Matchable = OneOf(
         Ref("ValuesClauseSegment"),
-        Sequence(Ref("TableReferenceSegment"), Ref("PostTableExpressionGrammar")),
+        Sequence(
+            Ref("TableReferenceSegment"), Ref("PostTableExpressionGrammar")
+        ),
         Ref("BareFunctionSegment"),
         Ref("FunctionSegment"),
         Ref("OpenRowSetSegment"),
@@ -4595,14 +4651,17 @@ class QueryHintSegment(BaseSegment):
                 Bracketed(
                     Ref("ParameterNameSegment"),
                     OneOf(
-                        "UNKNOWN", Sequence(Ref("EqualsSegment"), Ref("LiteralGrammar"))
+                        "UNKNOWN",
+                        Sequence(Ref("EqualsSegment"), Ref("LiteralGrammar")),
                     ),
                     AnyNumberOf(
                         Ref("CommaSegment"),
                         Ref("ParameterNameSegment"),
                         OneOf(
                             "UNKNOWN",
-                            Sequence(Ref("EqualsSegment"), Ref("LiteralGrammar")),
+                            Sequence(
+                                Ref("EqualsSegment"), Ref("LiteralGrammar")
+                            ),
                         ),
                     ),
                 ),
@@ -4664,7 +4723,10 @@ class TableHintSegment(BaseSegment):
             "INDEX",
             Bracketed(
                 Delimited(
-                    OneOf(Ref("IndexReferenceSegment"), Ref("NumericLiteralSegment")),
+                    OneOf(
+                        Ref("IndexReferenceSegment"),
+                        Ref("NumericLiteralSegment"),
+                    ),
                 ),
             ),
         ),
@@ -4672,7 +4734,9 @@ class TableHintSegment(BaseSegment):
             "INDEX",
             Ref("EqualsSegment"),
             Bracketed(
-                OneOf(Ref("IndexReferenceSegment"), Ref("NumericLiteralSegment")),
+                OneOf(
+                    Ref("IndexReferenceSegment"), Ref("NumericLiteralSegment")
+                ),
             ),
         ),
         "KEEPIDENTITY",
@@ -4683,7 +4747,9 @@ class TableHintSegment(BaseSegment):
                 Ref("IndexReferenceSegment"),
                 Bracketed(
                     Ref("SingleIdentifierGrammar"),
-                    AnyNumberOf(Ref("CommaSegment"), Ref("SingleIdentifierGrammar")),
+                    AnyNumberOf(
+                        Ref("CommaSegment"), Ref("SingleIdentifierGrammar")
+                    ),
                 ),
                 optional=True,
             ),
@@ -4863,13 +4929,19 @@ class ExecuteScriptSegment(BaseSegment):
     type = "execute_script_statement"
     match_grammar = Sequence(
         OneOf("EXEC", "EXECUTE"),
-        Sequence(Ref("ParameterNameSegment"), Ref("EqualsSegment"), optional=True),
+        Sequence(
+            Ref("ParameterNameSegment"), Ref("EqualsSegment"), optional=True
+        ),
         OptionallyBracketed(
             OneOf(Ref("ObjectReferenceSegment"), Ref("QuotedLiteralSegment"))
         ),
         Indent,
         Sequence(
-            Sequence(Ref("ParameterNameSegment"), Ref("EqualsSegment"), optional=True),
+            Sequence(
+                Ref("ParameterNameSegment"),
+                Ref("EqualsSegment"),
+                optional=True,
+            ),
             OneOf(
                 "DEFAULT",
                 Ref("LiteralGrammar"),
@@ -4880,7 +4952,9 @@ class ExecuteScriptSegment(BaseSegment):
             AnyNumberOf(
                 Ref("CommaSegment"),
                 Sequence(
-                    Ref("ParameterNameSegment"), Ref("EqualsSegment"), optional=True
+                    Ref("ParameterNameSegment"),
+                    Ref("EqualsSegment"),
+                    optional=True,
                 ),
                 OneOf(
                     "DEFAULT",
@@ -4943,7 +5017,11 @@ class MergeStatementSegment(ansi.MergeStatementSegment):
             ),
             optional=True,
         ),
-        Ref("AliasExpressionSegment", optional=True, exclude=Ref.keyword("USING")),
+        Ref(
+            "AliasExpressionSegment",
+            optional=True,
+            exclude=Ref.keyword("USING"),
+        ),
         Dedent,
         "USING",
         Indent,
@@ -5257,7 +5335,9 @@ class CreateTriggerStatementSegment(BaseSegment):
             optional=True,
         ),
         OneOf(
-            Sequence("FOR", Delimited(Ref("SingleIdentifierGrammar"), optional=True)),
+            Sequence(
+                "FOR", Delimited(Ref("SingleIdentifierGrammar"), optional=True)
+            ),
             "AFTER",
             Sequence("INSTEAD", "OF"),
             optional=True,
@@ -5289,7 +5369,9 @@ class DropTriggerStatementSegment(BaseSegment):
         "TRIGGER",
         Ref("IfExistsGrammar", optional=True),
         Delimited(Ref("TriggerReferenceSegment")),
-        Sequence("ON", OneOf("DATABASE", Sequence("ALL", "SERVER")), optional=True),
+        Sequence(
+            "ON", OneOf("DATABASE", Sequence("ALL", "SERVER")), optional=True
+        ),
     )
 
 
@@ -5310,7 +5392,11 @@ class DisableTriggerStatementSegment(BaseSegment):
         ),
         Sequence(
             "ON",
-            OneOf(Ref("ObjectReferenceSegment"), "DATABASE", Sequence("ALL", "SERVER")),
+            OneOf(
+                Ref("ObjectReferenceSegment"),
+                "DATABASE",
+                Sequence("ALL", "SERVER"),
+            ),
             optional=True,
         ),
     )
@@ -5590,7 +5676,9 @@ class FetchCursorStatementSegment(BaseSegment):
         OneOf("NEXT", "PRIOR", "FIRST", "LAST", optional=True),
         "FROM",
         Ref("CursorNameGrammar"),
-        Sequence("INTO", Delimited(Ref("ParameterNameSegment")), optional=True),
+        Sequence(
+            "INTO", Delimited(Ref("ParameterNameSegment")), optional=True
+        ),
     )
 
 
@@ -5658,7 +5746,8 @@ class SamplingExpressionSegment(ansi.SamplingExpressionSegment):
         Sequence("SYSTEM", optional=True),
         Bracketed(
             Sequence(
-                Ref("NumericLiteralSegment"), OneOf("PERCENT", "ROWS", optional=True)
+                Ref("NumericLiteralSegment"),
+                OneOf("PERCENT", "ROWS", optional=True),
             )
         ),
         Sequence(
@@ -5685,19 +5774,29 @@ class TemporalQuerySegment(ansi.TemporalQuerySegment):
             Sequence(
                 "AS",
                 "OF",
-                OneOf(Ref("QuotedLiteralSegment"), Ref("ParameterNameSegment")),
+                OneOf(
+                    Ref("QuotedLiteralSegment"), Ref("ParameterNameSegment")
+                ),
             ),
             Sequence(
                 "FROM",
-                OneOf(Ref("QuotedLiteralSegment"), Ref("ParameterNameSegment")),
+                OneOf(
+                    Ref("QuotedLiteralSegment"), Ref("ParameterNameSegment")
+                ),
                 "TO",
-                OneOf(Ref("QuotedLiteralSegment"), Ref("ParameterNameSegment")),
+                OneOf(
+                    Ref("QuotedLiteralSegment"), Ref("ParameterNameSegment")
+                ),
             ),
             Sequence(
                 "BETWEEN",
-                OneOf(Ref("QuotedLiteralSegment"), Ref("ParameterNameSegment")),
+                OneOf(
+                    Ref("QuotedLiteralSegment"), Ref("ParameterNameSegment")
+                ),
                 "AND",
-                OneOf(Ref("QuotedLiteralSegment"), Ref("ParameterNameSegment")),
+                OneOf(
+                    Ref("QuotedLiteralSegment"), Ref("ParameterNameSegment")
+                ),
             ),
             Sequence(
                 "CONTAINED",
@@ -5831,7 +5930,10 @@ class ExternalFileFormatDelimitedTextFormatOptionClause(BaseSegment):
     match_grammar = OneOf(
         Sequence(
             OneOf(
-                "FIELD_TERMINATOR", "STRING_DELIMITER", "DATE_FORMAT", "PARSER_VERSION"
+                "FIELD_TERMINATOR",
+                "STRING_DELIMITER",
+                "DATE_FORMAT",
+                "PARSER_VERSION",
             ),
             Ref("EqualsSegment"),
             Ref("QuotedLiteralSegment"),

@@ -55,7 +55,9 @@ class Rule_LT08(BaseRule):
         # Find all the closing brackets. They are our anchor points.
         bracket_indices = []
         expanded_segments = list(
-            context.segment.iter_segments(expanding=["common_table_expression"])
+            context.segment.iter_segments(
+                expanding=["common_table_expression"]
+            )
         )
         for idx, seg in enumerate(expanded_segments):
             if seg.is_type("bracketed"):
@@ -143,7 +145,9 @@ class Rule_LT08(BaseRule):
             # to correct the issue.
 
             # First handle the potential simple case of a current one line
-            fix_type = "create_before"  # In most cases we just insert newlines.
+            fix_type = (
+                "create_before"  # In most cases we just insert newlines.
+            )
             if comma_style == "oneline":
                 # Here we respect the target comma style to insert at the
                 # relevant point.
@@ -204,6 +208,8 @@ class Rule_LT08(BaseRule):
                 )
             ]
             # Create a result, anchored on the start of the next content.
-            error_buffer.append(LintResult(anchor=forward_slice[seg_idx], fixes=fixes))
+            error_buffer.append(
+                LintResult(anchor=forward_slice[seg_idx], fixes=fixes)
+            )
         # Return the buffer if we have one.
         return error_buffer or None

@@ -103,7 +103,9 @@ class Rule_RF02(Rule_AL04):
                 continue
 
             # Skip if matches ignore regex
-            if self.ignore_words_regex and regex.search(self.ignore_words_regex, r.raw):
+            if self.ignore_words_regex and regex.search(
+                self.ignore_words_regex, r.raw
+            ):
                 continue
 
             this_ref_type = r.qualification()

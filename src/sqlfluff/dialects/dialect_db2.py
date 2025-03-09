@@ -51,7 +51,9 @@ db2_dialect.replace(
             r"[A-Z0-9_#]*[A-Z#][A-Z0-9_#]*",
             IdentifierSegment,
             type="naked_identifier",
-            anti_template=r"^(" + r"|".join(dialect.sets("reserved_keywords")) + r")$",
+            anti_template=r"^("
+            + r"|".join(dialect.sets("reserved_keywords"))
+            + r")$",
             casefold=str.upper,
         )
     ),
@@ -87,7 +89,9 @@ db2_dialect.replace(
     ).copy(
         insert=[Ref.keyword("OFFSET")],
     ),
-    OrderByClauseTerminators=ansi_dialect.get_grammar("OrderByClauseTerminators").copy(
+    OrderByClauseTerminators=ansi_dialect.get_grammar(
+        "OrderByClauseTerminators"
+    ).copy(
         insert=[Ref.keyword("OFFSET")],
     ),
     Expression_C_Grammar=OneOf(
@@ -213,7 +217,9 @@ db2_dialect.add(
                 "ISOLATION",
                 Sequence("LOCALE", OneOf("LC_MESSAGES", "LC_TIME")),
                 Sequence("LOCK", "TIMEOUT"),
-                Sequence("MAINTAINED", "TABLE", "TYPES", "FOR", "OPTIMIZATION"),
+                Sequence(
+                    "MAINTAINED", "TABLE", "TYPES", "FOR", "OPTIMIZATION"
+                ),
                 Sequence("MDC", "ROLLOUT", "MODE"),
                 "MEMBER",
                 Sequence("OPTIMIZATION", "PROFILE"),
@@ -466,7 +472,9 @@ class CreateIndexStatementSegment(ansi.CreateIndexStatementSegment):
                     "USING",
                     OptionallyBracketed(
                         Ref("IndexReferenceSegment"),
-                        Bracketed(Delimited(Ref("BaseExpressionElementGrammar"))),
+                        Bracketed(
+                            Delimited(Ref("BaseExpressionElementGrammar"))
+                        ),
                     ),
                 ),
             ),
@@ -570,7 +578,8 @@ class WithinGroupClauseSegment(BaseSegment):
         "WITHIN",
         "GROUP",
         Bracketed(
-            Ref("OrderByClauseSegment", optional=True), parse_mode=ParseMode.GREEDY
+            Ref("OrderByClauseSegment", optional=True),
+            parse_mode=ParseMode.GREEDY,
         ),
     )
 

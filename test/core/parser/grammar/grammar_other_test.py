@@ -218,7 +218,9 @@ def test__parser__grammar_anything_match(
     """
     ctx = ParseContext(dialect=fresh_ansi_dialect)
     terms = [StringParser(kw, KeywordSegment) for kw in terminators]
-    result = Anything(terminators=terms).match(test_segments, 0, parse_context=ctx)
+    result = Anything(terminators=terms).match(
+        test_segments, 0, parse_context=ctx
+    )
     assert result.matched_slice == slice(0, match_length)
     assert result.matched_class is None  # We shouldn't have set a class
 

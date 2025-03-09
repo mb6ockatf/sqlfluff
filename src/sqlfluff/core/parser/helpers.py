@@ -34,7 +34,9 @@ def check_still_complete(
 def trim_non_code_segments(
     segments: Tuple["BaseSegment", ...],
 ) -> Tuple[
-    Tuple["BaseSegment", ...], Tuple["BaseSegment", ...], Tuple["BaseSegment", ...]
+    Tuple["BaseSegment", ...],
+    Tuple["BaseSegment", ...],
+    Tuple["BaseSegment", ...],
 ]:
     """Take segments and split off surrounding non-code segments as appropriate.
 

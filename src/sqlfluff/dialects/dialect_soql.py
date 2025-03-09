@@ -118,7 +118,9 @@ soql_dialect.replace(
     ),
     DateTimeLiteralGrammar=OneOf(
         TypedParser("date_literal", LiteralSegment, type="date_literal"),
-        TypedParser("datetime_literal", LiteralSegment, type="datetime_literal"),
+        TypedParser(
+            "datetime_literal", LiteralSegment, type="datetime_literal"
+        ),
         Sequence(
             OneOf("DATE", "TIME", "TIMESTAMP", "INTERVAL"),
             TypedParser(

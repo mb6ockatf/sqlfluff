@@ -2,7 +2,15 @@
 
 import copy
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, FrozenSet, Optional, Sequence, Tuple, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    FrozenSet,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+)
 
 if TYPE_CHECKING:  # pragma: no cover
     from sqlfluff.core.parser.context import ParseContext
@@ -25,7 +33,9 @@ class Matchable(ABC):
 
     @abstractmethod
     def simple(
-        self, parse_context: "ParseContext", crumbs: Optional[Tuple[str, ...]] = None
+        self,
+        parse_context: "ParseContext",
+        crumbs: Optional[Tuple[str, ...]] = None,
     ) -> Optional[Tuple[FrozenSet[str], FrozenSet[str]]]:
         """Try to obtain a simple response from the matcher.
 

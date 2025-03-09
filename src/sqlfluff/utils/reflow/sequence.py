@@ -2,7 +2,16 @@
 
 import logging
 from itertools import chain
-from typing import Iterator, List, Literal, Optional, Sequence, Tuple, Type, cast
+from typing import (
+    Iterator,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    cast,
+)
 
 from sqlfluff.core.config import FluffConfig
 from sqlfluff.core.parser import BaseSegment, RawSegment
@@ -16,7 +25,10 @@ from sqlfluff.utils.reflow.elements import (
     get_consumed_whitespace,
 )
 from sqlfluff.utils.reflow.helpers import fixes_from_results
-from sqlfluff.utils.reflow.rebreak import rebreak_keywords_sequence, rebreak_sequence
+from sqlfluff.utils.reflow.rebreak import (
+    rebreak_keywords_sequence,
+    rebreak_sequence,
+)
 from sqlfluff.utils.reflow.reindent import (
     construct_single_indent,
     lint_indent_points,
@@ -123,12 +135,16 @@ class ReflowSequence:
         except AssertionError as err:  # pragma: no cover
             for elem in elements:
                 reflow_logger.error("   - %s", elem)
-            reflow_logger.exception("Assertion check on ReflowSequence failed.")
+            reflow_logger.exception(
+                "Assertion check on ReflowSequence failed."
+            )
             raise err
 
     @staticmethod
     def _elements_from_raw_segments(
-        segments: Sequence[RawSegment], reflow_config: ReflowConfig, depth_map: DepthMap
+        segments: Sequence[RawSegment],
+        reflow_config: ReflowConfig,
+        depth_map: DepthMap,
     ) -> ReflowSequenceType:
         """Construct reflow elements from raw segments.
 
@@ -206,7 +222,9 @@ class ReflowSequence:
 
     @classmethod
     def from_root(
-        cls: Type["ReflowSequence"], root_segment: BaseSegment, config: FluffConfig
+        cls: Type["ReflowSequence"],
+        root_segment: BaseSegment,
+        config: FluffConfig,
     ) -> "ReflowSequence":
         """Generate a sequence from a root segment.
 
@@ -339,7 +357,9 @@ class ReflowSequence:
         assert pos in ("before", "after")
         target_idx = self._find_element_idx_with(target)
         # Are we trying to insert something whitespace-like?
-        if insertion.is_type("whitespace", "indent", "newline"):  # pragma: no cover
+        if insertion.is_type(
+            "whitespace", "indent", "newline"
+        ):  # pragma: no cover
             raise ValueError(
                 "ReflowSequence.insert() does not support direct insertion of "
                 "spacing elements such as whitespace or newlines"
@@ -371,7 +391,9 @@ class ReflowSequence:
                 depth_map=self.depth_map,
                 # Generate the fix to do the removal.
                 lint_results=[
-                    LintResult(target, [LintFix.create_before(target, [insertion])])
+                    LintResult(
+                        target, [LintFix.create_before(target, [insertion])]
+                    )
                 ],
             )
         elif pos == "after":  # pragma: no cover
@@ -387,7 +409,9 @@ class ReflowSequence:
                 depth_map=self.depth_map,
                 # Generate the fix to do the removal.
                 lint_results=[
-                    LintResult(target, [LintFix.create_after(target, [insertion])])
+                    LintResult(
+                        target, [LintFix.create_after(target, [insertion])]
+                    )
                 ],
             )
         raise ValueError(
@@ -418,7 +442,9 @@ class ReflowSequence:
             # NOTE: if target raws has more than one segment we take the depth info
             # of the first one. We trim to avoid including the implications of removed
             # "container" segments.
-            self.depth_map.copy_depth_info(target_raws[0], edit_raw, trim=trim_amount)
+            self.depth_map.copy_depth_info(
+                target_raws[0], edit_raw, trim=trim_amount
+            )
 
         # It's much easier to just totally reconstruct the sequence rather
         # than do surgery on the elements.
@@ -434,7 +460,9 @@ class ReflowSequence:
 
         return ReflowSequence(
             self._elements_from_raw_segments(
-                current_raws[:start_idx] + edit_raws + current_raws[last_idx + 1 :],
+                current_raws[:start_idx]
+                + edit_raws
+                + current_raws[last_idx + 1 :],
                 reflow_config=self.reflow_config,
                 # NOTE: the depth map has been mutated to include the new segments.
                 depth_map=self.depth_map,
@@ -447,7 +475,9 @@ class ReflowSequence:
 
     def _iter_points_with_constraints(
         self,
-    ) -> Iterator[Tuple[ReflowPoint, Optional[ReflowBlock], Optional[ReflowBlock]]]:
+    ) -> Iterator[
+        Tuple[ReflowPoint, Optional[ReflowBlock], Optional[ReflowBlock]]
+    ]:
         for idx, elem in enumerate(self.elements):
             # Only evaluate points.
             if isinstance(elem, ReflowPoint):
@@ -555,7 +585,9 @@ class ReflowSequence:
 
         # Delegate to the rebreak algorithm
         if rebreak_type == "lines":
-            elem_buff, lint_results = rebreak_sequence(self.elements, self.root_segment)
+            elem_buff, lint_results = rebreak_sequence(
+                self.elements, self.root_segment
+            )
         elif rebreak_type == "keywords":
             elem_buff, lint_results = rebreak_keywords_sequence(
                 self.elements, self.root_segment

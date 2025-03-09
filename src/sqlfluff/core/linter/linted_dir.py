@@ -4,7 +4,16 @@ This stores the idea of a collection of linted files at a single start path
 
 """
 
-from typing import Dict, Iterable, List, Optional, Tuple, Type, TypedDict, Union
+from typing import (
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypedDict,
+    Union,
+)
 
 from sqlfluff.core.errors import (
     CheckTuple,
@@ -80,14 +89,20 @@ class LintedDir:
             "violations": violation_records,
             "statistics": {
                 "source_chars": (
-                    len(file.templated_file.source_str) if file.templated_file else 0
+                    len(file.templated_file.source_str)
+                    if file.templated_file
+                    else 0
                 ),
                 "templated_chars": (
-                    len(file.templated_file.templated_str) if file.templated_file else 0
+                    len(file.templated_file.templated_str)
+                    if file.templated_file
+                    else 0
                 ),
                 # These are all the segments in the tree
                 "segments": (
-                    file.tree.count_segments(raw_only=False) if file.tree else 0
+                    file.tree.count_segments(raw_only=False)
+                    if file.tree
+                    else 0
                 ),
                 # These are just the "leaf" nodes of the tree
                 "raw_segments": (
@@ -120,7 +135,9 @@ class LintedDir:
             filter_warning=False,
         )
         self.num_unfiltered_tmp_prs_errors += _unfiltered_tmp_prs_errors
-        self._unfiltered_tmp_prs_errors_map[file.path] = _unfiltered_tmp_prs_errors
+        self._unfiltered_tmp_prs_errors_map[file.path] = (
+            _unfiltered_tmp_prs_errors
+        )
         self.num_tmp_prs_errors += file.num_violations(
             types=TMP_PRS_ERROR_TYPES,
         )
@@ -175,19 +192,24 @@ class LintedDir:
 
     def num_violations(
         self,
-        types: Optional[Union[Type[SQLBaseError], Iterable[Type[SQLBaseError]]]] = None,
+        types: Optional[
+            Union[Type[SQLBaseError], Iterable[Type[SQLBaseError]]]
+        ] = None,
         fixable: Optional[bool] = None,
     ) -> int:
         """Count the number of violations in the path."""
         return sum(
-            file.num_violations(types=types, fixable=fixable) for file in self.files
+            file.num_violations(types=types, fixable=fixable)
+            for file in self.files
         )
 
     def get_violations(
         self, rules: Optional[Union[str, Tuple[str, ...]]] = None
     ) -> List[SQLBaseError]:
         """Return a list of violations in the path."""
-        return [v for file in self.files for v in file.get_violations(rules=rules)]
+        return [
+            v for file in self.files for v in file.get_violations(rules=rules)
+        ]
 
     def as_records(self) -> List[LintingRecord]:
         """Return the result as a list of dictionaries.
@@ -216,7 +238,9 @@ class LintedDir:
 
         This also logs the output as we go using the formatter if present.
         """
-        assert self.retain_files, "cannot `persist_changes()` without `retain_files`"
+        assert (
+            self.retain_files
+        ), "cannot `persist_changes()` without `retain_files`"
         # Run all the fixes for all the files and return a dict
         buffer: Dict[str, Union[bool, str]] = {}
         for file in self.files:
@@ -225,7 +249,9 @@ class LintedDir:
             )
         return buffer
 
-    def discard_fixes_for_lint_errors_in_files_with_tmp_or_prs_errors(self) -> None:
+    def discard_fixes_for_lint_errors_in_files_with_tmp_or_prs_errors(
+        self,
+    ) -> None:
         """Discard lint fixes for files with templating or parse errors."""
         if self.num_unfiltered_tmp_prs_errors:
             # Filter serialised versions if present.
@@ -247,7 +273,9 @@ class LintedDir:
     @property
     def tree(self) -> Optional[BaseSegment]:
         """A convenience method for when there is only one file and we want the tree."""
-        assert self.retain_files, ".tree() cannot be called if `retain_files` is False."
+        assert (
+            self.retain_files
+        ), ".tree() cannot be called if `retain_files` is False."
         assert (
             len(self.files) == 1
         ), ".tree() cannot be called when a LintedDir contains more than one file."

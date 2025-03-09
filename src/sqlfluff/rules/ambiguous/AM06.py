@@ -105,7 +105,9 @@ class Rule_AM06(BaseRule):
         )
 
         # Ignore Windowing clauses
-        if FunctionalContext(context).parent_stack.any(sp.is_type(*self._ignore_types)):
+        if FunctionalContext(context).parent_stack.any(
+            sp.is_type(*self._ignore_types)
+        ):
             return LintResult(memory=context.memory)
 
         # Ignore Array expressions in BigQuery

@@ -30,11 +30,15 @@ def _get_point_pos_at_idx(
 ) -> PositionMarker:
     if idx < len(segments):
         _next_pos = segments[idx].pos_marker
-        assert _next_pos, "Segments passed to .apply() should all have position."
+        assert (
+            _next_pos
+        ), "Segments passed to .apply() should all have position."
         return _next_pos.start_point_marker()
     else:
         _prev_pos = segments[idx - 1].pos_marker
-        assert _prev_pos, "Segments passed to .apply() should all have position."
+        assert (
+            _prev_pos
+        ), "Segments passed to .apply() should all have position."
         return _prev_pos.end_point_marker()
 
 
@@ -176,7 +180,9 @@ class MatchResult:
         # through. It's not valid to add a matched class to an empty
         # result.
         if not slice_length(self.matched_slice) and not self.insert_segments:
-            assert not insert_segments, "Cannot wrap inserts onto an empty match."
+            assert (
+                not insert_segments
+            ), "Cannot wrap inserts onto an empty match."
             return self
 
         child_matches: Tuple[MatchResult, ...]
@@ -200,7 +206,9 @@ class MatchResult:
             child_matches=child_matches,
         )
 
-    def apply(self, segments: Tuple["BaseSegment", ...]) -> Tuple["BaseSegment", ...]:
+    def apply(
+        self, segments: Tuple["BaseSegment", ...]
+    ) -> Tuple["BaseSegment", ...]:
         """Actually this match to segments to instantiate.
 
         This turns a theoretical match into a nested structure of segments.
@@ -223,7 +231,9 @@ class MatchResult:
                 f"Result: {self}"
             )
             if self.insert_segments:
-                assert segments, "Cannot insert segments without reference position."
+                assert (
+                    segments
+                ), "Cannot insert segments without reference position."
                 for idx, seg in self.insert_segments:
                     assert idx == self.matched_slice.start, (
                         f"Tried to insert @{idx} outside of matched "

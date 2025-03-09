@@ -127,7 +127,9 @@ class ParseContext:
         """
         indentation_config = config.get_section("indentation") or {}
         try:
-            indentation_config = {k: bool(v) for k, v in indentation_config.items()}
+            indentation_config = {
+                k: bool(v) for k, v in indentation_config.items()
+            }
         except TypeError:  # pragma: no cover
             raise TypeError(
                 "One of the configuration keys in the `indentation` section is not "
@@ -171,7 +173,9 @@ class ParseContext:
             # we don't know what else has a reference to the input list, and
             # we rely a lot in this code on having full control over the
             # list of terminators.
-            self.terminators = tuple(push_terminators) if push_terminators else ()
+            self.terminators = (
+                tuple(push_terminators) if push_terminators else ()
+            )
         elif push_terminators:
             # Yes, inefficient for now.
             for terminator in push_terminators:
@@ -240,13 +244,17 @@ class ParseContext:
         self._match_stack.append(self.match_segment)
         self.match_segment = name
         self.match_depth += 1
-        _append, _terms = self._set_terminators(clear_terminators, push_terminators)
+        _append, _terms = self._set_terminators(
+            clear_terminators, push_terminators
+        )
         _track_progress = self.track_progress
         if track_progress is False:
             self.track_progress = False
         elif track_progress is True:  # pragma: no cover
             # We can't go from False to True. Raise an issue if not.
-            assert self.track_progress is True, "Cannot set tracking from False to True"
+            assert (
+                self.track_progress is True
+            ), "Cannot set tracking from False to True"
         try:
             yield self
         finally:
@@ -301,7 +309,9 @@ class ParseContext:
         self._current_char = char_idx
         return None
 
-    def stack(self) -> Tuple[Tuple[str, ...], Tuple[str, ...]]:  # pragma: no cover
+    def stack(
+        self,
+    ) -> Tuple[Tuple[str, ...], Tuple[str, ...]]:  # pragma: no cover
         """Return stacks as a tuples so that it can't be edited."""
         return tuple(self._parse_stack), tuple(self._match_stack)
 

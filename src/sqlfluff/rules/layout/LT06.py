@@ -64,7 +64,9 @@ class Rule_LT06(BaseRule):
             if intermediate_segments.all(sp.is_type("whitespace", "newline")):
                 return LintResult(
                     anchor=intermediate_segments[0],
-                    fixes=[LintFix.delete(seg) for seg in intermediate_segments],
+                    fixes=[
+                        LintFix.delete(seg) for seg in intermediate_segments
+                    ],
                 )
             else:
                 # It's not all whitespace, just report the error.

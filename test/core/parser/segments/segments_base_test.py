@@ -41,7 +41,9 @@ def test__parser__base_segments_direct_descendant_type_set(
     assert test_seg.direct_descendant_type_set == {"base", "dummy_aux"}
 
 
-def test__parser__base_segments_to_tuple_a(raw_segments, DummySegment, DummyAuxSegment):
+def test__parser__base_segments_to_tuple_a(
+    raw_segments, DummySegment, DummyAuxSegment
+):
     """Test the .to_tuple() method."""
     test_seg = DummySegment([DummyAuxSegment(raw_segments)])
     assert test_seg.to_tuple() == (
@@ -50,18 +52,27 @@ def test__parser__base_segments_to_tuple_a(raw_segments, DummySegment, DummyAuxS
     )
 
 
-def test__parser__base_segments_to_tuple_b(raw_segments, DummySegment, DummyAuxSegment):
+def test__parser__base_segments_to_tuple_b(
+    raw_segments, DummySegment, DummyAuxSegment
+):
     """Test the .to_tuple() method."""
     test_seg = DummySegment(
         [DummyAuxSegment(raw_segments + (DummyAuxSegment(raw_segments[:1]),))]
     )
     assert test_seg.to_tuple() == (
         "dummy",
-        (("dummy_aux", (("raw", ()), ("raw", ()), ("dummy_aux", (("raw", ()),)))),),
+        (
+            (
+                "dummy_aux",
+                (("raw", ()), ("raw", ()), ("dummy_aux", (("raw", ()),))),
+            ),
+        ),
     )
 
 
-def test__parser__base_segments_to_tuple_c(raw_segments, DummySegment, DummyAuxSegment):
+def test__parser__base_segments_to_tuple_c(
+    raw_segments, DummySegment, DummyAuxSegment
+):
     """Test the .to_tuple() method with show_raw=True."""
     test_seg = DummySegment(
         [DummyAuxSegment(raw_segments + (DummyAuxSegment(raw_segments[:1]),))]
@@ -104,7 +115,11 @@ def test__parser__base_segments_as_record_b(
     is unique within it's parent segment, and so there is no need.
     """
     test_seg = DummySegment(
-        [DummyAuxSegment(raw_segments[:1] + (DummyAuxSegment(raw_segments[:1]),))]
+        [
+            DummyAuxSegment(
+                raw_segments[:1] + (DummyAuxSegment(raw_segments[:1]),)
+            )
+        ]
     )
     assert test_seg.as_record() == {
         "dummy": {"dummy_aux": {"raw": None, "dummy_aux": {"raw": None}}}
@@ -120,10 +135,16 @@ def test__parser__base_segments_as_record_c(
     is unique within it's parent segment, and so there is no need.
     """
     test_seg = DummySegment(
-        [DummyAuxSegment(raw_segments[:1] + (DummyAuxSegment(raw_segments[:1]),))]
+        [
+            DummyAuxSegment(
+                raw_segments[:1] + (DummyAuxSegment(raw_segments[:1]),)
+            )
+        ]
     )
     assert test_seg.as_record(show_raw=True) == {
-        "dummy": {"dummy_aux": {"raw": "foobar", "dummy_aux": {"raw": "foobar"}}}
+        "dummy": {
+            "dummy_aux": {"raw": "foobar", "dummy_aux": {"raw": "foobar"}}
+        }
     }
 
 
@@ -163,7 +184,9 @@ def test__parser_base_segments_validate_non_code_ends(
         seg.validate_non_code_ends()
 
 
-def test__parser__base_segments_path_to(raw_segments, DummySegment, DummyAuxSegment):
+def test__parser__base_segments_path_to(
+    raw_segments, DummySegment, DummyAuxSegment
+):
     """Test the .path_to() method."""
     test_seg_a = DummyAuxSegment(raw_segments)
     test_seg_b = DummySegment([test_seg_a])
@@ -186,7 +209,9 @@ def test__parser__base_segments_path_to(raw_segments, DummySegment, DummyAuxSegm
 def test__parser__base_segments_stubs():
     """Test stub methods that have no implementation in base class."""
     template = TemplatedFile.from_string("foobar")
-    rs1 = RawSegment("foobar", PositionMarker(slice(0, 6), slice(0, 6), template))
+    rs1 = RawSegment(
+        "foobar", PositionMarker(slice(0, 6), slice(0, 6), template)
+    )
     base_segment = BaseSegment(segments=[rs1])
 
     with pytest.raises(NotImplementedError):
@@ -199,7 +224,11 @@ def test__parser__base_segments_raw(raw_seg):
     assert raw_seg.segments == ()
     assert raw_seg.raw == "foobar"
     # Check Formatting and Stringification
-    assert str(raw_seg) == repr(raw_seg) == "<CodeSegment: ([L:  1, P:  1]) 'foobar'>"
+    assert (
+        str(raw_seg)
+        == repr(raw_seg)
+        == "<CodeSegment: ([L:  1, P:  1]) 'foobar'>"
+    )
     assert (
         raw_seg.stringify(ident=1, tabsize=2)
         == "[L:  1, P:  1]      |  raw:                                                "
@@ -211,7 +240,9 @@ def test__parser__base_segments_raw(raw_seg):
     assert raw_seg.to_tuple(show_raw=True) == ("raw", "foobar")
 
 
-def test__parser__base_segments_base(raw_segments, fresh_ansi_dialect, DummySegment):
+def test__parser__base_segments_base(
+    raw_segments, fresh_ansi_dialect, DummySegment
+):
     """Test base segments behave as expected."""
     base_seg = DummySegment(raw_segments)
     # Check we assume the position correctly
@@ -232,7 +263,9 @@ def test__parser__base_segments_base(raw_segments, fresh_ansi_dialect, DummySegm
         (raw_segments[0].to_tuple(), raw_segments[1].to_tuple()),
     )
     # Check Formatting and Stringification
-    assert str(base_seg) == repr(base_seg) == "<DummySegment: ([L:  1, P:  1])>"
+    assert (
+        str(base_seg) == repr(base_seg) == "<DummySegment: ([L:  1, P:  1])>"
+    )
     assert base_seg.stringify(ident=1, tabsize=2) == (
         "[L:  1, P:  1]      |  dummy:\n"
         "[L:  1, P:  1]      |    raw:                                                 "
@@ -245,16 +278,24 @@ def test__parser__base_segments_base(raw_segments, fresh_ansi_dialect, DummySegm
 def test__parser__base_segments_raw_compare():
     """Test comparison of raw segments."""
     template = TemplatedFile.from_string("foobar")
-    rs1 = RawSegment("foobar", PositionMarker(slice(0, 6), slice(0, 6), template))
-    rs2 = RawSegment("foobar", PositionMarker(slice(0, 6), slice(0, 6), template))
+    rs1 = RawSegment(
+        "foobar", PositionMarker(slice(0, 6), slice(0, 6), template)
+    )
+    rs2 = RawSegment(
+        "foobar", PositionMarker(slice(0, 6), slice(0, 6), template)
+    )
     assert rs1 == rs2
 
 
 def test__parser__base_segments_base_compare(DummySegment, DummyAuxSegment):
     """Test comparison of base segments."""
     template = TemplatedFile.from_string("foobar")
-    rs1 = RawSegment("foobar", PositionMarker(slice(0, 6), slice(0, 6), template))
-    rs2 = RawSegment("foobar", PositionMarker(slice(0, 6), slice(0, 6), template))
+    rs1 = RawSegment(
+        "foobar", PositionMarker(slice(0, 6), slice(0, 6), template)
+    )
+    rs2 = RawSegment(
+        "foobar", PositionMarker(slice(0, 6), slice(0, 6), template)
+    )
 
     ds1 = DummySegment([rs1])
     ds2 = DummySegment([rs2])

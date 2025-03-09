@@ -58,7 +58,10 @@ class MetaSegment(RawSegment):
 
     @classmethod
     def match(
-        cls, segments: Sequence["BaseSegment"], idx: int, parse_context: ParseContext
+        cls,
+        segments: Sequence["BaseSegment"],
+        idx: int,
+        parse_context: ParseContext,
     ) -> MatchResult:  # pragma: no cover
         """This will never be called. If it is then we're using it wrong."""
         raise NotImplementedError(
@@ -69,7 +72,9 @@ class MetaSegment(RawSegment):
 
     @classmethod
     def simple(
-        cls, parse_context: ParseContext, crumbs: Optional[Tuple[str, ...]] = None
+        cls,
+        parse_context: ParseContext,
+        crumbs: Optional[Tuple[str, ...]] = None,
     ) -> None:
         """Does this matcher support an uppercase hash matching route?
 
@@ -116,7 +121,9 @@ class Indent(MetaSegment):
 
     def _suffix(self) -> str:
         """If present, output the block uuid."""
-        return f"[Block: {self.block_uuid.hex[:6]!r}]" if self.block_uuid else ""
+        return (
+            f"[Block: {self.block_uuid.hex[:6]!r}]" if self.block_uuid else ""
+        )
 
 
 class ImplicitIndent(Indent):
@@ -178,19 +185,27 @@ class TemplateSegment(MetaSegment):
         """Initialise a placeholder with the source code embedded."""
         # NOTE: Empty string is ok, None is not.
         if source_str is None:  # pragma: no cover
-            raise ValueError("Cannot instantiate TemplateSegment without a source_str.")
+            raise ValueError(
+                "Cannot instantiate TemplateSegment without a source_str."
+            )
         self.source_str = source_str
         self.block_type = block_type
         # Call the super of the pos_marker.
         super().__init__(
-            pos_marker=pos_marker, source_fixes=source_fixes, block_uuid=block_uuid
+            pos_marker=pos_marker,
+            source_fixes=source_fixes,
+            block_uuid=block_uuid,
         )
 
     def _suffix(self) -> str:
         """Also output what it's a placeholder for."""
         return (
             f"[Type: {self.block_type!r}, Raw: {self.source_str!r}"
-            + (f", Block: {self.block_uuid.hex[:6]!r}" if self.block_uuid else "")
+            + (
+                f", Block: {self.block_uuid.hex[:6]!r}"
+                if self.block_uuid
+                else ""
+            )
             + "]"
         )
 
@@ -263,7 +278,9 @@ class TemplateSegment(MetaSegment):
             sf = None
         return self.__class__(
             pos_marker=self.pos_marker,
-            source_str=source_str if source_str is not None else self.source_str,
+            source_str=(
+                source_str if source_str is not None else self.source_str
+            ),
             block_type=self.block_type,
             source_fixes=sf,
             block_uuid=self.block_uuid,

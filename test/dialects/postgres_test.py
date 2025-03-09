@@ -65,7 +65,9 @@ def test_epoch_datetime_unit(raw: str) -> None:
     """Test the EPOCH keyword for postgres dialect."""
     # Don't test for new lines or capitalisation
     cfg = FluffConfig(
-        configs={"core": {"exclude_rules": "LT12,LT05,LT09", "dialect": "postgres"}}
+        configs={
+            "core": {"exclude_rules": "LT12,LT05,LT09", "dialect": "postgres"}
+        }
     )
     lnt = Linter(config=cfg)
     result = lnt.lint_string(raw)
@@ -82,7 +84,9 @@ def test_epoch_datetime_unit(raw: str) -> None:
 def test_space_is_not_reserved(raw: str) -> None:
     """Ensure that SPACE is not treated as reserved."""
     cfg = FluffConfig(
-        configs={"core": {"exclude_rules": "LT12,LT05,AL07", "dialect": "postgres"}}
+        configs={
+            "core": {"exclude_rules": "LT12,LT05,AL07", "dialect": "postgres"}
+        }
     )
     lnt = Linter(config=cfg)
     result = lnt.lint_string(raw)
@@ -97,7 +101,11 @@ def test_priority_keyword_merge() -> None:
 
     result = priority_keyword_merge(kw_list_1, kw_list_2)
 
-    expected_result = [("A", "reserved"), ("B", "non-reserved"), ("C", "non-reserved")]
+    expected_result = [
+        ("A", "reserved"),
+        ("B", "non-reserved"),
+        ("C", "non-reserved"),
+    ]
 
     assert sorted(result) == sorted(expected_result)
 
@@ -123,7 +131,11 @@ def test_priority_keyword_merge() -> None:
 
     result_3 = priority_keyword_merge(kw_list_2, kw_list_1, kw_list_3)
 
-    expected_result_3 = [("A", "not-keyword"), ("B", "reserved"), ("C", "non-reserved")]
+    expected_result_3 = [
+        ("A", "not-keyword"),
+        ("B", "reserved"),
+        ("C", "non-reserved"),
+    ]
 
     assert sorted(result_3) == sorted(expected_result_3)
 
@@ -148,12 +160,18 @@ def test_get_keywords() -> None:
 
     expected_result = ["A", "D"]
 
-    assert sorted(get_keywords(kw_list, "not-keyword")) == sorted(expected_result)
+    assert sorted(get_keywords(kw_list, "not-keyword")) == sorted(
+        expected_result
+    )
 
     expected_result_2 = ["C", "E"]
 
-    assert sorted(get_keywords(kw_list, "non-reserved")) == sorted(expected_result_2)
+    assert sorted(get_keywords(kw_list, "non-reserved")) == sorted(
+        expected_result_2
+    )
 
     expected_result_3 = ["B"]
 
-    assert sorted(get_keywords(kw_list, "reserved")) == sorted(expected_result_3)
+    assert sorted(get_keywords(kw_list, "reserved")) == sorted(
+        expected_result_3
+    )

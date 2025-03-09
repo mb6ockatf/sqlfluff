@@ -1,7 +1,17 @@
 """The code for the Lexer."""
 
 import logging
-from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Tuple, Type, Union
+from typing import (
+    Any,
+    Dict,
+    Iterator,
+    List,
+    NamedTuple,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+)
 from uuid import UUID, uuid4
 
 import regex
@@ -99,7 +109,9 @@ class TemplateElement(NamedTuple):
     ) -> "TemplateElement":
         """Make a TemplateElement from a LexedElement."""
         return cls(
-            raw=element.raw, template_slice=template_slice, matcher=element.matcher
+            raw=element.raw,
+            template_slice=template_slice,
+            matcher=element.matcher,
         )
 
     def to_segment(
@@ -282,7 +294,9 @@ class StringLexer:
         else:
             return LexMatch(forward_string, [])
 
-    def construct_segment(self, raw: str, pos_marker: PositionMarker) -> RawSegment:
+    def construct_segment(
+        self, raw: str, pos_marker: PositionMarker
+    ) -> RawSegment:
         """Construct a segment using the given class a properties.
 
         Unless an override `type` is provided in the `segment_kwargs`,
@@ -300,7 +314,10 @@ class StringLexer:
             # allow setting `instance_types`.
             assert _kwargs["type"]
             _kwargs["instance_types"] = (_kwargs.pop("type"),)
-        elif "instance_types" not in _kwargs and self.name not in _segment_class_types:
+        elif (
+            "instance_types" not in _kwargs
+            and self.name not in _segment_class_types
+        ):
             _kwargs["instance_types"] = (self.name,)
         return self.segment_class(raw=raw, pos_marker=pos_marker, **_kwargs)
 
@@ -372,7 +389,9 @@ def _handle_zero_length_slice(
     if tfs.slice_type.startswith("block") and next_tfs:
         # Look for potential backward jump
         if next_tfs.source_slice.start < tfs.source_slice.start:
-            lexer_logger.debug("      Backward jump detected. Inserting Loop Marker")
+            lexer_logger.debug(
+                "      Backward jump detected. Inserting Loop Marker"
+            )
             # If we're here remember we're on the tfs which is the block end
             # i.e. not the thing we want to render.
             pos_marker = PositionMarker.from_point(
@@ -386,7 +405,9 @@ def _handle_zero_length_slice(
                     pos_marker=pos_marker,
                 )
 
-            yield TemplateLoop(pos_marker=pos_marker, block_uuid=block_stack.top())
+            yield TemplateLoop(
+                pos_marker=pos_marker, block_uuid=block_stack.top()
+            )
 
             if add_indents:
                 yield Indent(
@@ -449,9 +470,12 @@ def _handle_zero_length_slice(
             # Trim it if it's too long to show.
             if len(placeholder_str) >= 20:
                 placeholder_str = (
-                    f"... [{len(placeholder_str)} unused template " "characters] ..."
+                    f"... [{len(placeholder_str)} unused template "
+                    "characters] ..."
                 )
-            lexer_logger.debug("      Forward jump detected. Inserting placeholder")
+            lexer_logger.debug(
+                "      Forward jump detected. Inserting placeholder"
+            )
             yield TemplateSegment(
                 pos_marker=PositionMarker(
                     slice(tfs.source_slice.stop, next_tfs.source_slice.start),
@@ -518,7 +542,9 @@ def _iter_segments(
         # The position in the source which we still need to yield from.
         stashed_source_idx = None
 
-        for tfs_idx, tfs in enumerate(templated_file_slices[tfs_idx:], tfs_idx):
+        for tfs_idx, tfs in enumerate(
+            templated_file_slices[tfs_idx:], tfs_idx
+        ):
             lexer_logger.debug("      %s: %s", tfs_idx, tfs)
 
             # Is it a zero slice?
@@ -577,7 +603,9 @@ def _iter_segments(
                     # overlap?
                     # NOTE: If the rest of the logic works, this should never
                     # happen.
-                    lexer_logger.debug("     NOTE: Missed Skip")  # pragma: no cover
+                    lexer_logger.debug(
+                        "     NOTE: Missed Skip"
+                    )  # pragma: no cover
                     continue  # pragma: no cover
                 else:
                     # This means that the current lexed element spans across
@@ -604,7 +632,8 @@ def _iter_segments(
                                 "Found literal whitespace with stashed idx!"
                             )
                         incremental_length = (
-                            tfs.templated_slice.stop - element.template_slice.start
+                            tfs.templated_slice.stop
+                            - element.template_slice.start
                         )
                         yield element.to_segment(
                             pos_marker=PositionMarker(
@@ -635,7 +664,8 @@ def _iter_segments(
                                 element.template_slice.start + tfs_offset
                             )
                             lexer_logger.debug(
-                                "     Stashing a source start. %s", stashed_source_idx
+                                "     Stashing a source start. %s",
+                                stashed_source_idx,
                             )
                         continue
 
@@ -661,7 +691,8 @@ def _iter_segments(
                             slice_start = stashed_source_idx
                         else:
                             slice_start = (
-                                tfs.source_slice.start + consumed_element_length
+                                tfs.source_slice.start
+                                + consumed_element_length
                             )
                         yield element.to_segment(
                             pos_marker=PositionMarker(
@@ -678,7 +709,10 @@ def _iter_segments(
                         )
 
                         # If it was an exact match, consume the templated element too.
-                        if element.template_slice.stop == tfs.templated_slice.stop:
+                        if (
+                            element.template_slice.stop
+                            == tfs.templated_slice.stop
+                        ):
                             tfs_idx += 1
                         # Carry on to the next lexed element
                         break
@@ -694,7 +728,9 @@ def _iter_segments(
                     # are lexed, means that they should arrive "pre-split".
                     else:
                         # Stash the source idx for later when we do make a segment.
-                        lexer_logger.debug("     Spilling over templated slice.")
+                        lexer_logger.debug(
+                            "     Spilling over templated slice."
+                        )
                         if stashed_source_idx is None:
                             stashed_source_idx = tfs.source_slice.start
                             lexer_logger.debug(
@@ -738,7 +774,9 @@ class Lexer:
         # Use the provided config or create one from the dialect.
         self.config = config or FluffConfig.from_kwargs(dialect=dialect)
         # Store the matchers
-        self.lexer_matchers = self.config.get("dialect_obj").get_lexer_matchers()
+        self.lexer_matchers = self.config.get(
+            "dialect_obj"
+        ).get_lexer_matchers()
 
         self.last_resort_lexer = last_resort_lexer or RegexLexer(
             "<unlexable>",
@@ -824,7 +862,9 @@ class Lexer:
         return tuple(segment_buffer)
 
     @staticmethod
-    def violations_from_segments(segments: Tuple[RawSegment, ...]) -> List[SQLLexError]:
+    def violations_from_segments(
+        segments: Tuple[RawSegment, ...],
+    ) -> List[SQLLexError]:
         """Generate any lexing errors for any unlexables."""
         violations = []
         for segment in segments:
@@ -842,7 +882,9 @@ class Lexer:
         return violations
 
     @staticmethod
-    def lex_match(forward_string: str, lexer_matchers: List[StringLexer]) -> LexMatch:
+    def lex_match(
+        forward_string: str, lexer_matchers: List[StringLexer]
+    ) -> LexMatch:
         """Iteratively match strings using the selection of submatchers."""
         elem_buff: List[LexedElement] = []
         while True:
@@ -876,7 +918,9 @@ class Lexer:
         for element in elements:
             template_slice = offset_slice(idx, len(element.raw))
             idx += len(element.raw)
-            templated_buff.append(TemplateElement.from_element(element, template_slice))
+            templated_buff.append(
+                TemplateElement.from_element(element, template_slice)
+            )
             if (
                 template.templated_str[template_slice] != element.raw
             ):  # pragma: no cover

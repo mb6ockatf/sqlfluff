@@ -61,7 +61,9 @@ class SQLFluffViolationReporter(QualityReporter):
             raise OSError(f"{self.driver.name} is not installed")
 
         if src_paths:
-            output = self.reports if self.reports else self._run_sqlfluff(src_paths)
+            output = (
+                self.reports if self.reports else self._run_sqlfluff(src_paths)
+            )
             for o in output:
                 # Load and parse SQLFluff JSON output.
                 try:

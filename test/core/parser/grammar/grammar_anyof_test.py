@@ -107,9 +107,9 @@ def test__parser__grammar_oneof_take_longest_match(test_segments):
     )
 
     ctx = ParseContext(dialect=None)
-    assert fooRegex.match(test_segments, 2, parse_context=ctx).matched_slice == slice(
-        2, 3
-    )
+    assert fooRegex.match(
+        test_segments, 2, parse_context=ctx
+    ).matched_slice == slice(2, 3)
     # Even if fooRegex comes first, fooBaar
     # is a longer match and should be taken
     assert OneOf(fooRegex, fooBaar).match(
@@ -143,7 +143,14 @@ def test__parser__grammar_oneof_take_first(test_segments):
         # Strict matches
         # #####
         # 1. Match once
-        (ParseMode.STRICT, ["a"], [], slice(None, None), {}, (("keyword", "a"),)),
+        (
+            ParseMode.STRICT,
+            ["a"],
+            [],
+            slice(None, None),
+            {},
+            (("keyword", "a"),),
+        ),
         # 2. Match none
         (ParseMode.STRICT, ["b"], [], slice(None, None), {}, ()),
         # 3. Match twice

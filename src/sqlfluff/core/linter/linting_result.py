@@ -92,19 +92,24 @@ class LintingResult:
 
     def num_violations(
         self,
-        types: Optional[Union[Type[SQLBaseError], Iterable[Type[SQLBaseError]]]] = None,
+        types: Optional[
+            Union[Type[SQLBaseError], Iterable[Type[SQLBaseError]]]
+        ] = None,
         fixable: Optional[bool] = None,
     ) -> int:
         """Count the number of violations in the result."""
         return sum(
-            path.num_violations(types=types, fixable=fixable) for path in self.paths
+            path.num_violations(types=types, fixable=fixable)
+            for path in self.paths
         )
 
     def get_violations(
         self, rules: Optional[Union[str, Tuple[str, ...]]] = None
     ) -> List[SQLBaseError]:
         """Return a list of violations in the result."""
-        return [v for path in self.paths for v in path.get_violations(rules=rules)]
+        return [
+            v for path in self.paths for v in path.get_violations(rules=rules)
+        ]
 
     def stats(
         self, fail_code: int, success_code: int
@@ -113,21 +118,29 @@ class LintingResult:
         # Add up all the counts for each file.
         # NOTE: Having a more strictly typed dict for the counts also helps with
         # typing later in this method.
-        counts: Dict[str, int] = dict(files=0, clean=0, unclean=0, violations=0)
+        counts: Dict[str, int] = dict(
+            files=0, clean=0, unclean=0, violations=0
+        )
         for path in self.paths:
             counts = sum_dicts(path.stats(), counts)
         # Set up the overall dictionary.
         all_stats: Dict[str, Union[int, float, str]] = {}
         all_stats.update(counts)
         if counts["files"] > 0:
-            all_stats["avg per file"] = counts["violations"] * 1.0 / counts["files"]
-            all_stats["unclean rate"] = counts["unclean"] * 1.0 / counts["files"]
+            all_stats["avg per file"] = (
+                counts["violations"] * 1.0 / counts["files"]
+            )
+            all_stats["unclean rate"] = (
+                counts["unclean"] * 1.0 / counts["files"]
+            )
         else:
             all_stats["avg per file"] = 0
             all_stats["unclean rate"] = 0
         all_stats["clean files"] = all_stats["clean"]
         all_stats["unclean files"] = all_stats["unclean"]
-        all_stats["exit code"] = fail_code if counts["violations"] > 0 else success_code
+        all_stats["exit code"] = (
+            fail_code if counts["violations"] > 0 else success_code
+        )
         all_stats["status"] = "FAIL" if counts["violations"] > 0 else "PASS"
         return all_stats
 
@@ -183,7 +196,9 @@ class LintingResult:
                     writer.writerow(
                         {
                             "path": record["filepath"],
-                            **record["statistics"],  # character and segment lengths.
+                            **record[
+                                "statistics"
+                            ],  # character and segment lengths.
                             **record["timings"],  # step and rule timings.
                         }
                     )
@@ -196,13 +211,19 @@ class LintingResult:
         types (ints, strs).
         """
         return sorted(
-            (record for linted_dir in self.paths for record in linted_dir.as_records()),
+            (
+                record
+                for linted_dir in self.paths
+                for record in linted_dir.as_records()
+            ),
             # Sort records by filename
             key=lambda record: record["filepath"],
         )
 
     def persist_changes(
-        self, formatter: Optional[FormatterInterface], fixed_file_suffix: str = ""
+        self,
+        formatter: Optional[FormatterInterface],
+        fixed_file_suffix: str = "",
     ) -> Dict[str, Union[bool, str]]:
         """Run all the fixes for all the files and return a dict."""
         return combine_dicts(
@@ -226,11 +247,17 @@ class LintingResult:
 
     def count_tmp_prs_errors(self) -> Tuple[int, int]:
         """Count templating or parse errors before and after filtering."""
-        total_errors = sum(path.num_unfiltered_tmp_prs_errors for path in self.paths)
-        num_filtered_errors = sum(path.num_tmp_prs_errors for path in self.paths)
+        total_errors = sum(
+            path.num_unfiltered_tmp_prs_errors for path in self.paths
+        )
+        num_filtered_errors = sum(
+            path.num_tmp_prs_errors for path in self.paths
+        )
         return total_errors, num_filtered_errors
 
-    def discard_fixes_for_lint_errors_in_files_with_tmp_or_prs_errors(self) -> None:
+    def discard_fixes_for_lint_errors_in_files_with_tmp_or_prs_errors(
+        self,
+    ) -> None:
         """Discard lint fixes for files with templating or parse errors."""
         for path in self.paths:
             path.discard_fixes_for_lint_errors_in_files_with_tmp_or_prs_errors()

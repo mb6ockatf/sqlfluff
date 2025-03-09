@@ -71,13 +71,21 @@ hive_dialect.add(
     StartAngleBracketSegment=StringParser(
         "<", SymbolSegment, type="start_angle_bracket"
     ),
-    EndAngleBracketSegment=StringParser(">", SymbolSegment, type="end_angle_bracket"),
-    JsonfileKeywordSegment=StringParser("JSONFILE", KeywordSegment, type="file_format"),
-    RcfileKeywordSegment=StringParser("RCFILE", KeywordSegment, type="file_format"),
+    EndAngleBracketSegment=StringParser(
+        ">", SymbolSegment, type="end_angle_bracket"
+    ),
+    JsonfileKeywordSegment=StringParser(
+        "JSONFILE", KeywordSegment, type="file_format"
+    ),
+    RcfileKeywordSegment=StringParser(
+        "RCFILE", KeywordSegment, type="file_format"
+    ),
     SequencefileKeywordSegment=StringParser(
         "SEQUENCEFILE", KeywordSegment, type="file_format"
     ),
-    TextfileKeywordSegment=StringParser("TEXTFILE", KeywordSegment, type="file_format"),
+    TextfileKeywordSegment=StringParser(
+        "TEXTFILE", KeywordSegment, type="file_format"
+    ),
     LocationGrammar=Sequence("LOCATION", Ref("QuotedLiteralSegment")),
     PropertyGrammar=Sequence(
         Ref("QuotedLiteralSegment"),
@@ -91,7 +99,9 @@ hive_dialect.add(
     SerdePropertiesGrammar=Sequence(
         "WITH", "SERDEPROPERTIES", Ref("BracketedPropertyListGrammar")
     ),
-    TerminatedByGrammar=Sequence("TERMINATED", "BY", Ref("QuotedLiteralSegment")),
+    TerminatedByGrammar=Sequence(
+        "TERMINATED", "BY", Ref("QuotedLiteralSegment")
+    ),
     FileFormatGrammar=OneOf(
         "SEQUENCEFILE",
         "TEXTFILE",
@@ -150,13 +160,22 @@ hive_dialect.replace(
     JoinKeywordsGrammar=Sequence(Sequence("SEMI", optional=True), "JOIN"),
     QuotedLiteralSegment=OneOf(
         TypedParser(
-            "single_quote", LiteralSegment, type="quoted_literal", casefold=str.lower
+            "single_quote",
+            LiteralSegment,
+            type="quoted_literal",
+            casefold=str.lower,
         ),
         TypedParser(
-            "double_quote", LiteralSegment, type="quoted_literal", casefold=str.lower
+            "double_quote",
+            LiteralSegment,
+            type="quoted_literal",
+            casefold=str.lower,
         ),
         TypedParser(
-            "back_quote", LiteralSegment, type="quoted_literal", casefold=str.lower
+            "back_quote",
+            LiteralSegment,
+            type="quoted_literal",
+            casefold=str.lower,
         ),
     ),
     TrimParametersGrammar=Nothing(),
@@ -167,11 +186,15 @@ hive_dialect.replace(
             r"[A-Z0-9_]*[A-Z][A-Z0-9_]*",
             IdentifierSegment,
             type="naked_identifier",
-            anti_template=r"^(" + r"|".join(dialect.sets("reserved_keywords")) + r")$",
+            anti_template=r"^("
+            + r"|".join(dialect.sets("reserved_keywords"))
+            + r")$",
             casefold=str.lower,
         )
     ),
-    SingleIdentifierGrammar=ansi_dialect.get_grammar("SingleIdentifierGrammar").copy(
+    SingleIdentifierGrammar=ansi_dialect.get_grammar(
+        "SingleIdentifierGrammar"
+    ).copy(
         insert=[
             Ref("BackQuotedIdentifierSegment"),
         ]
@@ -232,7 +255,9 @@ hive_dialect.replace(
     ),
     # Full Apache Hive `CREATE ALTER` reference here:
     # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-AlterTable
-    AlterTableOptionsGrammar=ansi_dialect.get_grammar("AlterTableOptionsGrammar").copy(
+    AlterTableOptionsGrammar=ansi_dialect.get_grammar(
+        "AlterTableOptionsGrammar"
+    ).copy(
         insert=[
             # Exchange
             Sequence(
@@ -317,9 +342,14 @@ class CreateDatabaseStatementSegment(BaseSegment):
         Ref("DatabaseReferenceSegment"),
         Ref("CommentGrammar", optional=True),
         Ref("LocationGrammar", optional=True),
-        Sequence("MANAGEDLOCATION", Ref("QuotedLiteralSegment"), optional=True),
         Sequence(
-            "WITH", "DBPROPERTIES", Ref("BracketedPropertyListGrammar"), optional=True
+            "MANAGEDLOCATION", Ref("QuotedLiteralSegment"), optional=True
+        ),
+        Sequence(
+            "WITH",
+            "DBPROPERTIES",
+            Ref("BracketedPropertyListGrammar"),
+            optional=True,
         ),
     )
 
@@ -566,7 +596,8 @@ class DatatypeSegment(BaseSegment):
             "UNIONTYPE",
             Bracketed(
                 Delimited(
-                    Ref("DatatypeSegment"), bracket_pairs_set="angle_bracket_pairs"
+                    Ref("DatatypeSegment"),
+                    bracket_pairs_set="angle_bracket_pairs",
                 ),
                 bracket_pairs_set="angle_bracket_pairs",
                 bracket_type="angle",
@@ -587,7 +618,8 @@ class SkewedByClauseSegment(BaseSegment):
         Bracketed(
             Delimited(
                 OneOf(
-                    Ref("LiteralGrammar"), Bracketed(Delimited(Ref("LiteralGrammar")))
+                    Ref("LiteralGrammar"),
+                    Bracketed(Delimited(Ref("LiteralGrammar"))),
                 )
             )
         ),
@@ -609,17 +641,29 @@ class RowFormatClauseSegment(BaseSegment):
                     "FIELDS",
                     Ref("TerminatedByGrammar"),
                     Sequence(
-                        "ESCAPED", "BY", Ref("QuotedLiteralSegment"), optional=True
+                        "ESCAPED",
+                        "BY",
+                        Ref("QuotedLiteralSegment"),
+                        optional=True,
                     ),
                     optional=True,
                 ),
                 Sequence(
-                    "COLLECTION", "ITEMS", Ref("TerminatedByGrammar"), optional=True
+                    "COLLECTION",
+                    "ITEMS",
+                    Ref("TerminatedByGrammar"),
+                    optional=True,
                 ),
-                Sequence("MAP", "KEYS", Ref("TerminatedByGrammar"), optional=True),
+                Sequence(
+                    "MAP", "KEYS", Ref("TerminatedByGrammar"), optional=True
+                ),
                 Sequence("LINES", Ref("TerminatedByGrammar"), optional=True),
                 Sequence(
-                    "NULL", "DEFINED", "AS", Ref("QuotedLiteralSegment"), optional=True
+                    "NULL",
+                    "DEFINED",
+                    "AS",
+                    Ref("QuotedLiteralSegment"),
+                    optional=True,
                 ),
             ),
             Sequence(
@@ -699,7 +743,9 @@ class SetStatementSegment(BaseSegment):
             Sequence(
                 Delimited(
                     Ref("ParameterNameSegment"),
-                    delimiter=OneOf(Ref("DotSegment"), Ref("ColonDelimiterSegment")),
+                    delimiter=OneOf(
+                        Ref("DotSegment"), Ref("ColonDelimiterSegment")
+                    ),
                     allow_gaps=False,
                 ),
                 Ref("RawEqualsSegment"),

@@ -5,7 +5,12 @@ import pickle
 
 import pytest
 
-from sqlfluff.core.errors import SQLBaseError, SQLLexError, SQLLintError, SQLParseError
+from sqlfluff.core.errors import (
+    SQLBaseError,
+    SQLLexError,
+    SQLLintError,
+    SQLParseError,
+)
 from sqlfluff.core.parser import PositionMarker, RawSegment
 from sqlfluff.core.rules import BaseRule
 from sqlfluff.core.templaters import TemplatedFile
@@ -38,7 +43,9 @@ def assert_pickle_robust(err: SQLBaseError):
 def test__lex_error_pickle(ignore):
     """Test lexing error pickling."""
     template = TemplatedFile.from_string("foobar")
-    err = SQLLexError("Foo", pos=PositionMarker(slice(0, 6), slice(0, 6), template))
+    err = SQLLexError(
+        "Foo", pos=PositionMarker(slice(0, 6), slice(0, 6), template)
+    )
     # Set ignore to true if configured.
     # NOTE: This not copying was one of the reasons for this test.
     err.ignore = ignore
@@ -52,7 +59,9 @@ def test__lex_error_pickle(ignore):
 def test__parse_error_pickle(ignore):
     """Test parse error pickling."""
     template = TemplatedFile.from_string("foobar")
-    segment = RawSegment("foobar", PositionMarker(slice(0, 6), slice(0, 6), template))
+    segment = RawSegment(
+        "foobar", PositionMarker(slice(0, 6), slice(0, 6), template)
+    )
     err = SQLParseError("Foo", segment=segment)
     # Set ignore to true if configured.
     # NOTE: This not copying was one of the reasons for this test.
@@ -67,7 +76,9 @@ def test__parse_error_pickle(ignore):
 def test__lint_error_pickle(ignore):
     """Test lint error pickling."""
     template = TemplatedFile.from_string("foobar")
-    segment = RawSegment("foobar", PositionMarker(slice(0, 6), slice(0, 6), template))
+    segment = RawSegment(
+        "foobar", PositionMarker(slice(0, 6), slice(0, 6), template)
+    )
     err = SQLLintError("Foo", segment=segment, rule=Rule_T078)
     # Set ignore to true if configured.
     # NOTE: This not copying was one of the reasons for this test.

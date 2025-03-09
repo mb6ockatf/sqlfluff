@@ -41,7 +41,9 @@ class RelationEmulator:
 # so that there's a sensible error message if someone tries to render
 # them directly.
 DBT_BUILTINS = {
-    "ref": FunctionWrapper("ref", lambda *args, **kwargs: RelationEmulator(args[-1])),
+    "ref": FunctionWrapper(
+        "ref", lambda *args, **kwargs: RelationEmulator(args[-1])
+    ),
     # In case of a cross project ref in dbt, model_ref is the second
     # argument. Otherwise it is the only argument.
     "source": FunctionWrapper(
@@ -61,7 +63,9 @@ DBT_BUILTINS = {
     "zip": FunctionWrapper(
         "zip",
         lambda *args, default=None: (
-            zip(*args) if all(hasattr(arg, "__iter__") for arg in args) else default
+            zip(*args)
+            if all(hasattr(arg, "__iter__") for arg in args)
+            else default
         ),
     ),
 }

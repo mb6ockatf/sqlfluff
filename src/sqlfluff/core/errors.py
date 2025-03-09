@@ -11,7 +11,17 @@ tracking.
 https://stackoverflow.com/questions/49715881/how-to-pickle-inherited-exceptions
 """
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Type, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+    cast,
+)
 
 if TYPE_CHECKING:  # pragma: no cover
     from sqlfluff.core.parser import BaseSegment, PositionMarker
@@ -112,7 +122,9 @@ class SQLBaseError(ValueError):
             "start_line_pos": self.line_pos,
             "code": self.rule_code(),
             "description": self.desc(),
-            "name": getattr(self, "rule").name if hasattr(self, "rule") else "",
+            "name": (
+                getattr(self, "rule").name if hasattr(self, "rule") else ""
+            ),
             "warning": self.warning,
         }
 
@@ -146,7 +158,10 @@ class SQLBaseError(ValueError):
         Returns:
             None
         """
-        if self.rule_code() in warning_iterable or self.rule_name() in warning_iterable:
+        if (
+            self.rule_code() in warning_iterable
+            or self.rule_name() in warning_iterable
+        ):
             self.warning = True
 
 
@@ -354,7 +369,8 @@ class SQLLintError(SQLBaseError):
         in the templated file but also in the source.
         """
         fix_raws = tuple(
-            tuple(e.raw for e in f.edit) if f.edit else None for f in self.fixes
+            tuple(e.raw for e in f.edit) if f.edit else None
+            for f in self.fixes
         )
         _source_fixes: List[Tuple[str, int, int]] = []
         for fix in self.fixes:
@@ -372,7 +388,12 @@ class SQLLintError(SQLBaseError):
                             source_edit.source_slice.stop,
                         )
                     )
-        return (self.check_tuple(), self.description, fix_raws, tuple(_source_fixes))
+        return (
+            self.check_tuple(),
+            self.description,
+            fix_raws,
+            tuple(_source_fixes),
+        )
 
     def __repr__(self) -> str:
         return "<SQLLintError: rule {} pos:{!r}, #fixes: {}, description: {}>".format(

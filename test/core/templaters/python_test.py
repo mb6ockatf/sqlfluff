@@ -147,7 +147,9 @@ def test__templater_python_intermediate__trim(
         ("bar foo bar foo", ["bar", "foo"], [[0, 8], [4, 12]]),
     ],
 )
-def test__templater_python_substring_occurrences(mainstr, substrings, positions):
+def test__templater_python_substring_occurrences(
+    mainstr, substrings, positions
+):
     """Test _substring_occurrences."""
     occurrences = PythonTemplater._substring_occurrences(mainstr, substrings)
     assert isinstance(occurrences, dict)
@@ -261,7 +263,11 @@ def test__templater_python_split_invariants(
             {"foo": [0]},
             {"foo": [0]},
             "foo",
-            [TemplatedFileSlice("literal", slice(0, 3, None), slice(0, 3, None))],
+            [
+                TemplatedFileSlice(
+                    "literal", slice(0, 3, None), slice(0, 3, None)
+                )
+            ],
         ),
         (
             [
@@ -312,7 +318,11 @@ def test__templater_python_split_invariants(
                     "invariant",
                     slice(45, 76, None),
                     slice(40, 71, None),
-                    [RawFileSlice("' as convertible from something", "literal", 40)],
+                    [
+                        RawFileSlice(
+                            "' as convertible from something", "literal", 40
+                        )
+                    ],
                 ),
             ],
             {
@@ -331,19 +341,33 @@ def test__templater_python_split_invariants(
             },
             "SELECT nothing, 435.24 as foo, spam, '{}' as convertible from something",
             [
-                TemplatedFileSlice("literal", slice(0, 7, None), slice(0, 7, None)),
-                TemplatedFileSlice("templated", slice(7, 13, None), slice(7, 14, None)),
-                TemplatedFileSlice("literal", slice(13, 15, None), slice(14, 16, None)),
+                TemplatedFileSlice(
+                    "literal", slice(0, 7, None), slice(0, 7, None)
+                ),
+                TemplatedFileSlice(
+                    "templated", slice(7, 13, None), slice(7, 14, None)
+                ),
+                TemplatedFileSlice(
+                    "literal", slice(13, 15, None), slice(14, 16, None)
+                ),
                 TemplatedFileSlice(
                     "templated", slice(15, 24, None), slice(16, 22, None)
                 ),
-                TemplatedFileSlice("literal", slice(24, 33, None), slice(22, 31, None)),
+                TemplatedFileSlice(
+                    "literal", slice(24, 33, None), slice(22, 31, None)
+                ),
                 TemplatedFileSlice(
                     "templated", slice(33, 38, None), slice(31, 35, None)
                 ),
-                TemplatedFileSlice("literal", slice(38, 41, None), slice(35, 38, None)),
-                TemplatedFileSlice("escaped", slice(41, 45, None), slice(38, 40, None)),
-                TemplatedFileSlice("literal", slice(45, 76, None), slice(40, 71, None)),
+                TemplatedFileSlice(
+                    "literal", slice(38, 41, None), slice(35, 38, None)
+                ),
+                TemplatedFileSlice(
+                    "escaped", slice(41, 45, None), slice(38, 40, None)
+                ),
+                TemplatedFileSlice(
+                    "literal", slice(45, 76, None), slice(40, 71, None)
+                ),
             ],
         ),
         # Check for recursion error in non-exact raw cases.
@@ -364,19 +388,34 @@ def test__templater_python_split_invariants(
             {",": [4]},
             "foo , bar",
             [
-                TemplatedFileSlice("templated", slice(0, 5, None), slice(0, 3, None)),
+                TemplatedFileSlice(
+                    "templated", slice(0, 5, None), slice(0, 3, None)
+                ),
                 # Alternate implementations which group these next three together
                 # would also be fine.
-                TemplatedFileSlice("literal", slice(5, 6, None), slice(3, 4, None)),
-                TemplatedFileSlice("literal", slice(6, 7, None), slice(4, 5, None)),
-                TemplatedFileSlice("literal", slice(7, 8, None), slice(5, 6, None)),
-                TemplatedFileSlice("templated", slice(8, 13, None), slice(6, 9, None)),
+                TemplatedFileSlice(
+                    "literal", slice(5, 6, None), slice(3, 4, None)
+                ),
+                TemplatedFileSlice(
+                    "literal", slice(6, 7, None), slice(4, 5, None)
+                ),
+                TemplatedFileSlice(
+                    "literal", slice(7, 8, None), slice(5, 6, None)
+                ),
+                TemplatedFileSlice(
+                    "templated", slice(8, 13, None), slice(6, 9, None)
+                ),
             ],
         ),
     ],
 )
 def test__templater_python_split_uniques_coalesce_rest(
-    split_file, raw_occurrences, templated_occurrences, templated_str, result, caplog
+    split_file,
+    raw_occurrences,
+    templated_occurrences,
+    templated_str,
+    result,
+    caplog,
 ):
     """Test _split_uniques_coalesce_rest."""
     with caplog.at_level(logging.DEBUG, logger="sqlfluff.templater"):
@@ -454,7 +493,9 @@ def test__templater_python_split_uniques_coalesce_rest(
         ),
     ],
 )
-def test__templater_python_slice_file(raw_file, templated_file, unwrap_wrapped, result):
+def test__templater_python_slice_file(
+    raw_file, templated_file, unwrap_wrapped, result
+):
     """Test slice_file."""
     _, resp, _ = PythonTemplater().slice_file(
         raw_file,
@@ -472,7 +513,10 @@ def test__templater_python_slice_file(raw_file, templated_file, unwrap_wrapped, 
         if prev_slice:
             assert templated_slice.source_slice.start == prev_slice[0].stop
             assert templated_slice.templated_slice.start == prev_slice[1].stop
-        prev_slice = (templated_slice.source_slice, templated_slice.templated_slice)
+        prev_slice = (
+            templated_slice.source_slice,
+            templated_slice.templated_slice,
+        )
     # check result
     assert resp == result
 

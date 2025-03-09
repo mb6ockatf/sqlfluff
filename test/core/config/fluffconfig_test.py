@@ -19,7 +19,9 @@ from sqlfluff.utils.testing.logging import fluff_log_catcher
 config_b = {
     "core": {"rules": "LT03", "dialect": "ansi"},
     "layout": {
-        "type": {"comma": {"line_position": "trailing", "spacing_before": "touch"}}
+        "type": {
+            "comma": {"line_position": "trailing", "spacing_before": "touch"}
+        }
     },
 }
 
@@ -58,7 +60,9 @@ def test__config__nested_config_tests():
     """
     lntr = Linter(
         # Exclude CP02 in overrides (similar to cli --exclude-rules)
-        config=FluffConfig(overrides=dict(exclude_rules="CP02", dialect="ansi"))
+        config=FluffConfig(
+            overrides=dict(exclude_rules="CP02", dialect="ansi")
+        )
     )
     lnt = lntr.lint_path("test/fixtures/config/inheritance_b")
     violations = lnt.check_tuples_by_path()
@@ -97,15 +101,23 @@ def test__config__nested_config_tests():
         ("", None, True),
     ],
 )
-def test__config__templater_selection(templater_name, templater_class, raises_error):
+def test__config__templater_selection(
+    templater_name, templater_class, raises_error
+):
     """Test template selection by name."""
     if raises_error:
         with pytest.raises(SQLFluffUserError):
-            FluffConfig(overrides={"dialect": "ansi", "templater": templater_name})
+            FluffConfig(
+                overrides={"dialect": "ansi", "templater": templater_name}
+            )
     else:
-        cfg = FluffConfig(overrides={"dialect": "ansi", "templater": templater_name})
+        cfg = FluffConfig(
+            overrides={"dialect": "ansi", "templater": templater_name}
+        )
         assert cfg.get_templater().__class__ is templater_class
-        assert cfg._configs["core"]["templater_obj"].__class__ is templater_class
+        assert (
+            cfg._configs["core"]["templater_obj"].__class__ is templater_class
+        )
 
 
 def test__config__glob_exclude_config_tests():
@@ -114,7 +126,9 @@ def test__config__glob_exclude_config_tests():
     This looks like a linter test but it's actually a config
     test.
     """
-    lntr = Linter(config=FluffConfig.from_path("test/fixtures/config/glob_exclude"))
+    lntr = Linter(
+        config=FluffConfig.from_path("test/fixtures/config/glob_exclude")
+    )
     lnt = lntr.lint_path("test/fixtures/config/glob_exclude/test.sql")
     violations = lnt.check_tuples_by_path()
     for k in violations:
@@ -131,7 +145,9 @@ def test__config__glob_include_config_tests():
     This looks like a linter test but it's actually a config
     test.
     """
-    lntr = Linter(config=FluffConfig.from_path("test/fixtures/config/glob_include"))
+    lntr = Linter(
+        config=FluffConfig.from_path("test/fixtures/config/glob_include")
+    )
     lnt = lntr.lint_path("test/fixtures/config/glob_include/test.sql")
     violations = lnt.check_tuples_by_path()
     for k in violations:
@@ -161,9 +177,13 @@ def test__config__rules_set_to_none():
 def test__config__rules_group_with_exclude():
     """Test linting when a rules group is selected and rules are excluded."""
     lntr = Linter(
-        config=FluffConfig.from_path("test/fixtures/config/rules_group_with_exclude")
+        config=FluffConfig.from_path(
+            "test/fixtures/config/rules_group_with_exclude"
+        )
     )
-    lnt = lntr.lint_path("test/fixtures/config/rules_group_with_exclude/test.sql")
+    lnt = lntr.lint_path(
+        "test/fixtures/config/rules_group_with_exclude/test.sql"
+    )
     violations = lnt.check_tuples_by_path()
     for k in violations:
         assert ("CP01", 15, 1) in violations[k]
@@ -190,11 +210,17 @@ def test__config__get():
     assert cfg.get("rulez") is None
     assert cfg.get("rulez", section="core", default=123) == 123
     assert (
-        cfg.get("line_position", section=["layout", "type", "comma"], default=None)
+        cfg.get(
+            "line_position", section=["layout", "type", "comma"], default=None
+        )
         == "trailing"
     )
     assert (
-        cfg.get("line_position", section=["layout", "type", "ASDFSDG007"], default=None)
+        cfg.get(
+            "line_position",
+            section=["layout", "type", "ASDFSDG007"],
+            default=None,
+        )
         is None
     )
 
@@ -217,7 +243,9 @@ def test__config__from_kwargs():
 def test__config__from_string():
     """Test from_string method of FluffConfig."""
     with open(
-        os.path.join("test", "fixtures", "config", "inheritance_a", ".sqlfluff")
+        os.path.join(
+            "test", "fixtures", "config", "inheritance_a", ".sqlfluff"
+        )
     ) as f:
         config_string = f.read()
     cfg = FluffConfig.from_string(config_string)
@@ -308,7 +336,9 @@ def test__config__warn_unknown_rule():
     ) in caplog.text
     # Check we get a hint for the matched rule group.
     # NOTE: We don't check the set explicitly because we can't assume ordering.
-    assert ("The reference was found as a match for multiple rules: {") in caplog.text
+    assert (
+        "The reference was found as a match for multiple rules: {"
+    ) in caplog.text
     assert ("LT01") in caplog.text
     assert ("LT02") in caplog.text
 
@@ -322,7 +352,9 @@ def test__process_inline_config():
     assert cfg.get("rules") == "LT02"
 
     assert cfg.get("tab_space_size", section="indentation") == 4
-    cfg.process_inline_config("-- sqlfluff:indentation:tab_space_size:20", "test.sql")
+    cfg.process_inline_config(
+        "-- sqlfluff:indentation:tab_space_size:20", "test.sql"
+    )
     assert cfg.get("tab_space_size", section="indentation") == 20
 
     assert cfg.get("dialect") == "ansi"
@@ -340,11 +372,15 @@ def test__process_inline_config():
     assert cfg.get("my_path", section="jinja") == "c:\\foo"
 
     # Check that JSON objects are not mangled
-    cfg.process_inline_config('-- sqlfluff:jinja:my_dict:{"k":"v"}', "test.sql")
+    cfg.process_inline_config(
+        '-- sqlfluff:jinja:my_dict:{"k":"v"}', "test.sql"
+    )
     assert cfg.get("my_dict", section="jinja") == '{"k":"v"}'
 
     # Check that JSON arrays are not mangled
-    cfg.process_inline_config('-- sqlfluff:jinja:my_dict:[{"k":"v"}]', "test.sql")
+    cfg.process_inline_config(
+        '-- sqlfluff:jinja:my_dict:[{"k":"v"}]', "test.sql"
+    )
     assert cfg.get("my_dict", section="jinja") == '[{"k":"v"}]'
 
 

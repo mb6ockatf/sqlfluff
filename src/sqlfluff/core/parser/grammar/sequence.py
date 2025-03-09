@@ -191,7 +191,9 @@ class Sequence(BaseGrammar):
                 # NOTE: This won't consume from the end of a sequence
                 # because this happens only in the run up to matching
                 # another element. This is as designed.
-                _idx = skip_start_index_forward_to_code(segments, matched_idx, max_idx)
+                _idx = skip_start_index_forward_to_code(
+                    segments, matched_idx, max_idx
+                )
 
             # Have we prematurely run out of segments?
             if _idx >= max_idx:
@@ -215,7 +217,9 @@ class Sequence(BaseGrammar):
                 # On any of the other modes (GREEDY or GREEDY_ONCE_STARTED)
                 # we've effectively already claimed the segments, we've
                 # just failed to match. In which case it's unparsable.
-                insert_segments += tuple((matched_idx, meta) for meta in meta_buffer)
+                insert_segments += tuple(
+                    (matched_idx, meta) for meta in meta_buffer
+                )
                 return MatchResult(
                     matched_slice=slice(start_idx, matched_idx),
                     insert_segments=insert_segments,
@@ -307,20 +311,28 @@ class Sequence(BaseGrammar):
                 )
 
             # Flush any metas...
-            insert_segments += _flush_metas(matched_idx, _idx, meta_buffer, segments)
+            insert_segments += _flush_metas(
+                matched_idx, _idx, meta_buffer, segments
+            )
             meta_buffer = []
 
             # Otherwise we _do_ have a match. Update the position.
             matched_idx = elem_match.matched_slice.stop
             parse_context.update_progress(matched_idx)
 
-            if first_match and self.parse_mode == ParseMode.GREEDY_ONCE_STARTED:
+            if (
+                first_match
+                and self.parse_mode == ParseMode.GREEDY_ONCE_STARTED
+            ):
                 # In the GREEDY_ONCE_STARTED mode, we first look ahead to find a
                 # terminator after the first match (and only the first match).
                 max_idx = trim_to_terminator(
                     segments,
                     matched_idx,
-                    terminators=[*self.terminators, *parse_context.terminators],
+                    terminators=[
+                        *self.terminators,
+                        *parse_context.terminators,
+                    ],
                     parse_context=parse_context,
                 )
                 first_match = False
@@ -341,10 +353,17 @@ class Sequence(BaseGrammar):
 
         # Finally if we're in one of the greedy modes, and there's anything
         # left as unclaimed, mark it as unparsable.
-        if self.parse_mode in (ParseMode.GREEDY, ParseMode.GREEDY_ONCE_STARTED):
+        if self.parse_mode in (
+            ParseMode.GREEDY,
+            ParseMode.GREEDY_ONCE_STARTED,
+        ):
             if max_idx > matched_idx:
-                _idx = skip_start_index_forward_to_code(segments, matched_idx, max_idx)
-                _stop_idx = skip_stop_index_backward_to_code(segments, max_idx, _idx)
+                _idx = skip_start_index_forward_to_code(
+                    segments, matched_idx, max_idx
+                )
+                _stop_idx = skip_stop_index_backward_to_code(
+                    segments, max_idx, _idx
+                )
 
                 if _stop_idx > _idx:
                     child_matches += (
@@ -444,7 +463,9 @@ class Bracketed(Sequence):
         self, parse_context: ParseContext
     ) -> Tuple[Matchable, Matchable, bool]:
         """Rehydrate the bracket segments in question."""
-        bracket_pairs = parse_context.dialect.bracket_sets(self.bracket_pairs_set)
+        bracket_pairs = parse_context.dialect.bracket_sets(
+            self.bracket_pairs_set
+        )
         for bracket_type, start_ref, end_ref, persists in bracket_pairs:
             if bracket_type == self.bracket_type:
                 start_bracket = parse_context.dialect.ref(start_ref)
@@ -485,8 +506,8 @@ class Bracketed(Sequence):
         """
         # Rehydrate the bracket segments in question.
         # bracket_persists controls whether we make a BracketedSegment or not.
-        start_bracket, end_bracket, bracket_persists = self.get_bracket_from_dialect(
-            parse_context
+        start_bracket, end_bracket, bracket_persists = (
+            self.get_bracket_from_dialect(parse_context)
         )
         # Allow optional override for special bracket-like things
         start_bracket = self.start_bracket or start_bracket
@@ -530,12 +551,16 @@ class Bracketed(Sequence):
         _end_idx = bracketed_match.matched_slice.stop - 1
         if self.allow_gaps:
             _idx = skip_start_index_forward_to_code(segments, _idx)
-            _end_idx = skip_stop_index_backward_to_code(segments, _end_idx, _idx)
+            _end_idx = skip_stop_index_backward_to_code(
+                segments, _end_idx, _idx
+            )
 
         # Try and match content, clearing and adding the closing bracket
         # to the terminators.
         with parse_context.deeper_match(
-            name="Bracketed", clear_terminators=True, push_terminators=[end_bracket]
+            name="Bracketed",
+            clear_terminators=True,
+            push_terminators=[end_bracket],
         ) as ctx:
             # NOTE: This slice is a bit of a hack, but it's the only
             # reliable way so far to make sure we don't "over match" when

@@ -49,7 +49,9 @@ class StackPosition:
         to a specific segment which could induce bugs at a later
         stage if used.
         """
-        return cls(path_step.idx, path_step.len, cls._stack_pos_interpreter(path_step))
+        return cls(
+            path_step.idx, path_step.len, cls._stack_pos_interpreter(path_step)
+        )
 
 
 @dataclass(frozen=True)
@@ -97,14 +99,18 @@ class DepthInfo:
         if amount == 0:
             # The trivial case.
             return self
-        new_hash_set = self.stack_hash_set.difference(self.stack_hashes[-amount:])
+        new_hash_set = self.stack_hash_set.difference(
+            self.stack_hashes[-amount:]
+        )
         return self.__class__(
             stack_depth=self.stack_depth - amount,
             stack_hashes=self.stack_hashes[:-amount],
             stack_hash_set=new_hash_set,
             stack_class_types=self.stack_class_types[:-amount],
             stack_positions={
-                k: v for k, v in self.stack_positions.items() if k in new_hash_set
+                k: v
+                for k, v in self.stack_positions.items()
+                if k in new_hash_set
             },
         )
 
@@ -124,10 +130,14 @@ class DepthMap:
 
     """
 
-    def __init__(self, raws_with_stack: Sequence[Tuple[RawSegment, List[PathStep]]]):
+    def __init__(
+        self, raws_with_stack: Sequence[Tuple[RawSegment, List[PathStep]]]
+    ):
         self.depth_info = {}
         for raw, stack in raws_with_stack:
-            self.depth_info[raw.uuid] = DepthInfo.from_raw_and_stack(raw, stack)
+            self.depth_info[raw.uuid] = DepthInfo.from_raw_and_stack(
+                raw, stack
+            )
 
     @classmethod
     def from_parent(cls: Type["DepthMap"], parent: BaseSegment) -> "DepthMap":
@@ -161,7 +171,9 @@ class DepthMap:
         try:
             return self.depth_info[raw.uuid]
         except KeyError as err:  # pragma: no cover
-            reflow_logger.exception("Available UUIDS: %s", self.depth_info.keys())
+            reflow_logger.exception(
+                "Available UUIDS: %s", self.depth_info.keys()
+            )
             raise KeyError(
                 "Tried to get depth info for unknown "
                 f"segment {raw} with UUID {raw.uuid}"
@@ -180,4 +192,6 @@ class DepthMap:
 
         NOTE: we don't remove the old one because it causes no harm.
         """
-        self.depth_info[new_segment.uuid] = self.get_depth_info(anchor).trim(trim)
+        self.depth_info[new_segment.uuid] = self.get_depth_info(anchor).trim(
+            trim
+        )

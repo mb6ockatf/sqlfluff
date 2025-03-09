@@ -343,8 +343,12 @@ def test__templated_file_templated_slice_to_source_slice(
                 fname="test",
                 sliced_file=[
                     TemplatedFileSlice("literal", slice(0, 10), slice(0, 10)),
-                    TemplatedFileSlice("templated", slice(10, 17), slice(10, 10)),
-                    TemplatedFileSlice("literal", slice(17, 27), slice(10, 20)),
+                    TemplatedFileSlice(
+                        "templated", slice(10, 17), slice(10, 10)
+                    ),
+                    TemplatedFileSlice(
+                        "literal", slice(17, 27), slice(10, 20)
+                    ),
                 ],
                 raw_sliced=[
                     RawFileSlice("a" * 10, "literal", 0),

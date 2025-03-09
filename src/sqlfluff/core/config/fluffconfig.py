@@ -96,7 +96,12 @@ class FluffConfig:
        with the kind of things you'd like to achieve.
     """
 
-    private_vals = "rule_denylist", "rule_allowlist", "dialect_obj", "templater_obj"
+    private_vals = (
+        "rule_denylist",
+        "rule_allowlist",
+        "dialect_obj",
+        "templater_obj",
+    )
 
     def __init__(
         self,
@@ -128,7 +133,9 @@ class FluffConfig:
         # Fetch a fresh plugin manager if we weren't provided with one
         self._plugin_manager = plugin_manager or get_plugin_manager()
 
-        defaults = nested_combine(*self._plugin_manager.hook.load_default_config())
+        defaults = nested_combine(
+            *self._plugin_manager.hook.load_default_config()
+        )
         # If any existing configs are provided. Validate them:
         if configs:
             validate_config_dict(configs, "<provided configs>")
@@ -158,7 +165,9 @@ class FluffConfig:
             in_value = self._configs["core"].get(in_key, None)
             if in_value:
                 assert not isinstance(in_value, dict)
-                self._configs["core"][out_key] = split_comma_separated_string(in_value)
+                self._configs["core"][out_key] = split_comma_separated_string(
+                    in_value
+                )
             else:
                 self._configs["core"][out_key] = []
 
@@ -241,9 +250,9 @@ class FluffConfig:
         # which is used during pickling. The `templater_obj` doesn't pickle
         # well so is normally removed, but it's ok for us to just pass across
         # the original object here as we're in the same process.
-        configs_attribute_copy["core"]["templater_obj"] = self._configs["core"][
-            "templater_obj"
-        ]
+        configs_attribute_copy["core"]["templater_obj"] = self._configs[
+            "core"
+        ]["templater_obj"]
         return config_copy
 
     @classmethod
@@ -341,7 +350,9 @@ class FluffConfig:
         """
         config_state: ConfigMappingType = {}
         for config_string in config_strings:
-            config_state = load_config_string(config_string, configs=config_state)
+            config_state = load_config_string(
+                config_string, configs=config_state
+            )
         return cls(
             configs=config_state,
             overrides=overrides,
@@ -454,7 +465,9 @@ class FluffConfig:
             )
         }
         # Fetch the config value.
-        templater_name = self._configs["core"].get("templater", "<no value set>")
+        templater_name = self._configs["core"].get(
+            "templater", "<no value set>"
+        )
         assert isinstance(templater_name, str), (
             "Config value `templater` expected to be a string. "
             f"Not: {templater_name!r}"
@@ -521,7 +534,10 @@ class FluffConfig:
         return dict_diff(self._configs, other._configs, ignore=["dialect_obj"])
 
     def get(
-        self, val: str, section: Union[str, Iterable[str]] = "core", default: Any = None
+        self,
+        val: str,
+        section: Union[str, Iterable[str]] = "core",
+        default: Any = None,
     ) -> Any:
         """Get a particular value from the config.
 
@@ -695,7 +711,9 @@ class FluffConfig:
         # Coerce data types
         config_record = (config_key, coerce_value(config_value))
         # Convert to dict & validate
-        config_dict: ConfigMappingType = records_to_nested_dict([config_record])
+        config_dict: ConfigMappingType = records_to_nested_dict(
+            [config_record]
+        )
         validate_config_dict(config_dict, f"inline config in {fname}")
         config_val = list(iter_records_from_nested_dict(config_dict))[0]
 

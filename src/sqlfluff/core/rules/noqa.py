@@ -5,7 +5,11 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Tuple, Union, cast
 
-from sqlfluff.core.errors import SQLBaseError, SQLParseError, SQLUnusedNoQaWarning
+from sqlfluff.core.errors import (
+    SQLBaseError,
+    SQLParseError,
+    SQLUnusedNoQaWarning,
+)
 from sqlfluff.core.parser import BaseSegment, RawSegment, RegexLexer
 
 # Instantiate the linter logger
@@ -90,7 +94,10 @@ class IgnoreMask:
                     action: Optional[str]
                     if "=" in comment_remainder:
                         action, rule_part = comment_remainder.split("=", 1)
-                        if action not in {"disable", "enable"}:  # pragma: no cover
+                        if action not in {
+                            "disable",
+                            "enable",
+                        }:  # pragma: no cover
                             return SQLParseError(
                                 "Malformed 'noqa' section. "
                                 "Expected 'noqa: enable=<rule>[,...] | all' "
@@ -120,7 +127,9 @@ class IgnoreMask:
                             matched = False
                             for expanded in (
                                 reference_map[x]
-                                for x in fnmatch.filter(reference_map.keys(), r)
+                                for x in fnmatch.filter(
+                                    reference_map.keys(), r
+                                )
                             ):
                                 expanded_rules |= expanded
                                 matched = True
@@ -135,7 +144,9 @@ class IgnoreMask:
                         rules = tuple(sorted(expanded_rules))
                     else:
                         rules = None
-                    return NoQaDirective(line_no, line_pos, rules, action, comment)
+                    return NoQaDirective(
+                        line_no, line_pos, rules, action, comment
+                    )
             return NoQaDirective(line_no, line_pos, None, None, comment)
         return None
 
@@ -183,7 +194,9 @@ class IgnoreMask:
                 elif ignore_entry:
                     ignore_buff.append(ignore_entry)
         if ignore_buff:
-            linter_logger.info("Parsed noqa directives from file: %r", ignore_buff)
+            linter_logger.info(
+                "Parsed noqa directives from file: %r", ignore_buff
+            )
         return cls(ignore_buff), violations
 
     @classmethod
@@ -211,7 +224,9 @@ class IgnoreMask:
                 elif ignore_entry:
                     ignore_buff.append(ignore_entry)
         if ignore_buff:
-            linter_logger.info("Parsed noqa directives from file: %r", ignore_buff)
+            linter_logger.info(
+                "Parsed noqa directives from file: %r", ignore_buff
+            )
         return cls(ignore_buff), violations
 
     # ### Application methods.
@@ -310,12 +325,18 @@ class IgnoreMask:
         1. Filter out violations affected by single-line "noqa" directives.
         2. Filter out violations affected by disable/enable "noqa" directives.
         """
-        ignore_specific = [ignore for ignore in self._ignore_list if not ignore.action]
-        ignore_range = [ignore for ignore in self._ignore_list if ignore.action]
+        ignore_specific = [
+            ignore for ignore in self._ignore_list if not ignore.action
+        ]
+        ignore_range = [
+            ignore for ignore in self._ignore_list if ignore.action
+        ]
         violations = self._ignore_masked_violations_single_line(
             violations, ignore_specific
         )
-        violations = self._ignore_masked_violations_line_range(violations, ignore_range)
+        violations = self._ignore_masked_violations_line_range(
+            violations, ignore_range
+        )
         return violations
 
     def generate_warnings_for_unused(self) -> List[SQLBaseError]:

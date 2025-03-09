@@ -37,7 +37,9 @@ class FluffLogHandler(LogCaptureHandler):
 
 
 @contextmanager
-def fluff_log_catcher(level: int, logger_name: str) -> Iterator[FluffLogHandler]:
+def fluff_log_catcher(
+    level: int, logger_name: str
+) -> Iterator[FluffLogHandler]:
     """Context manager that sets the level for capturing of logs.
 
     After the end of the 'with' statement the level is restored to its

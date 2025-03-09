@@ -17,4 +17,6 @@ def test__rules__std_CV09_raised() -> None:
 
     assert len(result) == 2
     assert result[0]["description"] == "Use of blocked word 'MYOLDFUNCTION'."
-    assert result[1]["description"] == "Use of blocked word 'deprecated_table'."
+    assert (
+        result[1]["description"] == "Use of blocked word 'deprecated_table'."
+    )

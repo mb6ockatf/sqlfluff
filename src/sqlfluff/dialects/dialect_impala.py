@@ -236,7 +236,9 @@ class InsertStatementSegment(BaseSegment):
                 Ref("TableReferenceSegment"),
                 Ref("PartitionSpecGrammar", optional=True),
                 Bracketed(
-                    OneOf("SHUFFLE", "NOSHUFFLE"), bracket_type="square", optional=True
+                    OneOf("SHUFFLE", "NOSHUFFLE"),
+                    bracket_type="square",
+                    optional=True,
                 ),
                 Ref("IfNotExistsGrammar", optional=True),
                 Ref("SelectableGrammar"),
@@ -246,12 +248,16 @@ class InsertStatementSegment(BaseSegment):
                 Ref.keyword("TABLE", optional=True),
                 Ref("TableReferenceSegment"),
                 Sequence(
-                    Bracketed(Delimited(Sequence(Ref("ColumnReferenceSegment")))),
+                    Bracketed(
+                        Delimited(Sequence(Ref("ColumnReferenceSegment")))
+                    ),
                     optional=True,
                 ),
                 Ref("PartitionSpecGrammar", optional=True),
                 Bracketed(
-                    OneOf("SHUFFLE", "NOSHUFFLE"), bracket_type="square", optional=True
+                    OneOf("SHUFFLE", "NOSHUFFLE"),
+                    bracket_type="square",
+                    optional=True,
                 ),
                 OneOf(
                     Ref("SelectableGrammar"),

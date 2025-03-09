@@ -78,8 +78,12 @@ exasol_dialect.sets("date_part_function_name").update(
 
 exasol_dialect.insert_lexer_matchers(
     [
-        RegexLexer("lua_nested_quotes", r"\[={1,3}\[.*\]={1,3}\]", CodeSegment),
-        RegexLexer("lua_multiline_quotes", r"\[{2}([^[\\]|\\.)*\]{2}", CodeSegment),
+        RegexLexer(
+            "lua_nested_quotes", r"\[={1,3}\[.*\]={1,3}\]", CodeSegment
+        ),
+        RegexLexer(
+            "lua_multiline_quotes", r"\[{2}([^[\\]|\\.)*\]{2}", CodeSegment
+        ),
         # This matches escaped identifier e.g. [day]. There can be reserved keywords
         # within the square brackets.
         RegexLexer(
@@ -159,7 +163,9 @@ exasol_dialect.add(
     UDFParameterDotSyntaxSegment=TypedParser(
         "udf_param_dot_syntax", SymbolSegment, type="identifier"
     ),
-    RangeOperator=TypedParser("range_operator", SymbolSegment, type="range_operator"),
+    RangeOperator=TypedParser(
+        "range_operator", SymbolSegment, type="range_operator"
+    ),
     UnknownSegment=StringParser(
         "unknown", LiteralKeywordSegment, type="boolean_literal"
     ),
@@ -221,7 +227,9 @@ exasol_dialect.add(
         SymbolSegment,
         type="function_script_terminator",
     ),
-    WalrusOperatorSegment=StringParser(":=", SymbolSegment, type="assignment_operator"),
+    WalrusOperatorSegment=StringParser(
+        ":=", SymbolSegment, type="assignment_operator"
+    ),
     VariableNameSegment=RegexParser(
         r"[A-Z][A-Z0-9_]*",
         CodeSegment,
@@ -280,7 +288,9 @@ exasol_dialect.replace(
     ),
     DateTimeLiteralGrammar=Sequence(
         OneOf("DATE", "TIMESTAMP"),
-        TypedParser("single_quote", LiteralSegment, type="date_constructor_literal"),
+        TypedParser(
+            "single_quote", LiteralSegment, type="date_constructor_literal"
+        ),
     ),
     CharCharacterSetGrammar=OneOf(
         "UTF8",
@@ -328,7 +338,9 @@ class UnorderedSelectStatementSegment(BaseSegment):
         terminators=[
             Ref("SetOperatorSegment"),
             Ref("WithDataClauseSegment"),
-            Ref("CommentClauseSegment"),  # within CREATE TABLE / VIEW statements
+            Ref(
+                "CommentClauseSegment"
+            ),  # within CREATE TABLE / VIEW statements
             Ref("OrderByClauseSegment"),
             Ref("LimitClauseSegment"),
         ],
@@ -353,7 +365,9 @@ class SelectStatementSegment(BaseSegment):
         terminators=[
             Ref("SetOperatorSegment"),
             Ref("WithDataClauseSegment"),
-            Ref("CommentClauseSegment"),  # within CREATE TABLE / VIEW statements
+            Ref(
+                "CommentClauseSegment"
+            ),  # within CREATE TABLE / VIEW statements
         ],
         # Replace terminators because we're removing some.
         replace_terminators=True,
@@ -597,7 +611,9 @@ class LimitClauseSegment(BaseSegment):
             ),
             Sequence(  # count [OFFSET offset]
                 Ref("NumericLiteralSegment"),
-                Sequence("OFFSET", Ref("NumericLiteralSegment"), optional=True),
+                Sequence(
+                    "OFFSET", Ref("NumericLiteralSegment"), optional=True
+                ),
             ),
         ),
     )
@@ -616,7 +632,9 @@ class LocalAliasSegment(BaseSegment):
     """
 
     type = "local_alias_segment"
-    match_grammar = Sequence("LOCAL", Ref("DotSegment"), Ref("SingleIdentifierGrammar"))
+    match_grammar = Sequence(
+        "LOCAL", Ref("DotSegment"), Ref("SingleIdentifierGrammar")
+    )
 
 
 ############################
@@ -943,7 +961,8 @@ class DatatypeSegment(BaseSegment):
         OneOf(
             "DATE",
             Sequence(
-                "TIMESTAMP", Sequence("WITH", "LOCAL", "TIME", "ZONE", optional=True)
+                "TIMESTAMP",
+                Sequence("WITH", "LOCAL", "TIME", "ZONE", optional=True),
             ),
         ),
         Sequence(
@@ -973,7 +992,9 @@ class DatatypeSegment(BaseSegment):
             OneOf(
                 Sequence(
                     OneOf(
-                        Sequence("CHAR", Ref.keyword("VARYING", optional=True)),
+                        Sequence(
+                            "CHAR", Ref.keyword("VARYING", optional=True)
+                        ),
                         "VARCHAR",
                         "VARCHAR2",
                         "NCHAR",
@@ -986,7 +1007,11 @@ class DatatypeSegment(BaseSegment):
                 Sequence(
                     "CHARACTER",
                     Sequence(
-                        OneOf(Sequence("LARGE", "OBJECT"), "VARYING", optional=True),
+                        OneOf(
+                            Sequence("LARGE", "OBJECT"),
+                            "VARYING",
+                            optional=True,
+                        ),
                         Ref("BracketedArguments", optional=True),
                     ),
                 ),
@@ -1049,7 +1074,9 @@ class IntervalExpressionSegment(BaseSegment):
                         "MINUTE",
                         Sequence(
                             "SECOND",
-                            Bracketed(Ref("NumericLiteralSegment"), optional=True),
+                            Bracketed(
+                                Ref("NumericLiteralSegment"), optional=True
+                            ),
                         ),
                     ),
                     optional=True,
@@ -1075,12 +1102,15 @@ class ColumnConstraintSegment(ansi.ColumnConstraintSegment):
     match_grammar = Sequence(
         OneOf(
             Sequence(
-                "DEFAULT", OneOf(Ref("LiteralGrammar"), Ref("BareFunctionSegment"))
+                "DEFAULT",
+                OneOf(Ref("LiteralGrammar"), Ref("BareFunctionSegment")),
             ),
             Sequence(
                 # IDENTITY(1000) or IDENTITY 1000 or IDENTITY
                 "IDENTITY",
-                OptionallyBracketed(Ref("NumericLiteralSegment"), optional=True),
+                OptionallyBracketed(
+                    Ref("NumericLiteralSegment"), optional=True
+                ),
             ),
             optional=True,
         ),
@@ -1310,7 +1340,9 @@ class AlterTableAlterColumnSegment(BaseSegment):
                     ),
                     Sequence(
                         "DEFAULT",
-                        OneOf(Ref("LiteralGrammar"), Ref("BareFunctionSegment")),
+                        OneOf(
+                            Ref("LiteralGrammar"), Ref("BareFunctionSegment")
+                        ),
                     ),
                 ),
             ),
@@ -1578,7 +1610,9 @@ class UpdateStatementSegment(BaseSegment):
     match_grammar = Sequence(
         "UPDATE",
         Indent,
-        OneOf(Ref("TableReferenceSegment"), Ref("AliasedTableReferenceGrammar")),
+        OneOf(
+            Ref("TableReferenceSegment"), Ref("AliasedTableReferenceGrammar")
+        ),
         Dedent,
         Ref("SetClauseListSegment"),
         Ref("FromClauseSegment", optional=True),
@@ -1611,7 +1645,9 @@ class SetClauseSegment(BaseSegment):
         Ref("ColumnReferenceSegment"),
         Ref("EqualsSegment"),
         OneOf(
-            Ref("ExpressionSegment"),  # Maybe add this to ANSI to match math x=x+1
+            Ref(
+                "ExpressionSegment"
+            ),  # Maybe add this to ANSI to match math x=x+1
             Ref("LiteralGrammar"),
             Ref("BareFunctionSegment"),
             Ref("FunctionSegment"),
@@ -1724,7 +1760,9 @@ class DeleteStatementSegment(BaseSegment):
         "DELETE",
         Ref("StarSegment", optional=True),
         "FROM",
-        OneOf(Ref("TableReferenceSegment"), Ref("AliasedTableReferenceGrammar")),
+        OneOf(
+            Ref("TableReferenceSegment"), Ref("AliasedTableReferenceGrammar")
+        ),
         Ref("WhereClauseSegment", optional=True),
         Ref("PreferringClauseSegment", optional=True),
     )
@@ -2597,7 +2635,9 @@ class GrantRevokeObjectPrivilegesSegment(BaseSegment):
         "ON",
         OneOf(
             OneOf("SCHEMA", "TABLE", "VIEW", "FUNCTION", "SCRIPT"),
-            Sequence("ALL", Ref.keyword("OBJECTS", optional=True)),  # Revoke only
+            Sequence(
+                "ALL", Ref.keyword("OBJECTS", optional=True)
+            ),  # Revoke only
             optional=True,
         ),
         Ref("ObjectReferenceSegment"),
@@ -2698,7 +2738,11 @@ class SystemPrivilegesSegment(BaseSegment):
         Sequence(OneOf("CREATE", "ALTER", "DROP"), "USER"),
         Sequence("IMPERSONATE", "ANY", "USER"),
         Sequence(OneOf("DROP", "GRANT"), "ANY", "ROLE"),
-        Sequence(OneOf("ALTER", "DROP", "GRANT", "USE", "ACCESS"), "ANY", "CONNECTION"),
+        Sequence(
+            OneOf("ALTER", "DROP", "GRANT", "USE", "ACCESS"),
+            "ANY",
+            "CONNECTION",
+        ),
         Sequence("CREATE", Ref.keyword("VIRTUAL", optional=True), "SCHEMA"),
         Sequence(
             OneOf("ALTER", "DROP", "USE"),
@@ -2710,18 +2754,34 @@ class SystemPrivilegesSegment(BaseSegment):
         Sequence(
             "CREATE",
             OneOf(
-                "TABLE", "VIEW", "CONNECTION", "ROLE", "SESSION", "FUNCTION", "SCRIPT"
+                "TABLE",
+                "VIEW",
+                "CONNECTION",
+                "ROLE",
+                "SESSION",
+                "FUNCTION",
+                "SCRIPT",
             ),
         ),
         Sequence(
-            OneOf("CREATE", "ALTER", "DELETE", "DROP", "INSERT", "SELECT", "UPDATE"),
+            OneOf(
+                "CREATE",
+                "ALTER",
+                "DELETE",
+                "DROP",
+                "INSERT",
+                "SELECT",
+                "UPDATE",
+            ),
             "ANY",
             "TABLE",
         ),
         Sequence("SELECT", "ANY", "DICTIONARY"),
         Sequence(OneOf("CREATE", "DROP"), "ANY", "VIEW"),
         Sequence(
-            OneOf("CREATE", "DROP", "EXECUTE"), "ANY", OneOf("SCRIPT", "FUNCTION")
+            OneOf("CREATE", "DROP", "EXECUTE"),
+            "ANY",
+            OneOf("SCRIPT", "FUNCTION"),
         ),
         "IMPORT",
         "EXPORT",
@@ -2929,14 +2989,22 @@ class KillSegment(BaseSegment):
     match_grammar = Sequence(
         "KILL",
         OneOf(
-            Sequence("SESSION", OneOf("CURRENT_SESSION", Ref("NumericLiteralSegment"))),
+            Sequence(
+                "SESSION",
+                OneOf("CURRENT_SESSION", Ref("NumericLiteralSegment")),
+            ),
             Sequence(
                 "STATEMENT",
                 Ref("NumericLiteralSegment", optional=True),
                 "IN",
                 "SESSION",
                 Ref("NumericLiteralSegment"),
-                Sequence("WITH", "MESSAGE", Ref("QuotedLiteralSegment"), optional=True),
+                Sequence(
+                    "WITH",
+                    "MESSAGE",
+                    Ref("QuotedLiteralSegment"),
+                    optional=True,
+                ),
             ),
         ),
     )
@@ -2984,7 +3052,9 @@ class ExecuteScriptSegment(BaseSegment):
         "SCRIPT",
         Ref("ScriptReferenceSegment"),
         Bracketed(
-            Delimited(Ref.keyword("ARRAY", optional=True), Ref("ExpressionSegment")),
+            Delimited(
+                Ref.keyword("ARRAY", optional=True), Ref("ExpressionSegment")
+            ),
             optional=True,
         ),
         Sequence("WITH", "OUTPUT", optional=True),
@@ -3246,13 +3316,16 @@ class CreateScriptingLuaScriptStatementSegment(BaseSegment):
         Bracketed(
             Delimited(
                 Sequence(
-                    Ref.keyword("ARRAY", optional=True), Ref("SingleIdentifierGrammar")
+                    Ref.keyword("ARRAY", optional=True),
+                    Ref("SingleIdentifierGrammar"),
                 ),
                 optional=True,
             ),
             optional=True,
         ),
-        Sequence(Ref.keyword("RETURNS"), OneOf("TABLE", "ROWCOUNT"), optional=True),
+        Sequence(
+            Ref.keyword("RETURNS"), OneOf("TABLE", "ROWCOUNT"), optional=True
+        ),
         "AS",
         Indent,
         Ref("ScriptContentSegment"),
@@ -3277,7 +3350,12 @@ class CreateUDFScriptStatementSegment(BaseSegment):
         "CREATE",
         Ref("OrReplaceGrammar", optional=True),
         OneOf(
-            "JAVA", "PYTHON", "LUA", "R", Ref("SingleIdentifierGrammar"), optional=True
+            "JAVA",
+            "PYTHON",
+            "LUA",
+            "R",
+            Ref("SingleIdentifierGrammar"),
+            optional=True,
         ),
         OneOf("SCALAR", "SET"),
         "SCRIPT",
@@ -3289,7 +3367,9 @@ class CreateUDFScriptStatementSegment(BaseSegment):
                 optional=True,
             ),
         ),
-        OneOf(Sequence("RETURNS", Ref("DatatypeSegment")), Ref("EmitsSegment")),
+        OneOf(
+            Sequence("RETURNS", Ref("DatatypeSegment")), Ref("EmitsSegment")
+        ),
         "AS",
         Indent,
         Ref("ScriptContentSegment"),

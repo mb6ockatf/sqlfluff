@@ -22,7 +22,16 @@ from sqlfluff.utils.testing.rules import assert_rule_raises_violations_in_file
         (
             "LT01",
             "operator_errors.sql",
-            [(3, 8), (4, 10), (7, 6), (7, 7), (7, 9), (7, 10), (7, 12), (7, 13)],
+            [
+                (3, 8),
+                (4, 10),
+                (7, 6),
+                (7, 7),
+                (7, 9),
+                (7, 10),
+                (7, 12),
+                (7, 13),
+            ],
         ),
         ("LT03", "operator_errors.sql", [(5, 9)]),
         (
@@ -94,7 +103,11 @@ def test__rules__std_file(rule, path, violations):
         {"capitalisation.keywords": {"capitalisation_policy": "blah"}},
         {"aliasing.table": {"aliasing": "blah"}},
         {"aliasing.column": {"aliasing": "blah"}},
-        {"capitalisation.identifiers": {"extended_capitalisation_policy": "blah"}},
+        {
+            "capitalisation.identifiers": {
+                "extended_capitalisation_policy": "blah"
+            }
+        },
         {"capitalisation.functions": {"capitalisation_policy": "blah"}},
     ],
 )

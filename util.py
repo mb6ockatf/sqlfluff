@@ -107,7 +107,9 @@ def release(new_version_num):
             p,
         )
         if new_contrib_string.startswith("* "):
-            new_contrib_name = re.sub(r"\* \[(.*?)\].*", r"\1", new_contrib_string)
+            new_contrib_name = re.sub(
+                r"\* \[(.*?)\].*", r"\1", new_contrib_string
+            )
             potential_new_contributors.append(
                 {"name": new_contrib_name, "line": new_contrib_string}
             )
@@ -129,9 +131,14 @@ def release(new_version_num):
         write_changelog.write(line)
         if "DO NOT DELETE THIS LINE" in line:
             existing_entry_start = i + 2
-            new_heading = f"## [{new_version_num}] - {time.strftime('%Y-%m-%d')}\n"
+            new_heading = (
+                f"## [{new_version_num}] - {time.strftime('%Y-%m-%d')}\n"
+            )
             # If the release is already in the changelog, update it
-            if f"## [{new_version_num}]" in input_changelog[existing_entry_start]:
+            if (
+                f"## [{new_version_num}]"
+                in input_changelog[existing_entry_start]
+            ):
                 click.echo(f"...found existing entry for {new_version_num}")
                 # Update the existing heading with the new date.
                 input_changelog[existing_entry_start] = new_heading

@@ -100,16 +100,17 @@ class Rule_CV10(BaseRule):
 
         if not (
             self.force_enable
-            or context.dialect.name in self._dialects_with_double_quoted_strings
+            or context.dialect.name
+            in self._dialects_with_double_quoted_strings
         ):
             return LintResult(memory=context.memory)
 
         # This rule can also cover quoted literals that are partially templated.
         # I.e. when the quotes characters are _not_ part of the template we can
         # meaningfully apply this rule.
-        templated_raw_slices = FunctionalContext(context).segment.raw_slices.select(
-            rsp.is_slice_type("templated")
-        )
+        templated_raw_slices = FunctionalContext(
+            context
+        ).segment.raw_slices.select(rsp.is_slice_type("templated"))
         for raw_slice in templated_raw_slices:
             pos_marker = context.segment.pos_marker
             # This is to make mypy happy.
@@ -120,7 +121,9 @@ class Rule_CV10(BaseRule):
             leading_quote_inside_template = pos_marker.source_str()[:2].lstrip(
                 self._string_prefix_chars
             )[0] not in ['"', "'"]
-            trailing_quote_inside_template = pos_marker.source_str()[-1] not in [
+            trailing_quote_inside_template = pos_marker.source_str()[
+                -1
+            ] not in [
                 '"',
                 "'",
             ]
@@ -154,16 +157,18 @@ class Rule_CV10(BaseRule):
                     preferred_quoted_literal_style,
                 )
         else:
-            preferred_quoted_literal_style = self.preferred_quoted_literal_style
+            preferred_quoted_literal_style = (
+                self.preferred_quoted_literal_style
+            )
 
         fixed_string = self._normalize_preferred_quoted_literal_style(
             context.segment.raw,
-            preferred_quote_char=self._quotes_mapping[preferred_quoted_literal_style][
-                "preferred_quote_char"
-            ],
-            alternate_quote_char=self._quotes_mapping[preferred_quoted_literal_style][
-                "alternate_quote_char"
-            ],
+            preferred_quote_char=self._quotes_mapping[
+                preferred_quoted_literal_style
+            ]["preferred_quote_char"],
+            alternate_quote_char=self._quotes_mapping[
+                preferred_quoted_literal_style
+            ]["alternate_quote_char"],
         )
 
         if fixed_string != context.segment.raw:
@@ -250,8 +255,12 @@ class Rule_CV10(BaseRule):
         first_quote_pos = s.find(orig_quote)
         prefix = s[:first_quote_pos]
         unescaped_new_quote = regex.compile(rf"(([^\\]|^)(\\\\)*){new_quote}")
-        escaped_new_quote = regex.compile(rf"([^\\]|^)\\((?:\\\\)*){new_quote}")
-        escaped_orig_quote = regex.compile(rf"([^\\]|^)\\((?:\\\\)*){orig_quote}")
+        escaped_new_quote = regex.compile(
+            rf"([^\\]|^)\\((?:\\\\)*){new_quote}"
+        )
+        escaped_orig_quote = regex.compile(
+            rf"([^\\]|^)\\((?:\\\\)*){orig_quote}"
+        )
         body = s[first_quote_pos + len(orig_quote) : -len(orig_quote)]
 
         if "r" in prefix.lower():
@@ -301,7 +310,10 @@ class Rule_CV10(BaseRule):
             )
             return s  # Do not introduce more escaping
 
-        if new_escape_count == orig_escape_count and orig_quote == preferred_quote_char:
+        if (
+            new_escape_count == orig_escape_count
+            and orig_quote == preferred_quote_char
+        ):
             # Already using preferred_quote_char, and no escape benefit to changing
             return s
 

@@ -102,7 +102,11 @@ class Rule_CV03(BaseRule):
                 new_comma = SymbolSegment(",", type="comma")
                 return LintResult(
                     anchor=last_content,
-                    fixes=[LintFix.replace(last_content, [last_content, new_comma])],
+                    fixes=[
+                        LintFix.replace(
+                            last_content, [last_content, new_comma]
+                        )
+                    ],
                     description="Trailing comma in select statement required",
                 )
         return None

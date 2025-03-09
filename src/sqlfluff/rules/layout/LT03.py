@@ -60,7 +60,9 @@ class Rule_LT03(BaseRule):
     name = "layout.operators"
     aliases = ("L007",)
     groups = ("all", "layout")
-    crawl_behaviour = SegmentSeekerCrawler({"binary_operator", "comparison_operator"})
+    crawl_behaviour = SegmentSeekerCrawler(
+        {"binary_operator", "comparison_operator"}
+    )
     is_fix_compatible = True
 
     def _seek_newline(
@@ -134,7 +136,9 @@ class Rule_LT03(BaseRule):
                 "line_position", ["layout", "type", "comparison_operator"]
             )
             if self._check_trail_lead_shortcut(
-                context.segment, context.parent_stack[-1], comparison_positioning
+                context.segment,
+                context.parent_stack[-1],
+                comparison_positioning,
             ):
                 return [LintResult()]
         elif context.segment.is_type("binary_operator"):

@@ -40,7 +40,9 @@ class BracketedSegment(BaseSegment):
 
     @classmethod
     def simple(
-        cls, parse_context: ParseContext, crumbs: Optional[Tuple[str, ...]] = None
+        cls,
+        parse_context: ParseContext,
+        crumbs: Optional[Tuple[str, ...]] = None,
     ) -> Optional["SimpleHintType"]:
         """Simple methods for bracketed and the persistent brackets."""
         start_brackets = [
@@ -56,7 +58,9 @@ class BracketedSegment(BaseSegment):
                 parse_context, crumbs=crumbs
             )
             assert bracket_simple, "All bracket segments must support simple."
-            assert bracket_simple[0], "All bracket segments must support raw simple."
+            assert bracket_simple[
+                0
+            ], "All bracket segments must support raw simple."
             # NOTE: By making this assumption we don't have to handle the "typed"
             # simple here.
             simple_raws.update(bracket_simple[0])

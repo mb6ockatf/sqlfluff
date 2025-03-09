@@ -43,7 +43,9 @@ class BaseRunner(ABC):
 
     pass_formatter = True
 
-    def iter_rendered(self, fnames: List[str]) -> Iterator[Tuple[str, RenderedFile]]:
+    def iter_rendered(
+        self, fnames: List[str]
+    ) -> Iterator[Tuple[str, RenderedFile]]:
         """Iterate through rendered files ready for linting."""
         for fname in self.linter.templater.sequence_files(
             fnames, config=self.config, formatter=self.linter.formatter
@@ -93,7 +95,9 @@ class BaseRunner(ABC):
         pass
 
     @staticmethod
-    def _handle_lint_path_exception(fname: Optional[str], e: BaseException) -> None:
+    def _handle_lint_path_exception(
+        fname: Optional[str], e: BaseException
+    ) -> None:
         if isinstance(e, IOError):
             # IOErrors are caught in commands.py, so propagate it
             raise (e)  # pragma: no cover
@@ -127,7 +131,9 @@ class ParallelRunner(BaseRunner):
     # don't pickle well.
     pass_formatter = False
 
-    def __init__(self, linter: Linter, config: FluffConfig, processes: int) -> None:
+    def __init__(
+        self, linter: Linter, config: FluffConfig, processes: int
+    ) -> None:
         super().__init__(linter, config)
         self.processes = processes
 
@@ -153,7 +159,9 @@ class ParallelRunner(BaseRunner):
                         try:
                             lint_result.reraise()
                         except Exception as e:
-                            self._handle_lint_path_exception(lint_result.fname, e)
+                            self._handle_lint_path_exception(
+                                lint_result.fname, e
+                            )
                     else:
                         # It's a LintedDir.
                         if self.linter.formatter:
@@ -170,7 +178,9 @@ class ParallelRunner(BaseRunner):
                 # On keyboard interrupt (Ctrl-C), terminate the workers.
                 # Notify the user we've received the signal and are cleaning up,
                 # in case it takes awhile.
-                print("Received keyboard interrupt. Cleaning up and shutting down...")
+                print(
+                    "Received keyboard interrupt. Cleaning up and shutting down..."
+                )
                 pool.terminate()
 
     @staticmethod
@@ -205,7 +215,8 @@ class ParallelRunner(BaseRunner):
         cls,
         pool: multiprocessing.pool.Pool,
         func: Callable[
-            [Tuple[str, PartialLintCallable]], Union["DelayedException", LintedFile]
+            [Tuple[str, PartialLintCallable]],
+            Union["DelayedException", LintedFile],
         ],
         iterable: Iterable[Tuple[str, PartialLintCallable]],
     ) -> Iterable[Union["DelayedException", LintedFile]]:  # pragma: no cover
@@ -244,7 +255,8 @@ class MultiProcessRunner(ParallelRunner):
         cls,
         pool: multiprocessing.pool.Pool,
         func: Callable[
-            [Tuple[str, PartialLintCallable]], Union["DelayedException", LintedFile]
+            [Tuple[str, PartialLintCallable]],
+            Union["DelayedException", LintedFile],
         ],
         iterable: Iterable[Tuple[str, PartialLintCallable]],
     ) -> Iterable[Union["DelayedException", LintedFile]]:
@@ -269,7 +281,8 @@ class MultiThreadRunner(ParallelRunner):
         cls,
         pool: multiprocessing.pool.Pool,
         func: Callable[
-            [Tuple[str, PartialLintCallable]], Union["DelayedException", LintedFile]
+            [Tuple[str, PartialLintCallable]],
+            Union["DelayedException", LintedFile],
         ],
         iterable: Iterable[Tuple[str, PartialLintCallable]],
     ) -> Iterable[Union["DelayedException", LintedFile]]:
@@ -322,8 +335,14 @@ def get_runner(
         # so this flag allows us to fall back to a threaded runner
         # in those cases.
         if allow_process_parallelism:
-            return MultiProcessRunner(linter, config, processes=processes), processes
+            return (
+                MultiProcessRunner(linter, config, processes=processes),
+                processes,
+            )
         else:
-            return MultiThreadRunner(linter, config, processes=processes), processes
+            return (
+                MultiThreadRunner(linter, config, processes=processes),
+                processes,
+            )
     else:
         return SequentialRunner(linter, config), processes

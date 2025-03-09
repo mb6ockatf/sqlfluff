@@ -102,7 +102,10 @@ from sqlfluff.core.parser.context import ParseContext
                                         "bracketed",
                                         (
                                             ("start_bracket", "("),
-                                            ("expression", (("numeric_literal", "2"),)),
+                                            (
+                                                "expression",
+                                                (("numeric_literal", "2"),),
+                                            ),
                                             ("whitespace", " "),
                                             (
                                                 "unparsable",

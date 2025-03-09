@@ -16,5 +16,12 @@ def ds_filter(value: datetime.date | datetime.time | None) -> str | None:
 SQLFLUFF_JINJA_FILTERS = {"ds": ds_filter}
 
 now = datetime.datetime(
-    2006, 1, 2, 3, 4, 5, 0, tzinfo=datetime.timezone(-datetime.timedelta(hours=7))
+    2006,
+    1,
+    2,
+    3,
+    4,
+    5,
+    0,
+    tzinfo=datetime.timezone(-datetime.timedelta(hours=7)),
 )

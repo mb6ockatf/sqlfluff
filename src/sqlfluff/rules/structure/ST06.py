@@ -106,7 +106,9 @@ class Rule_ST06(BaseRule):
                 if maybe_with_compound_statement is None:
                     break  # pragma: no cover
                 with_compound_statement, _ = maybe_with_compound_statement
-                for ref in with_compound_statement.recursive_crawl("table_reference"):
+                for ref in with_compound_statement.recursive_crawl(
+                    "table_reference"
+                ):
                     if ref.raw_upper == cte_identifier.raw_upper:
                         path = with_compound_statement.path_to(ref)
                         if any(
@@ -129,7 +131,9 @@ class Rule_ST06(BaseRule):
                                 return None
 
         select_clause_segment = context.segment
-        select_target_elements = context.segment.get_children("select_clause_element")
+        select_target_elements = context.segment.get_children(
+            "select_clause_element"
+        )
         if not select_target_elements:
             return None
 
@@ -151,7 +155,9 @@ class Rule_ST06(BaseRule):
                         try:
                             _function = segment.get_child("function")
                             assert _function
-                            _function_name = _function.get_child("function_name")
+                            _function_name = _function.get_child(
+                                "function_name"
+                            )
                             assert _function_name
                             if _function_name.raw == e[1]:
                                 self._validate(i, segment)
@@ -221,7 +227,8 @@ class Rule_ST06(BaseRule):
                 for initial_select_target_element, replace_select_target_element in zip(  # noqa: E501
                     select_target_elements, ordered_select_target_elements
                 )
-                if initial_select_target_element is not replace_select_target_element
+                if initial_select_target_element
+                is not replace_select_target_element
             ]
             # Anchoring on the select statement segment ensures that
             # select statements which include macro targets are ignored
@@ -231,12 +238,17 @@ class Rule_ST06(BaseRule):
         return None
 
     @classmethod
-    def _implicit_column_references(cls, segment: BaseSegment) -> Iterator[BaseSegment]:
+    def _implicit_column_references(
+        cls, segment: BaseSegment
+    ) -> Iterator[BaseSegment]:
         """Yield any implicit ORDER BY or GROUP BY column references.
 
         This function was adapted from similar code in AM06.
         """
-        _ignore_types: List[str] = ["withingroup_clause", "window_specification"]
+        _ignore_types: List[str] = [
+            "withingroup_clause",
+            "window_specification",
+        ]
         if not segment.is_type(*_ignore_types):  # Ignore Windowing clauses
             if segment.is_type("groupby_clause", "orderby_clause"):
                 for seg in segment.segments:

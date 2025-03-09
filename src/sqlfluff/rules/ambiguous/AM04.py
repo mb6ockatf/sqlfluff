@@ -7,7 +7,11 @@ from sqlfluff.core.rules import BaseRule, LintResult, RuleContext
 from sqlfluff.core.rules.crawlers import SegmentSeekerCrawler
 from sqlfluff.utils.analysis.query import Query
 
-_START_TYPES = ["select_statement", "set_expression", "with_compound_statement"]
+_START_TYPES = [
+    "select_statement",
+    "set_expression",
+    "with_compound_statement",
+]
 
 
 class RuleFailure(Exception):
@@ -69,7 +73,9 @@ class Rule_AM04(BaseRule):
     aliases = ("L044",)
     groups: Tuple[str, ...] = ("all", "ambiguous")
     # Only evaluate the outermost query.
-    crawl_behaviour = SegmentSeekerCrawler(set(_START_TYPES), allow_recurse=False)
+    crawl_behaviour = SegmentSeekerCrawler(
+        set(_START_TYPES), allow_recurse=False
+    )
 
     def _handle_alias(self, selectable, alias_info, query) -> None:
         select_info_target = next(
@@ -126,7 +132,9 @@ class Rule_AM04(BaseRule):
                 else:
                     # No table was specified with the wildcard. Assume we're
                     # querying from a nested select in FROM.
-                    for o in query.crawl_sources(query.selectables[0].selectable, True):
+                    for o in query.crawl_sources(
+                        query.selectables[0].selectable, True
+                    ):
                         if isinstance(o, Query):
                             self._analyze_result_columns(o)
                             return None

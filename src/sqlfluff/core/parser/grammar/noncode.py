@@ -17,7 +17,9 @@ class NonCodeMatcher(Matchable):
     """An object which behaves like a matcher to match non-code."""
 
     def simple(
-        self, parse_context: ParseContext, crumbs: Optional[Tuple[str, ...]] = None
+        self,
+        parse_context: ParseContext,
+        crumbs: Optional[Tuple[str, ...]] = None,
     ) -> SimpleHintType:
         """This element doesn't work with simple."""
         return None

@@ -19,7 +19,10 @@ from sqlfluff.core.plugin.host import get_plugin_manager, purge_plugin_manager
 from sqlfluff.core.templaters import RawTemplater
 from sqlfluff.core.templaters.base import RawFileSlice, TemplatedFileSlice
 from sqlfluff.core.templaters.jinja import JinjaTemplater
-from sqlfluff.utils.reflow.helpers import deduce_line_indent, fixes_from_results
+from sqlfluff.utils.reflow.helpers import (
+    deduce_line_indent,
+    fixes_from_results,
+)
 from sqlfluff.utils.reflow.reindent import (
     _crawl_indent_points,
     _IndentLine,
@@ -565,7 +568,9 @@ def test_reflow__deduce_line_indent(
         ),
     ],
 )
-def test_reflow__crawl_indent_points(raw_sql_in, templater, points_out, caplog):
+def test_reflow__crawl_indent_points(
+    raw_sql_in, templater, points_out, caplog
+):
     """Test _crawl_indent_points directly."""
     # Register the mock templater in this module.
     purge_plugin_manager()
@@ -742,7 +747,9 @@ def test_reflow__crawl_indent_points(raw_sql_in, templater, points_out, caplog):
         ),
     ],
 )
-def test_reflow__lint_indent_points(raw_sql_in, raw_sql_out, default_config, caplog):
+def test_reflow__lint_indent_points(
+    raw_sql_in, raw_sql_out, default_config, caplog
+):
     """Test the lint_indent_points() method directly.
 
     Rather than testing directly, for brevity we check
@@ -754,7 +761,9 @@ def test_reflow__lint_indent_points(raw_sql_in, raw_sql_out, default_config, cap
     seq = ReflowSequence.from_root(root, config=default_config)
 
     with caplog.at_level(logging.DEBUG, logger="sqlfluff.rules.reflow"):
-        elements, results = lint_indent_points(seq.elements, single_indent="  ")
+        elements, results = lint_indent_points(
+            seq.elements, single_indent="  "
+        )
 
     result_raw = "".join(elem.raw for elem in elements)
     assert result_raw == raw_sql_out, "Raw Element Check Failed!"
@@ -767,7 +776,9 @@ def test_reflow__lint_indent_points(raw_sql_in, raw_sql_out, default_config, cap
         root, default_config.get("dialect_obj"), "TEST", anchor_info
     )
     assert valid, f"Reparse check failed: {fixed_tree.raw!r}"
-    assert fixed_tree.raw == raw_sql_out, "Element check passed - but fix check failed!"
+    assert (
+        fixed_tree.raw == raw_sql_out
+    ), "Element check passed - but fix check failed!"
 
 
 @pytest.mark.parametrize(
@@ -834,6 +845,8 @@ def test_reflow__lint_indent_points(raw_sql_in, raw_sql_out, default_config, cap
         ),
     ],
 )
-def test_reflow__desired_indent_units(indent_line, forced_indents, expected_units):
+def test_reflow__desired_indent_units(
+    indent_line, forced_indents, expected_units
+):
     """Test _IndentLine.desired_indent_units() directly."""
     assert indent_line.desired_indent_units(forced_indents) == expected_units

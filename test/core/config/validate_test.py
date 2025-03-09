@@ -47,7 +47,8 @@ def test__validate_configs_precedence_same_file():
     new_key = ("layout", "type", "binary_operator", "line_position")
     # Check it's still conflicted.
     assert any(
-        k.old_path == old_key and k.new_path == new_key for k in REMOVED_CONFIGS
+        k.old_path == old_key and k.new_path == new_key
+        for k in REMOVED_CONFIGS
     ), (
         "This test depends on this key still being removed. Update the test to "
         "one that is if this one isn't."
@@ -61,13 +62,18 @@ def test__validate_configs_precedence_same_file():
     }
     validate_config_dict_for_removed(config, "<test>")
     # Check we only get the new key after validation
-    assert config == {"layout": {"type": {"binary_operator": {"line_position": "foo"}}}}
+    assert config == {
+        "layout": {"type": {"binary_operator": {"line_position": "foo"}}}
+    }
 
 
 @pytest.mark.parametrize(
     "config_dict,config_warning",
     [
-        ({"layout": "foo"}, "Found value 'foo' instead of a valid layout section"),
+        (
+            {"layout": "foo"},
+            "Found value 'foo' instead of a valid layout section",
+        ),
         (
             {"layout": {"invalid": "foo"}},
             "Only sections of the form `sqlfluff:layout:type:...` are valid",

@@ -118,7 +118,9 @@ class JinjaTracer:
             else:
                 # E.g. "00000000000000000000000000000002 a < 10". The characters
                 # after the slice ID are executable code from raw_str.
-                alt_id, slice_length = m_id.group(0), len(p[len(m_id.group(0)) + 1 :])
+                alt_id, slice_length = m_id.group(0), len(
+                    p[len(m_id.group(0)) + 1 :]
+                )
 
             target_slice_idx = self.find_slice_index(alt_id)
             target_inside_block = self.raw_slice_info[
@@ -177,7 +179,9 @@ class JinjaTracer:
         step_candidates = {}
         while self.program_counter < len(self.raw_sliced):
             self.record_trace(
-                target_slice_length if self.program_counter == target_slice_idx else 0
+                target_slice_length
+                if self.program_counter == target_slice_idx
+                else 0
             )
             current_raw_slice = self.raw_sliced[self.program_counter]
             if self.program_counter == target_slice_idx:
@@ -204,7 +208,9 @@ class JinjaTracer:
             # Step forward to the best step found.
 
             # https://github.com/sqlfluff/sqlfluff/issues/6121
-            next_indices = self.raw_slice_info[current_raw_slice].next_slice_indices
+            next_indices = self.raw_slice_info[
+                current_raw_slice
+            ].next_slice_indices
             if (
                 current_raw_slice.tag == "endfor"  # noqa
                 # Elements of inside_set_macro_or_call have empty next_slice_indices
@@ -438,7 +444,9 @@ class JinjaAnalyzer:
         self.slice_id += 1
         return result
 
-    def slice_info_for_literal(self, length: int, prefix: str = "") -> RawSliceInfo:
+    def slice_info_for_literal(
+        self, length: int, prefix: str = ""
+    ) -> RawSliceInfo:
         """Returns a RawSliceInfo for a literal.
 
         In the alternate template, literals are replaced with a uniquely
@@ -508,7 +516,9 @@ class JinjaAnalyzer:
                         result = None
                         if trimmed_parts[0] == "call":
                             assert m_open and m_close
-                            result = self.track_call(m_open, m_close, tag_contents)
+                            result = self.track_call(
+                                m_open, m_close, tag_contents
+                            )
                         self.inside_set_macro_or_call = True
                         return result, block_type
                 else:
@@ -530,7 +540,9 @@ class JinjaAnalyzer:
     ) -> RawSliceInfo:
         """Create RawSliceInfo as given, or "empty" if in set/macro block."""
         if not self.inside_set_macro_or_call:
-            return RawSliceInfo(unique_alternate_id, alternate_code, [], inside_block)
+            return RawSliceInfo(
+                unique_alternate_id, alternate_code, [], inside_block
+            )
         else:
             return RawSliceInfo(None, None, [], False)
 
@@ -624,7 +636,11 @@ class JinjaAnalyzer:
                 )
                 if block_type == "block_start":
                     block_idx += 1
-                if elem_type.endswith("_end") and raw.startswith("-") and m_strip_right:
+                if (
+                    elem_type.endswith("_end")
+                    and raw.startswith("-")
+                    and m_strip_right
+                ):
                     # Right whitespace was stripped after closing block. Split
                     # off the trailing whitespace into a separate slice. The
                     # desired behavior is to behave similarly as the left
@@ -714,7 +730,8 @@ class JinjaAnalyzer:
         # case it has intentional side effects, but also return a slice ID
         # for tracking.
         alternate_code = (
-            f"\0{unique_alternate_id} {open_} " f"{''.join(tag_contents)} {close_}"
+            f"\0{unique_alternate_id} {open_} "
+            f"{''.join(tag_contents)} {close_}"
         )
         return self.make_raw_slice_info(unique_alternate_id, alternate_code)
 
@@ -743,7 +760,8 @@ class JinjaAnalyzer:
         # case it has intentional side effects, but also return a slice ID
         # for tracking.
         alternate_code = (
-            f"\0{unique_alternate_id} {open_} " f"{''.join(tag_contents)} {close_}"
+            f"\0{unique_alternate_id} {open_} "
+            f"{''.join(tag_contents)} {close_}"
         )
         return self.make_raw_slice_info(unique_alternate_id, alternate_code)
 
@@ -792,7 +810,9 @@ class JinjaAnalyzer:
                 del trimmed_parts[-1]
         else:
             # Handle a tag received in one go.
-            trimmed_content = str_buff[len(m_open.group(0)) : -len(m_close.group(0))]
+            trimmed_content = str_buff[
+                len(m_open.group(0)) : -len(m_close.group(0))
+            ]
             trimmed_parts = trimmed_content.split()
         return trimmed_parts
 
@@ -813,9 +833,11 @@ class JinjaAnalyzer:
             # ends with "{% endif %} (with no newline following), that we still
             # generate a TemplateSliceInfo for it.
             unique_alternate_id = self.next_slice_id()
-            alternate_code = f"{self.raw_sliced[-1].raw}\0{unique_alternate_id}_0"
-            self.raw_slice_info[self.raw_sliced[-1]] = self.make_raw_slice_info(
-                unique_alternate_id, alternate_code
+            alternate_code = (
+                f"{self.raw_sliced[-1].raw}\0{unique_alternate_id}_0"
+            )
+            self.raw_slice_info[self.raw_sliced[-1]] = (
+                self.make_raw_slice_info(unique_alternate_id, alternate_code)
             )
 
     def update_next_slice_indices(
@@ -852,13 +874,17 @@ class JinjaAnalyzer:
                 self.stack.pop()
                 if _raw_slice.slice_type == "block_start":
                     assert _raw_slice.tag
-                    if self._get_tag_configuration(_raw_slice.tag).block_may_loop:
+                    if self._get_tag_configuration(
+                        _raw_slice.tag
+                    ).block_may_loop:
                         # Record potential backward jump to the loop beginning.
                         self.raw_slice_info[
                             self.raw_sliced[slice_idx]
                         ].next_slice_indices.append(_idx + 1)
 
-    def handle_left_whitespace_stripping(self, token: str, block_idx: int) -> None:
+    def handle_left_whitespace_stripping(
+        self, token: str, block_idx: int
+    ) -> None:
         """If block open uses whitespace stripping, record it.
 
         When a "begin" tag (whether block, comment, or data) uses whitespace
@@ -883,13 +909,17 @@ class JinjaAnalyzer:
         over WHITESPACE; nothing else.
         """
         # Find the token returned. Did lex() skip over any characters?
-        num_chars_skipped = self.raw_str.index(token, self.idx_raw) - self.idx_raw
+        num_chars_skipped = (
+            self.raw_str.index(token, self.idx_raw) - self.idx_raw
+        )
         if not num_chars_skipped:
             return
 
         # Yes. It skipped over some characters. Compute a string
         # containing the skipped characters.
-        skipped_str = self.raw_str[self.idx_raw : self.idx_raw + num_chars_skipped]
+        skipped_str = self.raw_str[
+            self.idx_raw : self.idx_raw + num_chars_skipped
+        ]
 
         # Sanity check: Verify that Jinja only skips over
         # WHITESPACE, never anything else.
@@ -901,5 +931,7 @@ class JinjaAnalyzer:
         self.raw_sliced.append(
             RawFileSlice(skipped_str, "literal", self.idx_raw, block_idx)
         )
-        self.raw_slice_info[self.raw_sliced[-1]] = self.slice_info_for_literal(0)
+        self.raw_slice_info[self.raw_sliced[-1]] = self.slice_info_for_literal(
+            0
+        )
         self.idx_raw += num_chars_skipped

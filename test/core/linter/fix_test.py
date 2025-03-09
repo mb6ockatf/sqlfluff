@@ -92,7 +92,11 @@ templated_file_2 = TemplatedFile(
                 "code",
             ),
             templated_file_1,
-            [FixPatch(slice(0, 3), "abz", "literal", slice(0, 3), "abc", "abc")],
+            [
+                FixPatch(
+                    slice(0, 3), "abz", "literal", slice(0, 3), "abc", "abc"
+                )
+            ],
         ),
         # Nested literal edit example
         (
@@ -100,46 +104,64 @@ templated_file_2 = TemplatedFile(
                 [
                     RawSegment(
                         "a",
-                        PositionMarker(slice(0, 1), slice(0, 1), templated_file_1),
+                        PositionMarker(
+                            slice(0, 1), slice(0, 1), templated_file_1
+                        ),
                         "code",
                     ),
                     RawSegment(
                         "b",
-                        PositionMarker(slice(1, 2), slice(1, 2), templated_file_1),
+                        PositionMarker(
+                            slice(1, 2), slice(1, 2), templated_file_1
+                        ),
                         "code",
                     ),
                     RawSegment(
                         "z",
-                        PositionMarker(slice(2, 3), slice(2, 3), templated_file_1),
+                        PositionMarker(
+                            slice(2, 3), slice(2, 3), templated_file_1
+                        ),
                         "code",
                     ),
                 ]
             ),
             templated_file_1,
-            [FixPatch(slice(0, 3), "abz", "literal", slice(0, 3), "abc", "abc")],
+            [
+                FixPatch(
+                    slice(0, 3), "abz", "literal", slice(0, 3), "abc", "abc"
+                )
+            ],
         ),
         # More complicated templating example
         (
             BaseSegment(
                 [
                     TemplateSegment(
-                        PositionMarker(slice(0, 10), slice(0, 0), templated_file_2),
+                        PositionMarker(
+                            slice(0, 10), slice(0, 0), templated_file_2
+                        ),
                         "{# blah #}",
                         "comment",
                     ),
                     RawSegment(
                         "a",
-                        PositionMarker(slice(10, 20), slice(0, 1), templated_file_2),
+                        PositionMarker(
+                            slice(10, 20), slice(0, 1), templated_file_2
+                        ),
                         "code",
                     ),
                     RawSegment(
                         "b",
-                        PositionMarker(slice(19, 20), slice(1, 2), templated_file_2),
+                        PositionMarker(
+                            slice(19, 20), slice(1, 2), templated_file_2
+                        ),
                         "code",
                     ),
                     RawSegment(
                         "z",
-                        PositionMarker(slice(20, 21), slice(2, 3), templated_file_2),
+                        PositionMarker(
+                            slice(20, 21), slice(2, 3), templated_file_2
+                        ),
                         "code",
                     ),
                 ]
@@ -152,7 +174,9 @@ templated_file_2 = TemplatedFile(
             BaseSegment(
                 [
                     TemplateSegment(
-                        PositionMarker(slice(0, 10), slice(0, 0), templated_file_2),
+                        PositionMarker(
+                            slice(0, 10), slice(0, 0), templated_file_2
+                        ),
                         "{# blah #}",
                         "comment",
                         source_fixes=[
@@ -161,7 +185,9 @@ templated_file_2 = TemplatedFile(
                     ),
                     RawSegment(
                         "a",
-                        PositionMarker(slice(10, 19), slice(0, 1), templated_file_2),
+                        PositionMarker(
+                            slice(10, 19), slice(0, 1), templated_file_2
+                        ),
                         "code",
                         source_fixes=[
                             SourceFix("{{ bar }}", slice(10, 19), slice(0, 1))
@@ -169,12 +195,16 @@ templated_file_2 = TemplatedFile(
                     ),
                     RawSegment(
                         "b",
-                        PositionMarker(slice(19, 20), slice(1, 2), templated_file_2),
+                        PositionMarker(
+                            slice(19, 20), slice(1, 2), templated_file_2
+                        ),
                         "code",
                     ),
                     RawSegment(
                         "z",
-                        PositionMarker(slice(20, 21), slice(2, 3), templated_file_2),
+                        PositionMarker(
+                            slice(20, 21), slice(2, 3), templated_file_2
+                        ),
                         "code",
                     ),
                 ]
@@ -182,17 +212,29 @@ templated_file_2 = TemplatedFile(
             templated_file_2,
             [
                 FixPatch(
-                    slice(0, 0), "{# fixed #}", "source", slice(0, 10), "", "{# blah #}"
+                    slice(0, 0),
+                    "{# fixed #}",
+                    "source",
+                    slice(0, 10),
+                    "",
+                    "{# blah #}",
                 ),
                 FixPatch(
-                    slice(0, 1), "{{ bar }}", "source", slice(10, 19), "a", "{{ foo }}"
+                    slice(0, 1),
+                    "{{ bar }}",
+                    "source",
+                    slice(10, 19),
+                    "a",
+                    "{{ foo }}",
                 ),
                 FixPatch(slice(2, 3), "z", "literal", slice(20, 21), "c", "c"),
             ],
         ),
     ],
 )
-def test__fix__generate_source_patches(tree, templated_file, expected_result, caplog):
+def test__fix__generate_source_patches(
+    tree, templated_file, expected_result, caplog
+):
     """Test generate_source_patches.
 
     This is part of fix_string().

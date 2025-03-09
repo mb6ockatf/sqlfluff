@@ -33,7 +33,11 @@ def wrap_elem(s: str, width: int) -> List[str]:
 
 
 def wrap_field(
-    label: str, val: str, width: int, max_label_width: int = 10, sep_char: str = ": "
+    label: str,
+    val: str,
+    width: int,
+    max_label_width: int = 10,
+    sep_char: str = ": ",
 ) -> Dict[str, Any]:
     """Wrap a field (label, val).
 

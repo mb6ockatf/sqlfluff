@@ -65,10 +65,18 @@ def auto_fix_test(dialect, folder, caplog):
     tempdir_path = tempfile.mkdtemp()
     filepath = os.path.join(tempdir_path, filename)
     cfgpath = os.path.join(tempdir_path, ".sqlfluff")
-    src_filepath = os.path.join(*base_auto_fix_path, dialect, folder, "before.sql")
-    cmp_filepath = os.path.join(*base_auto_fix_path, dialect, folder, "after.sql")
-    vio_filepath = os.path.join(*base_auto_fix_path, dialect, folder, "violations.json")
-    cfg_filepath = os.path.join(*base_auto_fix_path, dialect, folder, ".sqlfluff")
+    src_filepath = os.path.join(
+        *base_auto_fix_path, dialect, folder, "before.sql"
+    )
+    cmp_filepath = os.path.join(
+        *base_auto_fix_path, dialect, folder, "after.sql"
+    )
+    vio_filepath = os.path.join(
+        *base_auto_fix_path, dialect, folder, "violations.json"
+    )
+    cfg_filepath = os.path.join(
+        *base_auto_fix_path, dialect, folder, ".sqlfluff"
+    )
     test_conf_filepath = os.path.join(
         *base_auto_fix_path, dialect, folder, "test-config.yml"
     )

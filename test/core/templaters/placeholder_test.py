@@ -185,7 +185,10 @@ def test__templater_raw():
             LIMIT 15
             """,
             dict(
-                city_id="(1, 2, 3, 45)", date="'2020-10-01'", limit=15, someflag=False
+                city_id="(1, 2, 3, 45)",
+                date="'2020-10-01'",
+                limit=15,
+                someflag=False,
             ),
         ),
         (
@@ -354,9 +357,13 @@ def test__templater_raw():
 )
 def test__templater_param_style(instr, expected_outstr, param_style, values):
     """Test different param_style templating."""
-    t = PlaceholderTemplater(override_context={**values, "param_style": param_style})
+    t = PlaceholderTemplater(
+        override_context={**values, "param_style": param_style}
+    )
     outstr, _ = t.process(
-        in_str=instr, fname="test", config=FluffConfig(overrides={"dialect": "ansi"})
+        in_str=instr,
+        fname="test",
+        config=FluffConfig(overrides={"dialect": "ansi"}),
     )
     assert str(outstr) == expected_outstr
 
@@ -364,7 +371,9 @@ def test__templater_param_style(instr, expected_outstr, param_style, values):
 def test__templater_custom_regex():
     """Test custom regex templating."""
     t = PlaceholderTemplater(
-        override_context=dict(param_regex="__(?P<param_name>[\\w_]+)__", my_name="john")
+        override_context=dict(
+            param_regex="__(?P<param_name>[\\w_]+)__", my_name="john"
+        )
     )
     outstr, _ = t.process(
         in_str="SELECT bla FROM blob WHERE id = __my_name__",

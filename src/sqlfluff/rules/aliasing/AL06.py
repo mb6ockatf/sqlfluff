@@ -60,11 +60,15 @@ class Rule_AL06(BaseRule):
 
         assert context.segment.is_type("select_statement")
         children = FunctionalContext(context).segment.children()
-        from_expression_elements = children.recursive_crawl("from_expression_element")
+        from_expression_elements = children.recursive_crawl(
+            "from_expression_element"
+        )
 
         return self._lint_aliases(from_expression_elements) or None
 
-    def _lint_aliases(self, from_expression_elements) -> Optional[List[LintResult]]:
+    def _lint_aliases(
+        self, from_expression_elements
+    ) -> Optional[List[LintResult]]:
         """Lint all table aliases."""
         # A buffer to keep any violations.
         violation_buff = []
@@ -72,7 +76,9 @@ class Rule_AL06(BaseRule):
         # For each table, check whether it is aliased, and if so check the
         # lengths.
         for from_expression_element in from_expression_elements:
-            table_expression = from_expression_element.get_child("table_expression")
+            table_expression = from_expression_element.get_child(
+                "table_expression"
+            )
             table_ref = (
                 table_expression.get_child("object_reference")
                 if table_expression
@@ -86,7 +92,9 @@ class Rule_AL06(BaseRule):
                 continue
 
             # If there's no alias expression - skip it
-            alias_exp_ref = from_expression_element.get_child("alias_expression")
+            alias_exp_ref = from_expression_element.get_child(
+                "alias_expression"
+            )
             if alias_exp_ref is None:
                 continue
 

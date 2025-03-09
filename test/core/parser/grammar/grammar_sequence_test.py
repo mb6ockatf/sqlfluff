@@ -22,7 +22,8 @@ def test__parser__grammar_sequence_repr():
     foo = StringParser("foo", KeywordSegment)
     sequence = Sequence(bar, foo)
     assert (
-        repr(sequence) == "<Sequence: [<StringParser: 'BAR'>, <StringParser: 'FOO'>]>"
+        repr(sequence)
+        == "<Sequence: [<StringParser: 'BAR'>, <StringParser: 'FOO'>]>"
     )
 
 
@@ -35,7 +36,14 @@ def test__parser__grammar_sequence_nested_match(test_segments, caplog):
 
     ctx = ParseContext(dialect=None)
     # Confirm the structure of the test segments:
-    assert [s.raw for s in test_segments] == ["bar", " \t ", "foo", "baar", " \t ", ""]
+    assert [s.raw for s in test_segments] == [
+        "bar",
+        " \t ",
+        "foo",
+        "baar",
+        " \t ",
+        "",
+    ]
 
     with caplog.at_level(logging.DEBUG, logger="sqlfluff.parser"):
         # Matching just the start of the list shouldn't work.
@@ -80,7 +88,13 @@ def test__parser__grammar_sequence_nested_match(test_segments, caplog):
         # segments) to check that it isn't included in the match.
         (ParseMode.STRICT, ["a"], [], slice(None, 2), (("keyword", "a"),)),
         (ParseMode.GREEDY, ["a"], [], slice(None, 2), (("keyword", "a"),)),
-        (ParseMode.GREEDY_ONCE_STARTED, ["a"], [], slice(None, 2), (("keyword", "a"),)),
+        (
+            ParseMode.GREEDY_ONCE_STARTED,
+            ["a"],
+            [],
+            slice(None, 2),
+            (("keyword", "a"),),
+        ),
         # #####
         # Test matching on sequences where we run out of segments before matching
         # the whole sequence.
@@ -133,7 +147,10 @@ def test__parser__grammar_sequence_nested_match(test_segments, caplog):
             (
                 ("keyword", "a"),
                 ("whitespace", " "),
-                ("unparsable", (("raw", "b"), ("whitespace", " "), ("raw", "c"))),
+                (
+                    "unparsable",
+                    (("raw", "b"), ("whitespace", " "), ("raw", "c")),
+                ),
             ),
         ),
         (
@@ -144,7 +161,10 @@ def test__parser__grammar_sequence_nested_match(test_segments, caplog):
             (
                 ("keyword", "a"),
                 ("whitespace", " "),
-                ("unparsable", (("raw", "b"), ("whitespace", " "), ("raw", "c"))),
+                (
+                    "unparsable",
+                    (("raw", "b"), ("whitespace", " "), ("raw", "c")),
+                ),
             ),
         ),
         # Second *with* terminators.
@@ -155,14 +175,22 @@ def test__parser__grammar_sequence_nested_match(test_segments, caplog):
             ["a"],
             ["c"],
             slice(None, 5),
-            (("keyword", "a"), ("whitespace", " "), ("unparsable", (("raw", "b"),))),
+            (
+                ("keyword", "a"),
+                ("whitespace", " "),
+                ("unparsable", (("raw", "b"),)),
+            ),
         ),
         (
             ParseMode.GREEDY_ONCE_STARTED,
             ["a"],
             ["c"],
             slice(None, 5),
-            (("keyword", "a"), ("whitespace", " "), ("unparsable", (("raw", "b"),))),
+            (
+                ("keyword", "a"),
+                ("whitespace", " "),
+                ("unparsable", (("raw", "b"),)),
+            ),
         ),
         # #####
         # Test matches where we match the first element of a sequence but not the
@@ -176,14 +204,22 @@ def test__parser__grammar_sequence_nested_match(test_segments, caplog):
             ["a", "x"],
             ["c"],
             slice(None, 5),
-            (("keyword", "a"), ("whitespace", " "), ("unparsable", (("raw", "b"),))),
+            (
+                ("keyword", "a"),
+                ("whitespace", " "),
+                ("unparsable", (("raw", "b"),)),
+            ),
         ),
         (
             ParseMode.GREEDY_ONCE_STARTED,
             ["a", "x"],
             ["c"],
             slice(None, 5),
-            (("keyword", "a"), ("whitespace", " "), ("unparsable", (("raw", "b"),))),
+            (
+                ("keyword", "a"),
+                ("whitespace", " "),
+                ("unparsable", (("raw", "b"),)),
+            ),
         ),
         # #####
         # Test competition between sequence elements and terminators.
@@ -519,7 +555,9 @@ def test__parser__grammar_bracketed_error_modes(
         )
 
 
-def test__parser__grammar_sequence_indent_conditional_match(test_segments, caplog):
+def test__parser__grammar_sequence_indent_conditional_match(
+    test_segments, caplog
+):
     """Test the Sequence grammar with indents."""
     bar = StringParser("bar", KeywordSegment)
     foo = StringParser("foo", KeywordSegment)

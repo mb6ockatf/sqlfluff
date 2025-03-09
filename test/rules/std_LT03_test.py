@@ -40,7 +40,11 @@ def test__rules__std_LT03_leading():
             b = 2
     """
     config = FluffConfig(
-        configs={"layout": {"type": {"binary_operator": {"line_position": "leading"}}}},
+        configs={
+            "layout": {
+                "type": {"binary_operator": {"line_position": "leading"}}
+            }
+        },
         overrides={"dialect": "ansi"},
     )
     # The sqlfluff.lint API doesn't allow us to pass config so need to do what it does
@@ -64,7 +68,9 @@ def test__rules__std_LT03_trailing():
     """
     config = FluffConfig(
         configs={
-            "layout": {"type": {"binary_operator": {"line_position": "trailing"}}}
+            "layout": {
+                "type": {"binary_operator": {"line_position": "trailing"}}
+            }
         },
         overrides={"dialect": "ansi"},
     )

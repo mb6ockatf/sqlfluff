@@ -72,5 +72,7 @@ def get_config_info() -> Dict[str, Any]:
     plugin_manager = get_plugin_manager()
     configs_info = plugin_manager.hook.get_configs_info()
     return {
-        k: v for config_info_dict in configs_info for k, v in config_info_dict.items()
+        k: v
+        for config_info_dict in configs_info
+        for k, v in config_info_dict.items()
     }

@@ -90,7 +90,9 @@ class Rule_CP05(Rule_CP01):
         # NOTE: Given the dialect structure we can assume the targets have a parent.
         parent: BaseSegment = context.parent_stack[-1]
         # Don't process it if it's likely to have been processed by the parent.
-        if context.segment.is_type("data_type_identifier") and not parent.is_type(
+        if context.segment.is_type(
+            "data_type_identifier"
+        ) and not parent.is_type(
             "primitive_type", "datetime_type_identifier", "data_type"
         ):
             results.append(

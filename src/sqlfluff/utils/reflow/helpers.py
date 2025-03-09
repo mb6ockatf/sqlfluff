@@ -33,7 +33,9 @@ def pretty_segment_name(segment: BaseSegment) -> str:
         return segment.get_type().replace("_", " ")
 
 
-def deduce_line_indent(raw_segment: RawSegment, root_segment: BaseSegment) -> str:
+def deduce_line_indent(
+    raw_segment: RawSegment, root_segment: BaseSegment
+) -> str:
     """Given a raw segment, deduce the indent of its line."""
     seg_idx = root_segment.raw_segments.index(raw_segment)
     indent_seg = None

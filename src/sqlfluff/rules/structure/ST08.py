@@ -50,7 +50,9 @@ class Rule_ST08(BaseRule):
         if context.segment.is_type("select_clause"):
             # Look for `select_clause_modifier`
             modifier = children.select(sp.is_type("select_clause_modifier"))
-            first_element = children.select(sp.is_type("select_clause_element")).first()
+            first_element = children.select(
+                sp.is_type("select_clause_element")
+            ).first()
             expression = (
                 first_element.children(sp.is_type("expression")).first()
                 or first_element
@@ -60,7 +62,9 @@ class Rule_ST08(BaseRule):
             if modifier and bracketed:
                 # If there's nothing else in the expression, remove the brackets.
                 if len(expression[0].segments) == 1:
-                    anchor, seq = self._remove_unneeded_brackets(context, bracketed)
+                    anchor, seq = self._remove_unneeded_brackets(
+                        context, bracketed
+                    )
                 # Otherwise, still make sure there's a space after the DISTINCT.
                 else:
                     anchor = modifier[0]
@@ -76,14 +80,18 @@ class Rule_ST08(BaseRule):
             anchor = context.parent_stack[-1]
             if not anchor.is_type("expression") or len(anchor.segments) != 1:
                 return None
-            function_name = children.select(sp.is_type("function_name")).first()
+            function_name = children.select(
+                sp.is_type("function_name")
+            ).first()
             bracketed = children.first(sp.is_type("function_contents"))
             if (
                 not function_name
                 or function_name[0].raw_upper != "DISTINCT"
                 or not bracketed
                 # If the DISTINCT has a subquery, don't remove the brackets
-                or bracketed.recursive_crawl("select_statement", recurse_into=False)
+                or bracketed.recursive_crawl(
+                    "select_statement", recurse_into=False
+                )
             ):
                 return None
             # Using ReflowSequence here creates an unneeded space between CONCAT
@@ -106,7 +114,9 @@ class Rule_ST08(BaseRule):
                     LintFix.replace(
                         anchor,
                         (KeywordSegment("DISTINCT"), WhitespaceSegment())
-                        + self.filter_meta(bracketed.children()[0].segments)[1:-1],
+                        + self.filter_meta(bracketed.children()[0].segments)[
+                            1:-1
+                        ],
                     )
                 ],
             )

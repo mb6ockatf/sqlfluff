@@ -4,7 +4,16 @@ Matchable objects which return individual segments.
 """
 
 from abc import abstractmethod
-from typing import Any, Callable, Collection, Dict, Optional, Sequence, Tuple, Type
+from typing import (
+    Any,
+    Callable,
+    Collection,
+    Dict,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+)
 from uuid import uuid4
 
 import regex
@@ -138,7 +147,9 @@ class TypedParser(BaseParser):
         return f"<TypedParser: {self.template!r}>"
 
     def simple(
-        self, parse_context: ParseContext, crumbs: Optional[Tuple[str, ...]] = None
+        self,
+        parse_context: ParseContext,
+        crumbs: Optional[Tuple[str, ...]] = None,
     ) -> SimpleHintType:
         """Check if the matcher supports uppercase hash matching route.
 
@@ -195,7 +206,9 @@ class StringParser(BaseParser):
         return f"<StringParser: {self.template!r}>"
 
     def simple(
-        self, parse_context: "ParseContext", crumbs: Optional[Tuple[str, ...]] = None
+        self,
+        parse_context: "ParseContext",
+        crumbs: Optional[Tuple[str, ...]] = None,
     ) -> SimpleHintType:
         """Return simple options for this matcher.
 
@@ -247,7 +260,9 @@ class MultiStringParser(BaseParser):
         return f"<MultiStringParser: {self.templates!r}>"
 
     def simple(
-        self, parse_context: "ParseContext", crumbs: Optional[Tuple[str, ...]] = None
+        self,
+        parse_context: "ParseContext",
+        crumbs: Optional[Tuple[str, ...]] = None,
     ) -> SimpleHintType:
         """Return simple options for this matcher.
 
@@ -289,7 +304,9 @@ class RegexParser(BaseParser):
         self.template = template
         self.anti_template = anti_template
         # Compile regexes upfront to avoid repeated overhead
-        self._anti_template = regex.compile(anti_template or r"", regex.IGNORECASE)
+        self._anti_template = regex.compile(
+            anti_template or r"", regex.IGNORECASE
+        )
         self._template = regex.compile(template, regex.IGNORECASE)
         super().__init__(
             raw_class=raw_class,
@@ -303,7 +320,9 @@ class RegexParser(BaseParser):
         return f"<RegexParser: {self.template!r}>"
 
     def simple(
-        self, parse_context: ParseContext, crumbs: Optional[Tuple[str, ...]] = None
+        self,
+        parse_context: ParseContext,
+        crumbs: Optional[Tuple[str, ...]] = None,
     ) -> None:
         """Does this matcher support a uppercase hash matching route?
 
@@ -329,6 +348,8 @@ class RegexParser(BaseParser):
             # Check that we've fully matched
             if result_string == _raw:
                 # Check that the anti_template (if set) hasn't also matched
-                if not self.anti_template or not self._anti_template.match(_raw):
+                if not self.anti_template or not self._anti_template.match(
+                    _raw
+                ):
                     return self._match_at(idx)
         return MatchResult.empty_at(idx)

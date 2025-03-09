@@ -94,7 +94,9 @@ class Selectable:
             # source), see the "Examples" section of the Postgres docs page:
             # (https://www.postgresql.org/docs/8.2/sql-values.html).
             values = Segments(self.selectable)
-            alias_expression = values.children().first(sp.is_type("alias_expression"))
+            alias_expression = values.children().first(
+                sp.is_type("alias_expression")
+            )
             name = alias_expression.children().first(
                 sp.is_type("naked_identifier", "quoted_identifier")
             )
@@ -157,7 +159,9 @@ class Selectable:
         """Find corresponding table_aliases entry (if any) matching "table"."""
         alias_info = [
             t
-            for t in (self.select_info.table_aliases if self.select_info else [])
+            for t in (
+                self.select_info.table_aliases if self.select_info else []
+            )
             if t.aliased and t.ref_str == table
         ]
         assert len(alias_info) <= 1
@@ -272,7 +276,9 @@ class Query(Generic[T]):
                 found_nested_select = True
                 # Generate a subquery, referencing the current query
                 # as the parent.
-                yield self.__class__.from_segment(seg, self.dialect, parent=self)
+                yield self.__class__.from_segment(
+                    seg, self.dialect, parent=self
+                )
         if not found_nested_select:
             # If we reach here, the SELECT may be querying from a value table
             # function, e.g. UNNEST(). For our purposes, this is basically the
@@ -302,14 +308,18 @@ class Query(Generic[T]):
             yield cls.from_segment(subselect, dialect=dialect)
 
     @classmethod
-    def from_root(cls: Type[T], root_segment: BaseSegment, dialect: Dialect) -> T:
+    def from_root(
+        cls: Type[T], root_segment: BaseSegment, dialect: Dialect
+    ) -> T:
         """Given a root segment, find the first appropriate selectable and analyse."""
         selectable_segment = next(
             # Could be a Selectable or a MERGE
             root_segment.recursive_crawl(*SELECTABLE_TYPES, "merge_statement"),
             None,
         )
-        assert selectable_segment, f"No selectable found in {root_segment.raw!r}."
+        assert (
+            selectable_segment
+        ), f"No selectable found in {root_segment.raw!r}."
         return cls.from_segment(selectable_segment, dialect=dialect)
 
     @classmethod
@@ -334,7 +344,9 @@ class Query(Generic[T]):
             selectables = [Selectable(segment, dialect=dialect)]
         elif segment.is_type("set_expression"):
             # It's a set expression. There may be multiple selectables.
-            for _seg in segment.recursive_crawl("select_statement", recurse_into=False):
+            for _seg in segment.recursive_crawl(
+                "select_statement", recurse_into=False
+            ):
                 selectables.append(Selectable(_seg, dialect=dialect))
         else:
             # Otherwise it's a WITH statement.
@@ -404,9 +416,13 @@ class Query(Generic[T]):
             # strange (w.g. a Clickhouse WITH clause setting a with).
             except StopIteration:  # pragma: no cover
                 # Log it as an issue, but otherwise skip this one.
-                analysis_logger.info(f"Skipping unexpected CTE structure: {cte.raw!r}")
+                analysis_logger.info(
+                    f"Skipping unexpected CTE structure: {cte.raw!r}"
+                )
                 continue
-            qry = cls.from_segment(inner_qry, dialect=dialect, parent=outer_query)
+            qry = cls.from_segment(
+                inner_qry, dialect=dialect, parent=outer_query
+            )
             assert qry
             # Populate the CTE specific args.
             qry.cte_definition_segment = cte

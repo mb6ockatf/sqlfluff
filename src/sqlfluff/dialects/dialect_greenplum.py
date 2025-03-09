@@ -95,7 +95,9 @@ class DistributedBySegment(BaseSegment):
         OneOf(
             "RANDOMLY",
             "REPLICATED",
-            Sequence("BY", Bracketed(Delimited(Ref("ColumnReferenceSegment")))),
+            Sequence(
+                "BY", Bracketed(Delimited(Ref("ColumnReferenceSegment")))
+            ),
         ),
     )
 
@@ -146,7 +148,9 @@ class CreateTableStatementSegment(postgres.CreateTableStatementSegment):
                             Sequence(
                                 "LIKE",
                                 Ref("TableReferenceSegment"),
-                                AnyNumberOf(Ref("LikeOptionSegment"), optional=True),
+                                AnyNumberOf(
+                                    Ref("LikeOptionSegment"), optional=True
+                                ),
                             ),
                         ),
                     )
@@ -190,7 +194,9 @@ class CreateTableStatementSegment(postgres.CreateTableStatementSegment):
                     optional=True,
                 ),
                 OneOf(
-                    Sequence("FOR", "VALUES", Ref("PartitionBoundSpecSegment")),
+                    Sequence(
+                        "FOR", "VALUES", Ref("PartitionBoundSpecSegment")
+                    ),
                     "DEFAULT",
                 ),
             ),
@@ -250,7 +256,11 @@ class CreateTableStatementSegment(postgres.CreateTableStatementSegment):
             Sequence(
                 "ON",
                 "COMMIT",
-                OneOf(Sequence("PRESERVE", "ROWS"), Sequence("DELETE", "ROWS"), "DROP"),
+                OneOf(
+                    Sequence("PRESERVE", "ROWS"),
+                    Sequence("DELETE", "ROWS"),
+                    "DROP",
+                ),
             ),
             Sequence("TABLESPACE", Ref("TablespaceReferenceSegment")),
             Ref("DistributedBySegment"),
@@ -311,15 +321,23 @@ class CreateTableAsStatementSegment(postgres.CreateTableAsStatementSegment):
             Sequence(
                 "ON",
                 "COMMIT",
-                OneOf(Sequence("PRESERVE", "ROWS"), Sequence("DELETE", "ROWS"), "DROP"),
+                OneOf(
+                    Sequence("PRESERVE", "ROWS"),
+                    Sequence("DELETE", "ROWS"),
+                    "DROP",
+                ),
                 optional=True,
             ),
-            Sequence("TABLESPACE", Ref("TablespaceReferenceSegment"), optional=True),
+            Sequence(
+                "TABLESPACE", Ref("TablespaceReferenceSegment"), optional=True
+            ),
         ),
         "AS",
         OneOf(
             OptionallyBracketed(Ref("SelectableGrammar")),
-            OptionallyBracketed(Sequence("TABLE", Ref("TableReferenceSegment"))),
+            OptionallyBracketed(
+                Sequence("TABLE", Ref("TableReferenceSegment"))
+            ),
             Ref("ValuesClauseSegment"),
             OptionallyBracketed(Sequence("EXECUTE", Ref("FunctionSegment"))),
         ),
@@ -328,13 +346,17 @@ class CreateTableAsStatementSegment(postgres.CreateTableAsStatementSegment):
     )
 
 
-class UnorderedSelectStatementSegment(postgres.UnorderedSelectStatementSegment):
+class UnorderedSelectStatementSegment(
+    postgres.UnorderedSelectStatementSegment
+):
     """Overrides Postgres Statement, adding DISTRIBUTED BY as a terminator."""
 
-    match_grammar = postgres.UnorderedSelectStatementSegment.match_grammar.copy(
-        terminators=[
-            Ref("DistributedBySegment"),
-        ],
+    match_grammar = (
+        postgres.UnorderedSelectStatementSegment.match_grammar.copy(
+            terminators=[
+                Ref("DistributedBySegment"),
+            ],
+        )
     )
 
 

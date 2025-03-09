@@ -28,7 +28,9 @@ def get_last_segment(segment: Segments) -> Tuple[List[BaseSegment], Segments]:
         children = segment.children()
         if children:
             parent_stack.append(segment[0])
-            segment = children.last(predicate=sp.not_(sp.is_type("end_of_file")))
+            segment = children.last(
+                predicate=sp.not_(sp.is_type("end_of_file"))
+            )
         else:
             return parent_stack, segment
 
@@ -125,7 +127,9 @@ class Rule_LT12(BaseRule):
 
         """
         # We only care about the final segment of the parse tree.
-        parent_stack, segment = get_last_segment(FunctionalContext(context).segment)
+        parent_stack, segment = get_last_segment(
+            FunctionalContext(context).segment
+        )
         self.logger.debug("Found last segment as: %s", segment)
         if not segment:
             # NOTE: Edge case. If the file is totally empty, we won't find a final
@@ -181,7 +185,9 @@ class Rule_LT12(BaseRule):
                     seg, context.templated_file
                 ).all(tsp.is_slice_type("literal"))
             )
-        self.logger.debug("Templated trailing newlines: %s", trailing_literal_newlines)
+        self.logger.debug(
+            "Templated trailing newlines: %s", trailing_literal_newlines
+        )
         if not trailing_literal_newlines:
             # We make an edit to create this segment after the child of the FileSegment.
             if len(parent_stack) == 1:
@@ -203,7 +209,9 @@ class Rule_LT12(BaseRule):
             # Delete extra newlines.
             return LintResult(
                 anchor=segment[0],
-                fixes=[LintFix.delete(d) for d in trailing_literal_newlines[1:]],
+                fixes=[
+                    LintFix.delete(d) for d in trailing_literal_newlines[1:]
+                ],
             )
         else:
             # Single newline, no need for fix.

@@ -92,7 +92,9 @@ class Rule_AL03(BaseRule):
             return None
 
         select_clause_children = children.select(sp.not_(sp.is_type("star")))
-        is_complex_clause = _recursively_check_is_complex(select_clause_children)
+        is_complex_clause = _recursively_check_is_complex(
+            select_clause_children
+        )
         if not is_complex_clause:
             return None
         # No fixes, because we don't know what the alias should be,
@@ -102,7 +104,9 @@ class Rule_AL03(BaseRule):
             # statement. If this is the only one, then we won't
             # report an error.
             immediate_parent = parent_stack.last()
-            elements = immediate_parent.children(sp.is_type("select_clause_element"))
+            elements = immediate_parent.children(
+                sp.is_type("select_clause_element")
+            )
             num_elements = len(elements)
 
             if num_elements > 1:
@@ -112,7 +116,9 @@ class Rule_AL03(BaseRule):
         return LintResult(anchor=context.segment)
 
 
-def _recursively_check_is_complex(select_clause_or_exp_children: Segments) -> bool:
+def _recursively_check_is_complex(
+    select_clause_or_exp_children: Segments,
+) -> bool:
     forgiveable_types = [
         "whitespace",
         "newline",

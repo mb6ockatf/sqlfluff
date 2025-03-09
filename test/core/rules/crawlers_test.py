@@ -31,7 +31,9 @@ from sqlfluff.core.templaters.base import TemplatedFile
         ),
     ],
 )
-def test_rules_crawlers(CrawlerType, crawler_kwargs, raw_sql_in, target_raws_out):
+def test_rules_crawlers(
+    CrawlerType, crawler_kwargs, raw_sql_in, target_raws_out
+):
     """Test Crawlers."""
     cfg = FluffConfig(overrides={"dialect": "ansi"})
     linter = Linter(config=cfg)
@@ -48,6 +50,8 @@ def test_rules_crawlers(CrawlerType, crawler_kwargs, raw_sql_in, target_raws_out
 
     crawler = CrawlerType(**crawler_kwargs)
 
-    result_raws = [context.segment.raw for context in crawler.crawl(root_context)]
+    result_raws = [
+        context.segment.raw for context in crawler.crawl(root_context)
+    ]
 
     assert result_raws == target_raws_out

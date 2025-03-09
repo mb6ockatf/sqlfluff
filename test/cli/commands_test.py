@@ -63,7 +63,8 @@ def logging_cleanup():
     loggers = [
         logger
         for logger in logging.Logger.manager.loggerDict.values()
-        if isinstance(logger, logging.Logger) and logger.name.startswith("sqlfluff")
+        if isinstance(logger, logging.Logger)
+        and logger.name.startswith("sqlfluff")
     ]
     for logger in loggers:
         if not hasattr(logger, "handlers"):
@@ -235,7 +236,8 @@ def test__cli__command_extra_config_fail():
 
 
 stdin_cli_input = (
-    "SELECT\n    A.COL1,\n    B.COL2\nFROM TABA AS A\n" "POSITIONAL JOIN TABB AS B;\n"
+    "SELECT\n    A.COL1,\n    B.COL2\nFROM TABA AS A\n"
+    "POSITIONAL JOIN TABB AS B;\n"
 )
 
 
@@ -375,7 +377,9 @@ def test__cli__command_lint_stdin(command):
     """
     with open("test/fixtures/cli/passing_a.sql") as test_file:
         sql = test_file.read()
-    invoke_assert_code(args=[lint, ("--dialect=ansi",) + command], cli_input=sql)
+    invoke_assert_code(
+        args=[lint, ("--dialect=ansi",) + command], cli_input=sql
+    )
 
 
 def test__cli__command_lint_empty_stdin():
@@ -480,7 +484,16 @@ def test__cli__command_render_stdin():
         # Check basic parsing, with the code only option
         (parse, ["-n", "test/fixtures/cli/passing_b.sql", "-c"]),
         # Check basic parsing, with the yaml output
-        (parse, ["-n", "test/fixtures/cli/passing_b.sql", "-c", "--format", "yaml"]),
+        (
+            parse,
+            [
+                "-n",
+                "test/fixtures/cli/passing_b.sql",
+                "-c",
+                "--format",
+                "yaml",
+            ],
+        ),
         (parse, ["-n", "test/fixtures/cli/passing_b.sql", "--format", "yaml"]),
         # Check parsing with no output (used mostly for testing)
         (parse, ["-n", "test/fixtures/cli/passing_b.sql", "--format", "none"]),
@@ -583,7 +596,14 @@ def test__cli__command_render_stdin():
             ],
         ),
         # Check timing outputs doesn't raise exceptions
-        (lint, ["test/fixtures/cli/passing_a.sql", "--persist-timing", "test.csv"]),
+        (
+            lint,
+            [
+                "test/fixtures/cli/passing_a.sql",
+                "--persist-timing",
+                "test.csv",
+            ],
+        ),
         # Check lint --help command doesn't raise exception.
         # NOTE: This tests the LazySequence in action.
         (lint, ["--help"]),
@@ -1115,7 +1135,9 @@ def test__cli__command__fix(rule, fname):
         "2_files_with_lint_errors_1_unsuppressed_parse_error",
     ],
 )
-def test__cli__fix_error_handling_behavior(sql, fix_args, fixed, exit_code, tmpdir):
+def test__cli__fix_error_handling_behavior(
+    sql, fix_args, fixed, exit_code, tmpdir
+):
     """Tests how "fix" behaves wrt parse errors, exit code, etc."""
     if not isinstance(sql, list):
         sql = [sql]
@@ -1227,7 +1249,13 @@ def test__cli__command_fix_stdin(stdin, rules, stdout):
     result = invoke_assert_code(
         args=[
             fix,
-            ("-", "--rules", rules, "--disable-progress-bar", "--dialect=ansi"),
+            (
+                "-",
+                "--rules",
+                rules,
+                "--disable-progress-bar",
+                "--dialect=ansi",
+            ),
         ],
         cli_input=stdin,
     )
@@ -1346,7 +1374,9 @@ def test__cli__command_fix_stdin_error_exit_code(
         ("LT01", "test/fixtures/linter/indentation_errors.sql", "n", 1, 1),
     ],
 )
-def test__cli__command__fix_check(rule, fname, prompt, exit_code, fix_exit_code):
+def test__cli__command__fix_check(
+    rule, fname, prompt, exit_code, fix_exit_code
+):
     """Round trip test, using the prompts."""
     with open(fname) as test_file:
         generic_roundtrip_test(
@@ -1361,7 +1391,9 @@ def test__cli__command__fix_check(rule, fname, prompt, exit_code, fix_exit_code)
 
 @pytest.mark.parametrize("serialize", ["yaml", "json"])
 @pytest.mark.parametrize("write_file", [None, "outfile"])
-def test__cli__command_parse_serialize_from_stdin(serialize, write_file, tmp_path):
+def test__cli__command_parse_serialize_from_stdin(
+    serialize, write_file, tmp_path
+):
     """Check that the parser serialized output option is working.
 
     This tests both output to stdout and output to file.
@@ -1627,10 +1659,19 @@ def test__cli__command_lint_nocolor(isatty, should_strip_ansi, capsys, tmpdir):
 
 @pytest.mark.parametrize(
     "serialize",
-    ["human", "yaml", "json", "github-annotation", "github-annotation-native", "none"],
+    [
+        "human",
+        "yaml",
+        "json",
+        "github-annotation",
+        "github-annotation-native",
+        "none",
+    ],
 )
 @pytest.mark.parametrize("write_file", [None, "outfile"])
-def test__cli__command_lint_serialize_multiple_files(serialize, write_file, tmp_path):
+def test__cli__command_lint_serialize_multiple_files(
+    serialize, write_file, tmp_path
+):
     """Test the output formats for multiple files.
 
     This tests runs both stdout checking and file checking.
@@ -1651,7 +1692,9 @@ def test__cli__command_lint_serialize_multiple_files(serialize, write_file, tmp_
             "human": ".txt",
             "yaml": ".yaml",
         }
-        target_file = os.path.join(tmp_path, write_file + ext.get(serialize, ".json"))
+        target_file = os.path.join(
+            tmp_path, write_file + ext.get(serialize, ".json")
+        )
         cmd_args += ("--write-output", target_file)
 
     # note the file is in here twice. two files = two payloads.
@@ -1891,7 +1934,9 @@ def test__cli__command_lint_serialize_github_annotation_native(
     assert result.stdout == expected_output.format(filename=fpath_normalised)
 
 
-@pytest.mark.parametrize("serialize", ["github-annotation", "github-annotation-native"])
+@pytest.mark.parametrize(
+    "serialize", ["github-annotation", "github-annotation-native"]
+)
 def test__cli__command_lint_serialize_annotation_level_error_failure_equivalent(
     serialize,
 ):
@@ -2157,7 +2202,8 @@ class TestProgressBars:
 
         assert r"\rfile test/fixtures/linter/passing.sql:" in normalised_stderr
         assert (
-            r"\rfile test/fixtures/linter/indentation_errors.sql:" in normalised_stderr
+            r"\rfile test/fixtures/linter/indentation_errors.sql:"
+            in normalised_stderr
         )
         assert r"\rlint by rules:" in normalised_stderr
         assert r"\rrule LT01:" in normalised_stderr
@@ -2299,7 +2345,10 @@ def test__cli__fix_multiple_errors_show_errors():
     assert check_a in result.stdout
     # Finally check the WHOLE output to make sure that unexpected newlines are not
     # added. The replace command just accounts for cross platform testing.
-    assert "L:  12 | P:   1 | LT02 | Expected indent of 4 spaces." in result.stdout
+    assert (
+        "L:  12 | P:   1 | LT02 | Expected indent of 4 spaces."
+        in result.stdout
+    )
     assert (
         "L:  36 | P:   9 | RF02 | Unqualified reference 'package_id' found in "
         "select with more than" in result.stdout
@@ -2336,7 +2385,9 @@ def test__cli__fix_show_parse_errors():
         "L:   9 | P:  21 |  PRS | Couldn't find closing bracket for opening bracket."
         in result.stdout
     )
-    assert "L:   9 | P:  22 |  LXR | Unable to lex characters: " in result.stdout
+    assert (
+        "L:   9 | P:  22 |  LXR | Unable to lex characters: " in result.stdout
+    )
 
     # Calling without show-lint-violations
     result = invoke_assert_code(
@@ -2353,7 +2404,10 @@ def test__cli__fix_show_parse_errors():
         "L:   9 | P:  21 |  PRS | Couldn't find closing bracket for opening bracket."
         not in result.stdout
     )
-    assert "L:   9 | P:  22 |  LXR | Unable to lex characters: " not in result.stdout
+    assert (
+        "L:   9 | P:  22 |  LXR | Unable to lex characters: "
+        not in result.stdout
+    )
 
 
 def test__cli__multiple_files__fix_multiple_errors_show_errors():
@@ -2385,7 +2439,9 @@ def test__cli__multiple_files__fix_multiple_errors_show_errors():
     assert multi_fail_msg in unfix_err_log
 
     # Assert that they are sorted in alphabetical order
-    assert unfix_err_log.index(indent_pass_msg) < unfix_err_log.index(multi_fail_msg)
+    assert unfix_err_log.index(indent_pass_msg) < unfix_err_log.index(
+        multi_fail_msg
+    )
 
 
 def test__cli__render_fail():
@@ -2399,7 +2455,8 @@ def test__cli__render_fail():
             ],
         ],
         assert_stdout_contains=(
-            "L:   3 | P:   8 |  TMP | Undefined jinja template " "variable: 'something'"
+            "L:   3 | P:   8 |  TMP | Undefined jinja template "
+            "variable: 'something'"
         ),
     )
 

@@ -38,7 +38,9 @@ def _get_sqlfluff_version() -> str:
     return importlib.metadata.version("sqlfluff")
 
 
-def _discover_plugins() -> Iterator[Tuple[importlib.metadata.EntryPoint, str, str]]:
+def _discover_plugins() -> (
+    Iterator[Tuple[importlib.metadata.EntryPoint, str, str]]
+):
     """Uses the same mechanism as pluggy to introspect available plugins.
 
     This method is then intended to allow loading of plugins individually,
@@ -100,7 +102,9 @@ def get_plugin_manager() -> pluggy.PluginManager:
     # Discover available plugins and load them individually.
     # If any fail, log the issue and carry on.
     for entry_point, plugin_name, plugin_version in _discover_plugins():
-        plugin_logger.info(f"Loading plugin {plugin_name} version {plugin_version}.")
+        plugin_logger.info(
+            f"Loading plugin {plugin_name} version {plugin_version}."
+        )
         _load_plugin(plugin_manager, entry_point, plugin_name, plugin_version)
 
     # Once plugins are loaded we set a second context var

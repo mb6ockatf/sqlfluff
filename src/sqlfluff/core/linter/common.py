@@ -98,7 +98,11 @@ class ParsedString(NamedTuple):
         """
         return [
             *self.templating_violations,
-            *(v for variant in self.parsed_variants for v in variant.violations()),
+            *(
+                v
+                for variant in self.parsed_variants
+                for v in variant.violations()
+            ),
         ]
 
     def root_variant(self) -> Optional[ParsedVariant]:

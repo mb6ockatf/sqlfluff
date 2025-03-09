@@ -98,7 +98,9 @@ class Linter:
             require_dialect=False,
         )
         # Get the dialect and templater
-        self.dialect: "Dialect" = cast("Dialect", self.config.get("dialect_obj"))
+        self.dialect: "Dialect" = cast(
+            "Dialect", self.config.get("dialect_obj")
+        )
         self.templater: "RawTemplater" = cast(
             "RawTemplater", self.config.get("templater_obj")
         )
@@ -120,7 +122,13 @@ class Linter:
         """A simple pass through to access the rule tuples of the rule set."""
         rs = self.get_rulepack()
         return [
-            RuleTuple(rule.code, rule.name, rule.description, rule.groups, rule.aliases)
+            RuleTuple(
+                rule.code,
+                rule.name,
+                rule.description,
+                rule.groups,
+                rule.aliases,
+            )
             for rule in rs.rules
         ]
 
@@ -133,7 +141,9 @@ class Linter:
     ) -> Tuple[str, FluffConfig, str]:
         """Load a raw file and the associated config."""
         file_config = root_config.make_child_from_path(fname)
-        config_encoding: str = file_config.get("encoding", default="autodetect")
+        config_encoding: str = file_config.get(
+            "encoding", default="autodetect"
+        )
         encoding = get_encoding(fname=fname, config_encoding=config_encoding)
         # Check file size before loading.
         limit = file_config.get("large_file_skip_byte_limit")
@@ -148,7 +158,9 @@ class Linter:
                     "'large_file_skip_byte_limit' value, or disable by setting it "
                     "to zero."
                 )
-        with open(fname, encoding=encoding, errors="backslashreplace") as target_file:
+        with open(
+            fname, encoding=encoding, errors="backslashreplace"
+        ) as target_file:
             raw_file = target_file.read()
         # Scan the raw file for config commands.
         file_config.process_raw_file_for_config(raw_file, fname)
@@ -177,23 +189,33 @@ class Linter:
             assert segments, "The token sequence should never be empty."
             # We might just get the violations as a list
             violations += lex_vs
-            linter_logger.info("Lexed segments: %s", [seg.raw for seg in segments])
+            linter_logger.info(
+                "Lexed segments: %s", [seg.raw for seg in segments]
+            )
         except SQLLexError as err:  # pragma: no cover
-            linter_logger.info("LEXING FAILED! (%s): %s", templated_file.fname, err)
+            linter_logger.info(
+                "LEXING FAILED! (%s): %s", templated_file.fname, err
+            )
             violations.append(err)
             return None, violations
 
         # Check that we've got sensible indentation from the lexer.
         # We might need to suppress if it's a complicated file.
-        templating_blocks_indent = config.get("template_blocks_indent", "indentation")
+        templating_blocks_indent = config.get(
+            "template_blocks_indent", "indentation"
+        )
         if isinstance(templating_blocks_indent, str):
-            force_block_indent = templating_blocks_indent.lower().strip() == "force"
+            force_block_indent = (
+                templating_blocks_indent.lower().strip() == "force"
+            )
         else:
             force_block_indent = False
         templating_blocks_indent = bool(templating_blocks_indent)
         # If we're forcing it through we don't check.
         if templating_blocks_indent and not force_block_indent:
-            indent_balance = sum(getattr(elem, "indent_val", 0) for elem in segments)
+            indent_balance = sum(
+                getattr(elem, "indent_val", 0) for elem in segments
+            )
             if indent_balance != 0:  # pragma: no cover
                 linter_logger.debug(
                     "Indent balance test failed for %r. Template indents will not be "
@@ -295,7 +317,9 @@ class Linter:
         return result
 
     @staticmethod
-    def _report_conflicting_fixes_same_anchor(message: str) -> None:  # pragma: no cover
+    def _report_conflicting_fixes_same_anchor(
+        message: str,
+    ) -> None:  # pragma: no cover
         # This function exists primarily in order to let us monkeypatch it at
         # runtime (replacing it with a function that raises an exception).
         linter_logger.critical(message)
@@ -324,7 +348,9 @@ class Linter:
         for idx, variant in enumerate(rendered.templated_variants):
             t0 = time.monotonic()
             linter_logger.info("Parse Rendered. Lexing Variant %s", idx)
-            tokens, lex_errors = cls._lex_templated_file(variant, rendered.config)
+            tokens, lex_errors = cls._lex_templated_file(
+                variant, rendered.config
+            )
             t1 = time.monotonic()
             linter_logger.info("Parse Rendered. Parsing Variant %s", idx)
             if tokens:
@@ -340,7 +366,10 @@ class Linter:
             _lt = t1 - t0
             _pt = time.monotonic() - t1
             linter_logger.info(
-                "Parse Rendered. Variant %s. Lex in %s. Parse in %s.", idx, _lt, _pt
+                "Parse Rendered. Variant %s. Lex in %s. Parse in %s.",
+                idx,
+                _lt,
+                _pt,
             )
             parsed_variants.append(
                 ParsedVariant(
@@ -377,7 +406,9 @@ class Linter:
         fname: Optional[str] = None,
         templated_file: Optional["TemplatedFile"] = None,
         formatter: Any = None,
-    ) -> Tuple[BaseSegment, List[SQLBaseError], Optional[IgnoreMask], RuleTimingsType]:
+    ) -> Tuple[
+        BaseSegment, List[SQLBaseError], Optional[IgnoreMask], RuleTimingsType
+    ]:
         """Lint and optionally fix a tree object."""
         # Keep track of the linting errors on the very first linter pass. The
         # list of issues output by "lint" and "fix" only includes issues present
@@ -387,7 +418,9 @@ class Linter:
         # A placeholder for the fixes we had on the previous loop
         last_fixes: Optional[List[LintFix]] = None
         # Keep a set of previous versions to catch infinite loops.
-        previous_versions: Set[Tuple[str, Tuple["SourceFix", ...]]] = {(tree.raw, ())}
+        previous_versions: Set[Tuple[str, Tuple["SourceFix", ...]]] = {
+            (tree.raw, ())
+        }
         # Keep a buffer for recording rule timings.
         rule_timings: RuleTimingsType = []
 
@@ -405,7 +438,9 @@ class Linter:
             allowed_rules_ref_map = cls.allowed_rule_ref_map(
                 rule_pack.reference_map, disable_noqa_except
             )
-            ignore_mask, ivs = IgnoreMask.from_tree(tree, allowed_rules_ref_map)
+            ignore_mask, ivs = IgnoreMask.from_tree(
+                tree, allowed_rules_ref_map
+            )
             initial_linting_errors += ivs
         else:
             ignore_mask = None
@@ -425,7 +460,9 @@ class Linter:
         for phase in phases:
             if len(phases) > 1:
                 rules_this_phase = [
-                    rule for rule in rule_pack.rules if rule.lint_phase == phase
+                    rule
+                    for rule in rule_pack.rules
+                    if rule.lint_phase == phase
                 ]
             else:
                 rules_this_phase = rule_pack.rules
@@ -466,7 +503,9 @@ class Linter:
                     ):
                         continue
 
-                    progress_bar_crawler.set_description(f"rule {crawler.code}")
+                    progress_bar_crawler.set_description(
+                        f"rule {crawler.code}"
+                    )
                     t0 = time.monotonic()
 
                     # fixes should be a dict {} with keys edit, delete, create
@@ -487,7 +526,9 @@ class Linter:
                         initial_linting_errors += linting_errors
 
                     if fix and fixes:
-                        linter_logger.info(f"Applying Fixes [{crawler.code}]: {fixes}")
+                        linter_logger.info(
+                            f"Applying Fixes [{crawler.code}]: {fixes}"
+                        )
                         # Do some sanity checks on the fixes before applying.
                         anchor_info = compute_anchor_edit_info(fixes)
                         if any(
@@ -528,7 +569,9 @@ class Linter:
                                 config.get("dialect_obj"),
                                 crawler.code,
                                 anchor_info,
-                                fix_even_unparsable=config.get("fix_even_unparsable"),
+                                fix_even_unparsable=config.get(
+                                    "fix_even_unparsable"
+                                ),
                             )
 
                             # Check for infinite loops. We use a combination of the
@@ -540,7 +583,10 @@ class Linter:
                             )
                             # Was anything actually applied? If not, then the fixes we
                             # had cannot be safely applied and we should stop trying.
-                            if loop_check_tuple == (tree.raw, tuple(tree.source_fixes)):
+                            if loop_check_tuple == (
+                                tree.raw,
+                                tuple(tree.source_fixes),
+                            ):
                                 linter_logger.debug(
                                     f"Fixes for {crawler.code} could not be safely be "
                                     "applied. Likely due to initially unparsable file."
@@ -607,10 +653,17 @@ class Linter:
                     # Reason: When the linter hits the loop limit, the file is often
                     # messy, e.g. some of the fixes were applied repeatedly, possibly
                     # other weird things. We don't want the user to see this junk!
-                    return save_tree, initial_linting_errors, ignore_mask, rule_timings
+                    return (
+                        save_tree,
+                        initial_linting_errors,
+                        ignore_mask,
+                        rule_timings,
+                    )
 
         if config.get("ignore_templated_areas", default=True):
-            initial_linting_errors = cls.remove_templated_errors(initial_linting_errors)
+            initial_linting_errors = cls.remove_templated_errors(
+                initial_linting_errors
+            )
 
         linter_logger.info("\n###\n#\n# {}\n#\n###".format("Fixed Tree:"))
         linter_logger.info("\n" + tree.stringify())
@@ -647,7 +700,9 @@ class Linter:
 
         # If there is a root variant, handle that first.
         if root_variant:
-            linter_logger.info("lint_parsed - linting root variant (%s)", parsed.fname)
+            linter_logger.info(
+                "lint_parsed - linting root variant (%s)", parsed.fname
+            )
             assert root_variant.tree  # We just checked this.
             (
                 fixed_tree,
@@ -678,7 +733,9 @@ class Linter:
             for idx, alternate_variant in enumerate(parsed.parsed_variants):
                 if alternate_variant is variant or not alternate_variant.tree:
                     continue
-                linter_logger.info("lint_parsed - linting alt variant (%s)", idx)
+                linter_logger.info(
+                    "lint_parsed - linting alt variant (%s)", idx
+                )
                 (
                     _,  # Fixed Tree
                     alt_linting_errors,
@@ -719,7 +776,9 @@ class Linter:
                     parsed.source_str,
                     [
                         lm
-                        for lm in parsed.config.get("dialect_obj").lexer_matchers
+                        for lm in parsed.config.get(
+                            "dialect_obj"
+                        ).lexer_matchers
                         if lm.name == "inline_comment"
                     ][0],
                     allowed_rules_ref_map,
@@ -759,13 +818,17 @@ class Linter:
             fixable=True if fix else None, types=SQLParseError
         ):
             if formatter:  # pragma: no cover TODO?
-                formatter.dispatch_dialect_warning(parsed.config.get("dialect"))
+                formatter.dispatch_dialect_warning(
+                    parsed.config.get("dialect")
+                )
 
         return linted_file
 
     @classmethod
     def allowed_rule_ref_map(
-        cls, reference_map: Dict[str, Set[str]], disable_noqa_except: Optional[str]
+        cls,
+        reference_map: Dict[str, Set[str]],
+        disable_noqa_except: Optional[str],
     ) -> Dict[str, Set[str]]:
         """Generate a noqa rule reference map."""
         # disable_noqa_except is not set, return the entire map.
@@ -776,7 +839,9 @@ class Linter:
         for special_rule in ["PRS", "LXR", "TMP"]:
             output_map[special_rule] = set([special_rule])
         # Expand glob usage of rules
-        unexpanded_rules = tuple(r.strip() for r in disable_noqa_except.split(","))
+        unexpanded_rules = tuple(
+            r.strip() for r in disable_noqa_except.split(",")
+        )
         noqa_set = set()
         for r in unexpanded_rules:
             for x in fnmatch.filter(output_map.keys(), r):
@@ -810,7 +875,9 @@ class Linter:
         self, in_str: str, fname: str, config: FluffConfig, encoding: str
     ) -> RenderedFile:
         """Template the file."""
-        linter_logger.info("Rendering String [%s] (%s)", self.templater.name, fname)
+        linter_logger.info(
+            "Rendering String [%s] (%s)", self.templater.name, fname
+        )
 
         # Start the templating timer
         t0 = time.monotonic()
@@ -842,8 +909,14 @@ class Linter:
         templater_violations: List[SQLTemplaterError] = []
 
         try:
-            for variant, templater_errs in self.templater.process_with_variants(
-                in_str=in_str, fname=fname, config=config, formatter=self.formatter
+            for (
+                variant,
+                templater_errs,
+            ) in self.templater.process_with_variants(
+                in_str=in_str,
+                fname=fname,
+                config=config,
+                formatter=self.formatter,
             ):
                 if variant:
                     templated_variants.append(variant)
@@ -881,10 +954,14 @@ class Linter:
             in_str,
         )
 
-    def render_file(self, fname: str, root_config: FluffConfig) -> RenderedFile:
+    def render_file(
+        self, fname: str, root_config: FluffConfig
+    ) -> RenderedFile:
         """Load and render a file with relevant config."""
         # Load the raw file.
-        raw_file, config, encoding = self.load_raw_file_and_config(fname, root_config)
+        raw_file, config, encoding = self.load_raw_file_and_config(
+            fname, root_config
+        )
         # Render the file
         return self.render_string(raw_file, fname, config, encoding)
 
@@ -1040,7 +1117,9 @@ class Linter:
 
         expanded_paths: List[str] = []
         expanded_path_to_linted_dir = {}
-        sql_exts = self.config.get("sql_file_exts", default=".sql").lower().split(",")
+        sql_exts = (
+            self.config.get("sql_file_exts", default=".sql").lower().split(",")
+        )
 
         for path in paths:
             linted_dir = LintedDir(path, retain_files=retain_files)
@@ -1082,15 +1161,22 @@ class Linter:
             total=files_count,
             desc=f"file {first_path}",
             leave=False,
-            disable=files_count <= 1 or progress_bar_configuration.disable_progress_bar,
+            disable=files_count <= 1
+            or progress_bar_configuration.disable_progress_bar,
         )
 
-        for i, linted_file in enumerate(runner.run(expanded_paths, fix), start=1):
+        for i, linted_file in enumerate(
+            runner.run(expanded_paths, fix), start=1
+        ):
             linted_dir = expanded_path_to_linted_dir[linted_file.path]
             linted_dir.add(linted_file)
             # If any fatal errors, then stop iteration.
-            if any(v.fatal for v in linted_file.violations):  # pragma: no cover
-                linter_logger.error("Fatal linting error. Halting further linting.")
+            if any(
+                v.fatal for v in linted_file.violations
+            ):  # pragma: no cover
+                linter_logger.error(
+                    "Fatal linting error. Halting further linting."
+                )
                 break
 
             # If we're applying fixes, then do that here.
@@ -1126,7 +1212,9 @@ class Linter:
         NB: This a generator which will yield the result of each file
         within the path iteratively.
         """
-        sql_exts = self.config.get("sql_file_exts", default=".sql").lower().split(",")
+        sql_exts = (
+            self.config.get("sql_file_exts", default=".sql").lower().split(",")
+        )
         for fname in paths_from_path(
             path,
             target_file_exts=sql_exts,

@@ -11,7 +11,9 @@ from sqlfluff.core.parser import Lexer, Parser
 @settings(max_examples=100, deadline=None)
 @given(
     st.lists(
-        st.tuples(st.sampled_from(["<", "=", ">"]), st.sampled_from(["AND", "OR"])),
+        st.tuples(
+            st.sampled_from(["<", "=", ">"]), st.sampled_from(["AND", "OR"])
+        ),
         min_size=1,
         max_size=30,
     )

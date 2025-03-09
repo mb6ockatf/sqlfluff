@@ -135,10 +135,16 @@ duckdb_dialect.replace(
     ),
     # Matching postgres lower casefold, as it is case-insensitive
     QuotedIdentifierSegment=TypedParser(
-        "double_quote", IdentifierSegment, type="quoted_identifier", casefold=str.lower
+        "double_quote",
+        IdentifierSegment,
+        type="quoted_identifier",
+        casefold=str.lower,
     ),
     SingleQuotedIdentifierSegment=TypedParser(
-        "single_quote", IdentifierSegment, type="quoted_identifier", casefold=str.lower
+        "single_quote",
+        IdentifierSegment,
+        type="quoted_identifier",
+        casefold=str.lower,
     ),
     ListComprehensionGrammar=Ref("ListComprehensionExpressionSegment"),
 )
@@ -238,7 +244,9 @@ class ColumnConstraintSegment(ansi.ColumnConstraintSegment):
     # https://duckdb.org/docs/sql/statements/create_table
     match_grammar = Sequence(
         OneOf(
-            Sequence(Ref.keyword("NOT", optional=True), "NULL"),  # NOT NULL or NULL
+            Sequence(
+                Ref.keyword("NOT", optional=True), "NULL"
+            ),  # NOT NULL or NULL
             Sequence(
                 "CHECK",
                 Bracketed(Ref("ExpressionSegment")),
@@ -809,7 +817,9 @@ class CreateTypeStatementSegment(postgres.CreateTypeStatementSegment):
         "AS",
         OneOf(
             Ref("DatatypeSegment"),
-            Sequence("ENUM", Bracketed(Delimited(Ref("QuotedLiteralSegment")))),
+            Sequence(
+                "ENUM", Bracketed(Delimited(Ref("QuotedLiteralSegment")))
+            ),
             Ref("StructTypeSegment"),
             Sequence("UNION", Ref("StructTypeSchemaSegment")),
         ),

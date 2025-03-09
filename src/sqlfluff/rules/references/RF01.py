@@ -70,7 +70,9 @@ class Rule_RF01(BaseRule):
     config_keywords = ["force_enable"]
     # If any of the parents would have also triggered the rule, don't fire
     # because they will more accurately process any internal references.
-    crawl_behaviour = SegmentSeekerCrawler(set(_START_TYPES), allow_recurse=False)
+    crawl_behaviour = SegmentSeekerCrawler(
+        set(_START_TYPES), allow_recurse=False
+    )
 
     def _eval(self, context: RuleContext) -> List[LintResult]:
         violations: List[LintResult] = []
@@ -88,7 +90,9 @@ class Rule_RF01(BaseRule):
         self.logger.debug("DML Reference Table: %s", dml_target_table)
         # Verify table references in any SELECT statements found in or
         # below context.segment in the parser tree.
-        query: RF01Query = RF01Query.from_segment(context.segment, context.dialect)
+        query: RF01Query = RF01Query.from_segment(
+            context.segment, context.dialect
+        )
         query.parent_stack = context.parent_stack
         self._analyze_table_references(
             query, dml_target_table, context.dialect, violations
@@ -96,7 +100,9 @@ class Rule_RF01(BaseRule):
         return violations
 
     @classmethod
-    def _alias_info_as_tuples(cls, alias_info: AliasInfo) -> List[Tuple[str, ...]]:
+    def _alias_info_as_tuples(
+        cls, alias_info: AliasInfo
+    ) -> List[Tuple[str, ...]]:
         result: List[Tuple[str, ...]] = []
         if alias_info.aliased:
             result.append((alias_info.ref_str,))
@@ -129,7 +135,10 @@ class Rule_RF01(BaseRule):
                 self.logger.debug(
                     "Aliases: %s %s",
                     [alias.ref_str for alias in select_info.table_aliases],
-                    [standalone.raw for standalone in select_info.standalone_aliases],
+                    [
+                        standalone.raw
+                        for standalone in select_info.standalone_aliases
+                    ],
                 )
 
                 # Try and resolve each reference to a value in query.aliases (or
@@ -138,7 +147,10 @@ class Rule_RF01(BaseRule):
                     if not self._should_ignore_reference(r, selectable):
                         # This function walks up the query's parent stack if necessary.
                         violation = self._resolve_reference(
-                            r, self._get_table_refs(r, dialect), dml_target_table, query
+                            r,
+                            self._get_table_refs(r, dialect),
+                            dml_target_table,
+                            query,
                         )
                         if violation:
                             violations.append(violation)
@@ -158,7 +170,9 @@ class Rule_RF01(BaseRule):
         #   statement, thus not expected to match a table in the FROM
         #   clause.
         if ref_path:
-            return any(ps.segment.is_type("into_table_clause") for ps in ref_path)
+            return any(
+                ps.segment.is_type("into_table_clause") for ps in ref_path
+            )
         else:
             return False  # pragma: no cover
 
@@ -193,7 +207,11 @@ class Rule_RF01(BaseRule):
         return tbl_refs
 
     def _resolve_reference(
-        self, r, tbl_refs, dml_target_table: Optional[Tuple[str, ...]], query: RF01Query
+        self,
+        r,
+        tbl_refs,
+        dml_target_table: Optional[Tuple[str, ...]],
+        query: RF01Query,
     ) -> Optional[LintResult]:
         # Does this query define the referenced table?
         possible_references = [tbl_ref[1] for tbl_ref in tbl_refs]
@@ -203,7 +221,9 @@ class Rule_RF01(BaseRule):
         for standalone_alias in query.standalone_aliases:
             targets.append((standalone_alias.raw,))
 
-        if len(targets) == 1 and self._dialect_supports_dot_access(query.dialect):
+        if len(targets) == 1 and self._dialect_supports_dot_access(
+            query.dialect
+        ):
             self.force_enable: bool
             if self.force_enable:
                 # Backwards compatibility.
@@ -219,7 +239,10 @@ class Rule_RF01(BaseRule):
             # No. Check the parent query, if there is one.
             if query.parent:
                 return self._resolve_reference(
-                    r, tbl_refs, dml_target_table, cast(RF01Query, query.parent)
+                    r,
+                    tbl_refs,
+                    dml_target_table,
+                    cast(RF01Query, query.parent),
                 )
             # No parent query. If there's a DML statement at the root, check its
             # target table or alias.
@@ -252,9 +275,13 @@ class Rule_RF01(BaseRule):
             for seg in maybe_create_trigger.segments:
                 if seg.is_type("keyword") and seg.raw_normalized() == "INSERT":
                     return [("new",)]
-                elif seg.is_type("keyword") and seg.raw_normalized() == "UPDATE":
+                elif (
+                    seg.is_type("keyword") and seg.raw_normalized() == "UPDATE"
+                ):
                     return [("new",), ("old",)]
-                elif seg.is_type("keyword") and seg.raw_normalized() == "DELETE":
+                elif (
+                    seg.is_type("keyword") and seg.raw_normalized() == "DELETE"
+                ):
                     return [("old",)]
                 else:
                     pass  # pragma: no cover

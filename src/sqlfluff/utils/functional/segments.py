@@ -28,7 +28,9 @@ class Segments(Tuple[BaseSegment, ...]):
     """
 
     def __new__(
-        cls, *segments: BaseSegment, templated_file: Optional[TemplatedFile] = None
+        cls,
+        *segments: BaseSegment,
+        templated_file: Optional[TemplatedFile] = None,
     ) -> "Segments":
         """Override new operator."""
         return super(Segments, cls).__new__(cls, segments)
@@ -40,12 +42,14 @@ class Segments(Tuple[BaseSegment, ...]):
 
     def __add__(self, segments_) -> "Segments":
         return Segments(
-            *tuple(self).__add__(tuple(segments_)), templated_file=self.templated_file
+            *tuple(self).__add__(tuple(segments_)),
+            templated_file=self.templated_file,
         )
 
     def __radd__(self, segments_) -> "Segments":
         return Segments(
-            *tuple(segments_).__add__(tuple(self)), templated_file=self.templated_file
+            *tuple(segments_).__add__(tuple(self)),
+            templated_file=self.templated_file,
         )
 
     def find(self, segment: Optional[BaseSegment]) -> int:
@@ -88,7 +92,9 @@ class Segments(Tuple[BaseSegment, ...]):
                 )  # pragma: no cover
             source_slice = s.pos_marker.source_slice
             raw_slices.update(
-                self.templated_file.raw_slices_spanning_source_slice(source_slice)
+                self.templated_file.raw_slices_spanning_source_slice(
+                    source_slice
+                )
             )
         return RawFileSlices(
             *sorted(raw_slices, key=lambda slice_: slice_.source_idx),
@@ -112,7 +118,9 @@ class Segments(Tuple[BaseSegment, ...]):
                 segments.append(i)
         return Segments(*segments, templated_file=self.templated_file)
 
-    def recursive_crawl(self, *seg_type: str, recurse_into: bool = True) -> "Segments":
+    def recursive_crawl(
+        self, *seg_type: str, recurse_into: bool = True
+    ) -> "Segments":
         """Recursively crawl for segments of a given type."""
         segments: List[BaseSegment] = []
         for s in self:

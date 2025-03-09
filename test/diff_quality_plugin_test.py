@@ -21,12 +21,18 @@ from sqlfluff.utils.testing.cli import invoke_assert_code
         (tuple(), []),
     ],
 )
-def test_diff_quality_plugin(sql_paths, expected_violations_lines, monkeypatch):
+def test_diff_quality_plugin(
+    sql_paths, expected_violations_lines, monkeypatch
+):
     """Test the plugin at least finds errors on the expected lines."""
 
     def execute(command, exit_codes):
         printable_command_parts = [
-            c.decode(sys.getfilesystemencoding()) if isinstance(c, bytes) else c
+            (
+                c.decode(sys.getfilesystemencoding())
+                if isinstance(c, bytes)
+                else c
+            )
             for c in command
         ]
 

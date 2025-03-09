@@ -203,7 +203,9 @@ redshift_dialect.replace(
             r"#?([A-Z_]+|[0-9]+[A-Z_$])[A-Z0-9_$]*",
             IdentifierSegment,
             type="naked_identifier",
-            anti_template=r"^(" + r"|".join(dialect.sets("reserved_keywords")) + r")$",
+            anti_template=r"^("
+            + r"|".join(dialect.sets("reserved_keywords"))
+            + r")$",
             casefold=str.lower,
         )
     ),
@@ -611,14 +613,18 @@ class AlterTableActionSegment(BaseSegment):
             "OWNER",
             "TO",
             OneOf(
-                OneOf(Ref("ParameterNameSegment"), Ref("QuotedIdentifierSegment")),
+                OneOf(
+                    Ref("ParameterNameSegment"), Ref("QuotedIdentifierSegment")
+                ),
             ),
         ),
         Sequence(
             "RENAME",
             "TO",
             OneOf(
-                OneOf(Ref("ParameterNameSegment"), Ref("QuotedIdentifierSegment")),
+                OneOf(
+                    Ref("ParameterNameSegment"), Ref("QuotedIdentifierSegment")
+                ),
             ),
         ),
         Sequence(
@@ -690,7 +696,9 @@ class AlterTableActionSegment(BaseSegment):
             Ref("ColumnReferenceSegment"),
             Ref("DatatypeSegment"),
             Sequence("DEFAULT", Ref("ExpressionSegment"), optional=True),
-            Sequence("COLLATE", Ref("CollationReferenceSegment"), optional=True),
+            Sequence(
+                "COLLATE", Ref("CollationReferenceSegment"), optional=True
+            ),
             AnyNumberOf(Ref("ColumnConstraintSegment")),
         ),
         Sequence(
@@ -719,8 +727,12 @@ class TableAttributeSegment(BaseSegment):
     type = "table_constraint"
 
     match_grammar = AnySetOf(
-        Sequence("DISTSTYLE", OneOf("AUTO", "EVEN", "KEY", "ALL"), optional=True),
-        Sequence("DISTKEY", Bracketed(Ref("ColumnReferenceSegment")), optional=True),
+        Sequence(
+            "DISTSTYLE", OneOf("AUTO", "EVEN", "KEY", "ALL"), optional=True
+        ),
+        Sequence(
+            "DISTKEY", Bracketed(Ref("ColumnReferenceSegment")), optional=True
+        ),
         OneOf(
             Sequence(
                 OneOf("COMPOUND", "INTERLEAVED", optional=True),
@@ -748,7 +760,9 @@ class TableConstraintSegment(BaseSegment):
             "CONSTRAINT", Ref("ObjectReferenceSegment"), optional=True
         ),
         OneOf(
-            Sequence("UNIQUE", Bracketed(Delimited(Ref("ColumnReferenceSegment")))),
+            Sequence(
+                "UNIQUE", Bracketed(Delimited(Ref("ColumnReferenceSegment")))
+            ),
             Sequence(
                 "PRIMARY",
                 "KEY",
@@ -1619,7 +1633,10 @@ class AlterProcedureStatementSegment(BaseSegment):
                 "OWNER",
                 "TO",
                 OneOf(
-                    OneOf(Ref("ParameterNameSegment"), Ref("QuotedIdentifierSegment")),
+                    OneOf(
+                        Ref("ParameterNameSegment"),
+                        Ref("QuotedIdentifierSegment"),
+                    ),
                     "CURRENT_USER",
                     "SESSION_USER",
                 ),
@@ -2244,7 +2261,12 @@ class AlterUserStatementSegment(BaseSegment):
                     Ref("QuotedLiteralSegment"),
                     "DISABLE",
                 ),
-                Sequence("VALID", "UNTIL", Ref("QuotedLiteralSegment"), optional=True),
+                Sequence(
+                    "VALID",
+                    "UNTIL",
+                    Ref("QuotedLiteralSegment"),
+                    optional=True,
+                ),
             ),
             Sequence(
                 "RENAME",
@@ -2614,7 +2636,9 @@ class CreateMaterializedViewStatementSegment(
         "AS",
         OneOf(
             OptionallyBracketed(Ref("SelectableGrammar")),
-            OptionallyBracketed(Sequence("TABLE", Ref("TableReferenceSegment"))),
+            OptionallyBracketed(
+                Sequence("TABLE", Ref("TableReferenceSegment"))
+            ),
             Ref("ValuesClauseSegment"),
             OptionallyBracketed(Sequence("EXECUTE", Ref("FunctionSegment"))),
         ),

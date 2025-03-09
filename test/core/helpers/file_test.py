@@ -98,17 +98,23 @@ def test__parser__helper_get_encoding(fname, config_encoding, result):
 def test__config__iter_config_paths(path, working_path, result):
     """Test that config paths are fetched ordered by priority."""
     cfg_paths = iter_intermediate_paths(Path(path), Path(working_path))
-    assert [str(p) for p in cfg_paths] == [str(Path(p).resolve()) for p in result]
+    assert [str(p) for p in cfg_paths] == [
+        str(Path(p).resolve()) for p in result
+    ]
 
 
-@pytest.mark.skipif(sys.platform != "win32", reason="Only applicable on Windows")
+@pytest.mark.skipif(
+    sys.platform != "win32", reason="Only applicable on Windows"
+)
 def test__config__iter_config_paths_exc_win():
     """Test that config path resolution exception handling works on windows."""
     cfg_paths = iter_intermediate_paths(Path("J:\\\\"), Path("C:\\\\"))
     assert list(cfg_paths) == [Path("C:\\\\"), Path("J:\\\\")]
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="Not applicable on Windows")
+@pytest.mark.skipif(
+    sys.platform == "win32", reason="Not applicable on Windows"
+)
 def test__config__iter_config_paths_exc_unix():
     """Test that config path resolution exception handling works on linux."""
     cfg_paths = iter_intermediate_paths(Path("/abc/def"), Path("/ghi/jlk"))

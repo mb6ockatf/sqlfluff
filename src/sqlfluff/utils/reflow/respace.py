@@ -24,7 +24,9 @@ if TYPE_CHECKING:  # pragma: no cover
 reflow_logger = logging.getLogger("sqlfluff.rules.reflow")
 
 
-def _unpack_constraint(constraint: str, strip_newlines: bool) -> Tuple[str, bool]:
+def _unpack_constraint(
+    constraint: str, strip_newlines: bool
+) -> Tuple[str, bool]:
     """Unpack a spacing constraint.
 
     Used as a helper function in `determine_constraints`.
@@ -50,7 +52,9 @@ def _unpack_constraint(constraint: str, strip_newlines: bool) -> Tuple[str, bool
     elif modifier == "inline":
         strip_newlines = True
     else:  # pragma: no cover
-        raise SQLFluffUserError(f"Unexpected constraint modifier: {constraint!r}")
+        raise SQLFluffUserError(
+            f"Unexpected constraint modifier: {constraint!r}"
+        )
 
     return constraint, strip_newlines
 
@@ -79,7 +83,9 @@ def determine_constraints(
         # so it doesn't matter whether we get it from prev_block or next_block.
         idx = prev_block.depth_info.stack_hashes.index(common[-1])
 
-        within_constraint = prev_block.stack_spacing_configs.get(common[-1], None)
+        within_constraint = prev_block.stack_spacing_configs.get(
+            common[-1], None
+        )
         if within_constraint:
             within_spacing, strip_newlines = _unpack_constraint(
                 within_constraint, strip_newlines
@@ -139,7 +145,9 @@ def process_spacing(
                 removal_buffer.append(seg)
                 result_buffer.append(
                     LintResult(
-                        seg, [LintFix.delete(seg)], description="Unexpected line break."
+                        seg,
+                        [LintFix.delete(seg)],
+                        description="Unexpected line break.",
                     )
                 )
                 # Carry on as though it wasn't here.
@@ -216,7 +224,9 @@ def _determine_aligned_inline_spacing(
                 break
 
     if not parent_segment:
-        reflow_logger.debug("    No Parent found for alignment case. Treat as single.")
+        reflow_logger.debug(
+            "    No Parent found for alignment case. Treat as single."
+        )
         return " "
 
     # We've got a parent. Find some siblings.
@@ -225,12 +235,14 @@ def _determine_aligned_inline_spacing(
     for sibling in parent_segment.recursive_crawl(segment_type):
         # Purge any siblings with a boundary between them
         if not align_scope or not any(
-            ps.segment.is_type(align_scope) for ps in parent_segment.path_to(sibling)
+            ps.segment.is_type(align_scope)
+            for ps in parent_segment.path_to(sibling)
         ):
             siblings.append(sibling)
         else:
             reflow_logger.debug(
-                "    Purging a sibling because they're blocked " "by a boundary: %s",
+                "    Purging a sibling because they're blocked "
+                "by a boundary: %s",
                 sibling,
             )
 
@@ -255,7 +267,9 @@ def _determine_aligned_inline_spacing(
 
     target_index = next(
         idx
-        for idx, segment in enumerate(siblings_by_line[next_pos.working_line_no])
+        for idx, segment in enumerate(
+            siblings_by_line[next_pos.working_line_no]
+        )
         if (
             cast(PositionMarker, segment.pos_marker).working_line_pos
             == next_pos.working_line_pos
@@ -292,7 +306,8 @@ def _determine_aligned_inline_spacing(
             if (
                 seg.pos_marker
                 and sibling.pos_marker
-                and seg.pos_marker.working_loc == sibling.pos_marker.working_loc
+                and seg.pos_marker.working_loc
+                == sibling.pos_marker.working_loc
                 and last_code
             ):
                 loc = last_code.pos_marker.working_loc_after(last_code.raw)
@@ -416,14 +431,22 @@ def handle_respace__inline_with_space(
             # These second clauses are much less likely and so are excluded from
             # coverage. If we find a way of covering them, that would be great
             # but for now they exist as backups.
-            elif prev_block and prev_block.segments[-1].pos_marker:  # pragma: no cover
-                next_pos = prev_block.segments[-1].pos_marker.end_point_marker()
+            elif (
+                prev_block and prev_block.segments[-1].pos_marker
+            ):  # pragma: no cover
+                next_pos = prev_block.segments[
+                    -1
+                ].pos_marker.end_point_marker()
             else:  # pragma: no cover
-                reflow_logger.info("Unable to find position marker for alignment.")
+                reflow_logger.info(
+                    "Unable to find position marker for alignment."
+                )
                 next_pos = None
                 desired_space = " "
                 desc = (
-                    "Expected only single space. " "Found " f"{last_whitespace.raw!r}."
+                    "Expected only single space. "
+                    "Found "
+                    f"{last_whitespace.raw!r}."
                 )
 
             if next_pos:
@@ -453,7 +476,10 @@ def handle_respace__inline_with_space(
             else:  # pragma: no cover
                 # This clause isn't has no test coverage because next_block is
                 # normally provided.
-                desc = "Expected only single space. Found " f"{last_whitespace.raw!r}."
+                desc = (
+                    "Expected only single space. Found "
+                    f"{last_whitespace.raw!r}."
+                )
             desired_space = " "
 
         new_results: List[LintResult] = []
@@ -519,7 +545,9 @@ def handle_respace__inline_without_space(
         desired_space = " "
         added_whitespace = WhitespaceSegment(desired_space)
     # Is it anything other than the default case?
-    elif not (pre_constraint == post_constraint == "single"):  # pragma: no cover
+    elif not (
+        pre_constraint == post_constraint == "single"
+    ):  # pragma: no cover
         # TODO: This will get test coverage when configuration routines
         # are in properly.
         raise NotImplementedError(
@@ -564,7 +592,9 @@ def handle_respace__inline_without_space(
             # to uuid matching for RawSegment. Perhaps this should be
             # more aligned. There might be a better way of doing this.
             for fix in res.fixes or []:
-                if fix.edit and insertion.uuid in [elem.uuid for elem in fix.edit]:
+                if fix.edit and insertion.uuid in [
+                    elem.uuid for elem in fix.edit
+                ]:
                     break
             else:  # pragma: no cover
                 continue
@@ -628,6 +658,8 @@ def handle_respace__inline_without_space(
             description=desc,
         )
     else:  # pragma: no cover
-        NotImplementedError("Not set up to handle a missing _after_ and _before_.")
+        NotImplementedError(
+            "Not set up to handle a missing _after_ and _before_."
+        )
 
     return segment_buffer, existing_results + [new_result], True

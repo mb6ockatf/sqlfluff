@@ -24,11 +24,15 @@ def get_configs_info() -> Dict[str, Any]:
         },
         "prefer_count_1": {
             "validation": [True, False],
-            "definition": ("Should count(1) be preferred over count(*) and count(0)?"),
+            "definition": (
+                "Should count(1) be preferred over count(*) and count(0)?"
+            ),
         },
         "prefer_count_0": {
             "validation": [True, False],
-            "definition": ("Should count(0) be preferred over count(*) and count(1)?"),
+            "definition": (
+                "Should count(0) be preferred over count(*) and count(1)?"
+            ),
         },
         "multiline_newline": {
             "validation": [True, False],

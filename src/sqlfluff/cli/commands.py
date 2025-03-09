@@ -17,7 +17,10 @@ import yaml
 from tqdm import tqdm
 
 from sqlfluff.cli import EXIT_ERROR, EXIT_FAIL, EXIT_SUCCESS
-from sqlfluff.cli.autocomplete import dialect_shell_complete, shell_completion_enabled
+from sqlfluff.cli.autocomplete import (
+    dialect_shell_complete,
+    shell_completion_enabled,
+)
 from sqlfluff.cli.formatters import (
     OutputStreamFormatter,
     format_linting_result_header,
@@ -86,10 +89,14 @@ def set_logging_level(
 
     # Set up the log handler which is able to print messages without overlapping
     # with progressbars.
-    handler = StreamHandlerTqdm(stream=sys.stderr if stderr_output else sys.stdout)
+    handler = StreamHandlerTqdm(
+        stream=sys.stderr if stderr_output else sys.stdout
+    )
     # NB: the unicode character at the beginning is to squash any badly
     # tamed ANSI colour statements, and return us to normality.
-    handler.setFormatter(logging.Formatter("\u001b[0m%(levelname)-10s %(message)s"))
+    handler.setFormatter(
+        logging.Formatter("\u001b[0m%(levelname)-10s %(message)s")
+    )
 
     # Set up a handler to colour warnings red.
     # See: https://docs.python.org/3/library/logging.html#filter-objects
@@ -378,7 +385,9 @@ def get_config(
     **kwargs,
 ) -> FluffConfig:
     """Get a config object from kwargs."""
-    plain_output = OutputStreamFormatter.should_produce_plain_output(kwargs["nocolor"])
+    plain_output = OutputStreamFormatter.should_produce_plain_output(
+        kwargs["nocolor"]
+    )
     if kwargs.get("dialect"):
         try:
             # We're just making sure it exists at this stage.
@@ -523,7 +532,9 @@ def dialects(**kwargs) -> None:
     """Show the current dialects available."""
     c = get_config(**kwargs, require_dialect=False)
     _, formatter = get_linter_and_formatter(c)
-    click.echo(formatter.format_dialects(dialect_readout), color=c.get("color"))
+    click.echo(
+        formatter.format_dialects(dialect_readout), color=c.get("color")
+    )
 
 
 def dump_file_payload(filename: Optional[str], payload: str) -> None:
@@ -560,7 +571,9 @@ def dump_file_payload(filename: Optional[str], payload: str) -> None:
 @click.option(
     "--annotation-level",
     default="warning",
-    type=click.Choice(["notice", "warning", "failure", "error"], case_sensitive=False),
+    type=click.Choice(
+        ["notice", "warning", "failure", "error"], case_sensitive=False
+    ),
     help=(
         'When format is set to "github-annotation" or "github-annotation-native", '
         'default annotation level (default="warning"). "failure" and "error" '
@@ -620,7 +633,9 @@ def lint(
     config = get_config(
         extra_config_path, ignore_local_config, require_dialect=False, **kwargs
     )
-    non_human_output = (format != FormatType.human.value) or (write_output is not None)
+    non_human_output = (format != FormatType.human.value) or (
+        write_output is not None
+    )
     file_output = None
     output_stream = make_output_stream(config, format, write_output)
     lnt, formatter = get_linter_and_formatter(config, output_stream)
@@ -707,7 +722,9 @@ def lint(
                         # been set to warn rather than fail will always be given the
                         # `notice` annotation level in the serialised result.
                         "annotation_level": (
-                            annotation_level if not violation["warning"] else "notice"
+                            annotation_level
+                            if not violation["warning"]
+                            else "notice"
                         ),
                     }
                 )
@@ -733,7 +750,11 @@ def lint(
                 # to warnings using the `warnings` config value. Any which have
                 # been set to warn rather than fail will always be given the
                 # `notice` annotation level in the serialised result.
-                line = "::notice " if violation["warning"] else f"::{annotation_level} "
+                line = (
+                    "::notice "
+                    if violation["warning"]
+                    else f"::{annotation_level} "
+                )
 
                 line += "title=SQLFluff,"
                 line += f"file={filepath},"
@@ -770,14 +791,18 @@ def lint(
         for step in timing_summary:
             click.echo(f"=== {step} ===")
             click.echo(
-                formatter.cli_table(timing_summary[step].items(), cols=3, col_width=20)
+                formatter.cli_table(
+                    timing_summary[step].items(), cols=3, col_width=20
+                )
             )
 
     if not nofail:
         if not non_human_output:
             formatter.completion_message()
         exit_code = result.stats(EXIT_FAIL, EXIT_SUCCESS)["exit code"]
-        assert isinstance(exit_code, int), "result.stats error code must be integer."
+        assert isinstance(
+            exit_code, int
+        ), "result.stats error code must be integer."
         sys.exit(exit_code)
     else:
         sys.exit(EXIT_SUCCESS)
@@ -846,9 +871,13 @@ def _stdin_fix(
 
     result = linter.lint_string_wrapped(stdin, fname="stdin", fix=True)
     templater_error = result.num_violations(types=SQLTemplaterError) > 0
-    unfixable_error = result.num_violations(types=SQLLintError, fixable=False) > 0
+    unfixable_error = (
+        result.num_violations(types=SQLLintError, fixable=False) > 0
+    )
 
-    exit_code = _handle_unparsable(fix_even_unparsable, exit_code, result, formatter)
+    exit_code = _handle_unparsable(
+        fix_even_unparsable, exit_code, result, formatter
+    )
 
     if result.num_violations(types=SQLLintError, fixable=True) > 0:
         stdout = result.paths[0].files[0].fix_string()[0]
@@ -915,7 +944,9 @@ def _paths_fix(
             retain_files=check,
         )
 
-    exit_code = _handle_unparsable(fix_even_unparsable, exit_code, result, formatter)
+    exit_code = _handle_unparsable(
+        fix_even_unparsable, exit_code, result, formatter
+    )
 
     # NB: We filter to linting violations here, because they're
     # the only ones which can be potentially fixed.
@@ -935,7 +966,8 @@ def _paths_fix(
 
         if check:
             click.echo(
-                "Are you sure you wish to attempt to fix these? [Y/n] ", nl=False
+                "Are you sure you wish to attempt to fix these? [Y/n] ",
+                nl=False,
             )
             c = click.getchar().lower()
             click.echo("...")
@@ -965,7 +997,9 @@ def _paths_fix(
 
     num_unfixable = sum(p.num_unfixable_lint_errors for p in result.paths)
     if num_unfixable > 0 and formatter.verbosity >= 0:
-        click.echo("  [{} unfixable linting violations found]".format(num_unfixable))
+        click.echo(
+            "  [{} unfixable linting violations found]".format(num_unfixable)
+        )
         exit_code = max(exit_code, EXIT_FAIL)
 
     if bench:
@@ -975,7 +1009,9 @@ def _paths_fix(
         for step in timing_summary:
             click.echo(f"=== {step} ===")
             click.echo(
-                formatter.cli_table(timing_summary[step].items(), cols=3, col_width=20)
+                formatter.cli_table(
+                    timing_summary[step].items(), cols=3, col_width=20
+                )
             )
 
     if show_lint_violations:
@@ -986,7 +1022,9 @@ def _paths_fix(
                 v for v in record["violations"] if v.get("fixes", None) == []
             ]
             click.echo(
-                formatter.format_filename(record["filepath"], success=(not non_fixable))
+                formatter.format_filename(
+                    record["filepath"], success=(not non_fixable)
+                )
             )
             for violation in non_fixable:
                 click.echo(formatter.format_violation(violation))
@@ -1249,7 +1287,9 @@ def cli_format(
 def quoted_presenter(dumper, data):
     """Re-presenter which always double quotes string values needing escapes."""
     if "\n" in data or "\t" in data or "'" in data:
-        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style='"')
+        return dumper.represent_scalar(
+            "tag:yaml.org,2002:str", data, style='"'
+        )
     else:
         return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="")
 
@@ -1339,7 +1379,9 @@ def parse(
     )
     # We don't want anything else to be logged if we want json or yaml output
     # unless we're writing to a file.
-    non_human_output = (format != FormatType.human.value) or (write_output is not None)
+    non_human_output = (format != FormatType.human.value) or (
+        write_output is not None
+    )
     output_stream = make_output_stream(c, format, write_output)
     lnt, formatter = get_linter_and_formatter(c, output_stream)
     verbose = c.get("verbose")
@@ -1387,7 +1429,12 @@ def parse(
     # iterative print for human readout
     if format == FormatType.human.value:
         violations_count = formatter.print_out_violations_and_timing(
-            output_stream, bench, code_only, total_time, verbose, parsed_strings
+            output_stream,
+            bench,
+            code_only,
+            total_time,
+            verbose,
+            parsed_strings,
         )
     else:
         parsed_strings_dict = []
@@ -1400,7 +1447,9 @@ def parse(
             if root_variant:
                 assert root_variant.tree
                 segments = root_variant.tree.as_record(
-                    code_only=code_only, show_raw=True, include_meta=include_meta
+                    code_only=code_only,
+                    show_raw=True,
+                    include_meta=include_meta,
                 )
             else:
                 # Parsing failed - return null for segments.
@@ -1478,7 +1527,9 @@ def render(
             fname = "stdin"
             file_config = lnt.config
         else:
-            raw_sql, file_config, _ = lnt.load_raw_file_and_config(path, lnt.config)
+            raw_sql, file_config, _ = lnt.load_raw_file_and_config(
+                path, lnt.config
+            )
             fname = path
 
         # Get file specific config

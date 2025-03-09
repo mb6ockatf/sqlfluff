@@ -87,7 +87,9 @@ def test_segments_any(input, expected):
 
 def test_segments_reversed():
     """Test the "reversed()" function."""
-    assert segments.Segments(seg1, seg2).reversed() == segments.Segments(seg2, seg1)
+    assert segments.Segments(seg1, seg2).reversed() == segments.Segments(
+        seg2, seg1
+    )
 
 
 def test_segments_raw_slices_no_templated_file():
@@ -103,7 +105,10 @@ def test_segments_first_no_predicate():
 
 def test_segments_first_with_predicate():
     """Test the "first()" function with a predicate."""
-    assert segments.Segments(seg1, seg2).first(sp.is_meta()) == segments.Segments()
+    assert (
+        segments.Segments(seg1, seg2).first(sp.is_meta())
+        == segments.Segments()
+    )
 
 
 def test_segments_last():
@@ -113,7 +118,10 @@ def test_segments_last():
 
 def test_segments_apply():
     """Test the "apply()" function."""
-    assert segments.Segments(seg1, seg2).apply(lambda s: s.raw[-1]) == ["1", "2"]
+    assert segments.Segments(seg1, seg2).apply(lambda s: s.raw[-1]) == [
+        "1",
+        "2",
+    ]
 
 
 @pytest.mark.parametrize(

@@ -22,13 +22,17 @@ templater_logger = logging.getLogger("sqlfluff.templater")
 
 KNOWN_STYLES = {
     # e.g. WHERE bla = :name
-    "colon": regex.compile(r"(?<![:\w\x5c]):(?P<param_name>\w+)(?!:)", regex.UNICODE),
+    "colon": regex.compile(
+        r"(?<![:\w\x5c]):(?P<param_name>\w+)(?!:)", regex.UNICODE
+    ),
     # e.g. SELECT :"column" FROM :table WHERE bla = :'name'
     "colon_optional_quotes": regex.compile(
         r"(?<!:):(?P<quotation>['\"]?)(?P<param_name>[\w_]+)\1", regex.UNICODE
     ),
     # e.g. WHERE bla = table:name - use with caution as more prone to false positives
-    "colon_nospaces": regex.compile(r"(?<!:):(?P<param_name>\w+)", regex.UNICODE),
+    "colon_nospaces": regex.compile(
+        r"(?<!:):(?P<param_name>\w+)", regex.UNICODE
+    ),
     # e.g. WHERE bla = :2
     "numeric_colon": regex.compile(
         r"(?<![:\w\x5c]):(?P<param_name>\d+)", regex.UNICODE
@@ -42,7 +46,9 @@ KNOWN_STYLES = {
         r"(?<![:\w\x5c])\${?(?P<param_name>[\w_]+)}?", regex.UNICODE
     ),
     # e.g. USE ${flyway:database}.schema_name;
-    "flyway_var": regex.compile(r"\${(?P<param_name>\w+[:\w_]+)}", regex.UNICODE),
+    "flyway_var": regex.compile(
+        r"\${(?P<param_name>\w+[:\w_]+)}", regex.UNICODE
+    ),
     # e.g. WHERE bla = ?
     "question_mark": regex.compile(r"(?<![:\w\x5c])\?", regex.UNICODE),
     # e.g. WHERE bla = $3 or WHERE bla = ${3}
@@ -52,7 +58,9 @@ KNOWN_STYLES = {
     # e.g. WHERE bla = %s
     "percent": regex.compile(r"(?<![:\w\x5c])%s", regex.UNICODE),
     # e.g. WHERE bla = &s or WHERE bla = &{s} or USE DATABASE {ENV}_MARKETING
-    "ampersand": regex.compile(r"(?<!&)&{?(?P<param_name>[\w]+)}?", regex.UNICODE),
+    "ampersand": regex.compile(
+        r"(?<!&)&{?(?P<param_name>[\w]+)}?", regex.UNICODE
+    ),
 }
 
 
@@ -188,7 +196,9 @@ class PlaceholderTemplater(RawTemplater):
                 TemplatedFileSlice(
                     slice_type="templated",
                     source_slice=slice(span[0], span[1]),
-                    templated_slice=offset_slice(start_template_pos, len(replacement)),
+                    templated_slice=offset_slice(
+                        start_template_pos, len(replacement)
+                    ),
                 )
             )
             raw_slices.append(

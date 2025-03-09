@@ -27,7 +27,10 @@ def escape_ansi(line):
 def test__cli__formatters__filename_nocol(tmpdir):
     """Test formatting filenames."""
     formatter = OutputStreamFormatter(
-        FileOutput(FluffConfig(require_dialect=False), str(tmpdir / "out.txt")), False
+        FileOutput(
+            FluffConfig(require_dialect=False), str(tmpdir / "out.txt")
+        ),
+        False,
     )
     res = formatter.format_filename("blahblah", success=True)
     assert escape_ansi(res) == "== [blahblah] PASS"
@@ -49,7 +52,10 @@ def test__cli__formatters__violation(tmpdir):
     r = RuleGhost("A", "some-name", "DESC")
     v = SQLLintError(description=r.description, segment=s, rule=r)
     formatter = OutputStreamFormatter(
-        FileOutput(FluffConfig(require_dialect=False), str(tmpdir / "out.txt")), False
+        FileOutput(
+            FluffConfig(require_dialect=False), str(tmpdir / "out.txt")
+        ),
+        False,
     )
     f = formatter.format_violation(v)
     # Position is 3, 3 because foobarbar is on the third
@@ -63,7 +69,10 @@ def test__cli__formatters__violation(tmpdir):
 def test__cli__helpers__colorize(tmpdir):
     """Test ANSI colouring."""
     formatter = OutputStreamFormatter(
-        FileOutput(FluffConfig(require_dialect=False), str(tmpdir / "out.txt")), False
+        FileOutput(
+            FluffConfig(require_dialect=False), str(tmpdir / "out.txt")
+        ),
+        False,
     )
     # Force color output for this test.
     formatter.plain_output = False
@@ -74,9 +83,14 @@ def test__cli__helpers__cli_table(tmpdir):
     """Test making tables."""
     vals = [("a", 3), ("b", "c"), ("d", 4.7654), ("e", 9)]
     formatter = OutputStreamFormatter(
-        FileOutput(FluffConfig(require_dialect=False), str(tmpdir / "out.txt")), False
+        FileOutput(
+            FluffConfig(require_dialect=False), str(tmpdir / "out.txt")
+        ),
+        False,
     )
-    txt = formatter.cli_table(vals, col_width=7, divider_char="|", label_color=None)
+    txt = formatter.cli_table(
+        vals, col_width=7, divider_char="|", label_color=None
+    )
     # NB: No trailing newline
     assert txt == "a:    3|b:    c\nd: 4.77|e:    9"
 
@@ -91,7 +105,13 @@ def test__cli__helpers__cli_table(tmpdir):
                 "rule VARCHAR(30)"
                 ");"
             ),
-            ["--force", "--dialect", "postgres", "--disable-progress-bar", "--nocolor"],
+            [
+                "--force",
+                "--dialect",
+                "postgres",
+                "--disable-progress-bar",
+                "--nocolor",
+            ],
             (
                 "CREATE TABLE IF NOT EXISTS vuln.software_name_dictionary("
                 "id SERIAL PRIMARY KEY"

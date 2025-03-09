@@ -26,7 +26,9 @@ parse_success_examples, parse_structure_examples = get_parse_fixtures(
 )
 
 
-def lex_and_parse(config_overrides: Dict[str, Any], raw: str) -> Optional[ParsedString]:
+def lex_and_parse(
+    config_overrides: Dict[str, Any], raw: str
+) -> Optional[ParsedString]:
     """Performs a Lex and Parse, with cacheable inputs within fixture."""
     # Load the right dialect
     config = FluffConfig(overrides=config_overrides)
@@ -77,7 +79,9 @@ def test__dialect__base_file_parse(dialect, file):
     # When testing the validity of fixes we re-parse sections of the file.
     # To ensure this is safe - here we re-parse the unfixed file to ensure
     # it's still valid even in the case that no fixes have been applied.
-    assert parsed.tree.validate_segment_with_reparse(parsed.config.get("dialect_obj"))
+    assert parsed.tree.validate_segment_with_reparse(
+        parsed.config.get("dialect_obj")
+    )
 
 
 @pytest.mark.integration
@@ -123,7 +127,9 @@ def test__dialect__base_broad_fix(
 
 @pytest.mark.integration
 @pytest.mark.parse_suite
-@pytest.mark.parametrize("dialect,sqlfile,code_only,yamlfile", parse_structure_examples)
+@pytest.mark.parametrize(
+    "dialect,sqlfile,code_only,yamlfile", parse_structure_examples
+)
 def test__dialect__base_parse_struct(
     dialect,
     sqlfile,

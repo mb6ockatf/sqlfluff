@@ -68,7 +68,8 @@ def nested_combine(*dicts: NestedStringDict[T]) -> NestedStringDict[T]:
                     # NOTE: The cast functions here are to appease mypy which doesn't
                     # pick up on the `isinstance` calls above.
                     r[k] = nested_combine(
-                        cast(NestedStringDict[T], r[k]), cast(NestedStringDict[T], d[k])
+                        cast(NestedStringDict[T], r[k]),
+                        cast(NestedStringDict[T], d[k]),
                     )
                 else:  # pragma: no cover
                     raise ValueError(
@@ -298,7 +299,9 @@ def nested_dict_set(
     # Do we have more keys to set?
     # If we do, recurse:
     if key_index + 1 < len(keys):
-        nested_dict_set(next_value, keys=keys, value=value, key_index=key_index + 1)
+        nested_dict_set(
+            next_value, keys=keys, value=value, key_index=key_index + 1
+        )
     # If we don't, then just set the value:
     else:
         dict_obj[next_key] = value

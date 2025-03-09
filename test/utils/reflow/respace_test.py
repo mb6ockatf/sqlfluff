@@ -32,8 +32,16 @@ def parse_ansi_string(sql, config):
         # Check filtering
         ("select  \n  1   +   2 \n ", {}, "select\n  1 + 2\n"),
         ("select  \n  1   +   2 \n ", {"filter": "all"}, "select\n  1 + 2\n"),
-        ("select  \n  1   +   2 \n ", {"filter": "inline"}, "select  \n  1 + 2 \n "),
-        ("select  \n  1   +   2 \n ", {"filter": "newline"}, "select\n  1   +   2\n"),
+        (
+            "select  \n  1   +   2 \n ",
+            {"filter": "inline"},
+            "select  \n  1 + 2 \n ",
+        ),
+        (
+            "select  \n  1   +   2 \n ",
+            {"filter": "newline"},
+            "select\n  1   +   2\n",
+        ),
     ],
 )
 def test_reflow__sequence_respace(
@@ -78,7 +86,13 @@ def test_reflow__sequence_respace(
     ],
 )
 def test_reflow__point_respace_point(
-    raw_sql_in, point_idx, kwargs, raw_point_sql_out, fixes_out, default_config, caplog
+    raw_sql_in,
+    point_idx,
+    kwargs,
+    raw_point_sql_out,
+    fixes_out,
+    default_config,
+    caplog,
 ):
     """Test the ReflowPoint.respace_point() method directly.
 

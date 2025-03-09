@@ -67,7 +67,9 @@ class Dialect:
         """
         # Are we already expanded?
         if self.expanded:  # pragma: no cover
-            raise ValueError("Attempted to re-expand an already expanded dialect.")
+            raise ValueError(
+                "Attempted to re-expand an already expanded dialect."
+            )
 
         expanded_copy = self.copy_as(name=self.name)
         # Expand any callable elements of the dialect.
@@ -88,7 +90,9 @@ class Dialect:
             for kw in keyword_sets:
                 n = kw.capitalize() + "KeywordSegment"
                 if n not in expanded_copy._library:
-                    expanded_copy._library[n] = StringParser(kw.lower(), KeywordSegment)
+                    expanded_copy._library[n] = StringParser(
+                        kw.lower(), KeywordSegment
+                    )
         expanded_copy.expanded = True
         return expanded_copy
 
@@ -188,7 +192,9 @@ class Dialect:
         """
         for n in kwargs:
             if n not in self._library:  # pragma: no cover
-                raise ValueError(f"{n!r} is not already registered in {self!r}")
+                raise ValueError(
+                    f"{n!r} is not already registered in {self!r}"
+                )
             replacement = kwargs[n]
             # If trying to replace with same, just skip.
             if self._library[n] is replacement:
@@ -229,7 +235,9 @@ class Dialect:
                     base_dir = set(dir(self._library[n]))
                     cls_dir = set(dir(new_seg))
                     missing = set(
-                        n for n in base_dir.difference(cls_dir) if not n.startswith("_")
+                        n
+                        for n in base_dir.difference(cls_dir)
+                        if not n.startswith("_")
                     )
                     if missing:
                         raise ValueError(  # pragma: no cover
@@ -349,7 +357,9 @@ class Dialect:
         if self.lexer_matchers:
             return self.lexer_matchers
         else:  # pragma: no cover
-            raise ValueError(f"Lexing struct has not been set for dialect {self}")
+            raise ValueError(
+                f"Lexing struct has not been set for dialect {self}"
+            )
 
     def patch_lexer_matchers(self, lexer_patch: List[LexerType]) -> None:
         """Patch an existing lexer struct.
@@ -358,7 +368,9 @@ class Dialect:
         """
         buff = []
         if not self.lexer_matchers:  # pragma: no cover
-            raise ValueError("Lexer struct must be defined before it can be patched!")
+            raise ValueError(
+                "Lexer struct must be defined before it can be patched!"
+            )
 
         # Make a new data struct for lookups
         patch_dict = {elem.name: elem for elem in lexer_patch}
@@ -371,7 +383,9 @@ class Dialect:
         # Overwrite with the buffer once we're done
         self.lexer_matchers = buff
 
-    def insert_lexer_matchers(self, lexer_patch: List[LexerType], before: str) -> None:
+    def insert_lexer_matchers(
+        self, lexer_patch: List[LexerType], before: str
+    ) -> None:
         """Insert new records into an existing lexer struct.
 
         Used to edit the lexer of a sub-dialect. The patch is
@@ -380,7 +394,9 @@ class Dialect:
         buff = []
         found = False
         if not self.lexer_matchers:  # pragma: no cover
-            raise ValueError("Lexer struct must be defined before it can be patched!")
+            raise ValueError(
+                "Lexer struct must be defined before it can be patched!"
+            )
 
         for elem in self.lexer_matchers:
             if elem.name == before:

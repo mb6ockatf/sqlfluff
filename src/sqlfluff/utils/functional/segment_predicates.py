@@ -47,7 +47,8 @@ def is_type(*seg_type: str) -> Callable[[BaseSegment], bool]:
 def is_keyword(*keyword_name: str) -> Callable[[BaseSegment], bool]:
     """Returns a function that determines if it's a matching keyword."""
     return and_(
-        is_type("keyword"), raw_upper_is(*[raw.upper() for raw in keyword_name])
+        is_type("keyword"),
+        raw_upper_is(*[raw.upper() for raw in keyword_name]),
     )
 
 
@@ -114,7 +115,9 @@ def get_type() -> Callable[[BaseSegment], str]:
     return _
 
 
-def and_(*functions: Callable[[BaseSegment], bool]) -> Callable[[BaseSegment], bool]:
+def and_(
+    *functions: Callable[[BaseSegment], bool]
+) -> Callable[[BaseSegment], bool]:
     """Returns a function that computes the functions and-ed together."""
 
     def _(segment: BaseSegment) -> bool:
@@ -123,7 +126,9 @@ def and_(*functions: Callable[[BaseSegment], bool]) -> Callable[[BaseSegment], b
     return _
 
 
-def or_(*functions: Callable[[BaseSegment], bool]) -> Callable[[BaseSegment], bool]:
+def or_(
+    *functions: Callable[[BaseSegment], bool]
+) -> Callable[[BaseSegment], bool]:
     """Returns a function that computes the functions or-ed together."""
 
     def _(segment: BaseSegment) -> bool:
@@ -184,6 +189,11 @@ def templated_slices(
     templated_slices = [
         slice_
         for slice_ in templated_file.sliced_file
-        if (stop > slice_.templated_slice.start and start < slice_.templated_slice.stop)
+        if (
+            stop > slice_.templated_slice.start
+            and start < slice_.templated_slice.stop
+        )
     ]
-    return TemplatedFileSlices(*templated_slices, templated_file=templated_file)
+    return TemplatedFileSlices(
+        *templated_slices, templated_file=templated_file
+    )

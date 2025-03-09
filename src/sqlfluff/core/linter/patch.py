@@ -52,7 +52,9 @@ def _iter_source_fix_patches(
             source_fix.edit,
             patch_category="source",
             source_slice=source_fix.source_slice,
-            templated_str=templated_file.templated_str[source_fix.templated_slice],
+            templated_str=templated_file.templated_str[
+                source_fix.templated_slice
+            ],
             source_str=templated_file.source_str[source_fix.source_slice],
         )
 
@@ -71,7 +73,9 @@ def _iter_templated_patches(
     """
     # Does it match? If so we can ignore it.
     assert segment.pos_marker
-    templated_raw = templated_file.templated_str[segment.pos_marker.templated_slice]
+    templated_raw = templated_file.templated_str[
+        segment.pos_marker.templated_slice
+    ]
     matches = segment.raw == templated_raw
     if matches:
         # First yield any source fixes
@@ -101,7 +105,9 @@ def _iter_templated_patches(
             templated_str=templated_file.templated_str[
                 segment.pos_marker.templated_slice
             ],
-            source_str=templated_file.source_str[segment.pos_marker.source_slice],
+            source_str=templated_file.source_str[
+                segment.pos_marker.source_slice
+            ],
         )
     # Can we go deeper?
     elif not segment.segments:
@@ -183,7 +189,9 @@ def _iter_templated_patches(
                 insert_buff = ""
 
             # Now we deal with any changes *within* the segment itself.
-            yield from _iter_templated_patches(seg, templated_file=templated_file)
+            yield from _iter_templated_patches(
+                seg, templated_file=templated_file
+            )
 
             # Once we've dealt with any patches from the segment, update
             # our position markers.
@@ -222,17 +230,23 @@ def _log_hints(patch: FixPatch, templated_file: TemplatedFile) -> None:
     max_log_length = 10
     if patch.templated_slice.start >= max_log_length:
         pre_hint = templated_file.templated_str[
-            patch.templated_slice.start - max_log_length : patch.templated_slice.start
+            patch.templated_slice.start
+            - max_log_length : patch.templated_slice.start
         ]
     else:
         pre_hint = templated_file.templated_str[: patch.templated_slice.start]
-    if patch.templated_slice.stop + max_log_length < len(templated_file.templated_str):
+    if patch.templated_slice.stop + max_log_length < len(
+        templated_file.templated_str
+    ):
         post_hint = templated_file.templated_str[
-            patch.templated_slice.stop : patch.templated_slice.stop + max_log_length
+            patch.templated_slice.stop : patch.templated_slice.stop
+            + max_log_length
         ]
     else:
         post_hint = templated_file.templated_str[patch.templated_slice.stop :]
-    linter_logger.debug("        Templated Hint: ...%r <> %r...", pre_hint, post_hint)
+    linter_logger.debug(
+        "        Templated Hint: ...%r <> %r...", pre_hint, post_hint
+    )
 
 
 def generate_source_patches(

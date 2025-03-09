@@ -229,7 +229,12 @@ def test_reflow_sequence_from_around_target_non_raw(default_config, caplog):
         ("SELECT \n 4, \n 6  ", "all", [2, 7, 12], []),
         ("SELECT \n 4, 5,  6   ,    7 \n 6  ", "newline", [2, 17, 21], []),
         ("SELECT \n 4, 5,  6   ,    7 \n 6  ", "inline", [12], [10, 14]),
-        ("SELECT \n 4, 5,  6    ,    7 \n 6  ", "all", [2, 12, 17, 21], [10, 14]),
+        (
+            "SELECT \n 4, 5,  6    ,    7 \n 6  ",
+            "all",
+            [2, 12, 17, 21],
+            [10, 14],
+        ),
     ],
 )
 def test_reflow_sequence_respace_filter(

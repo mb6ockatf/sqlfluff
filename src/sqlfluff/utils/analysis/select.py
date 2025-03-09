@@ -26,7 +26,9 @@ class SelectStatementColumnsAndTables(NamedTuple):
     table_reference_buffer: List[ObjectReferenceSegment]
 
 
-def _get_object_references(segment: BaseSegment) -> List[ObjectReferenceSegment]:
+def _get_object_references(
+    segment: BaseSegment,
+) -> List[ObjectReferenceSegment]:
     return list(
         cast(ObjectReferenceSegment, _seg)
         for _seg in segment.recursive_crawl(
@@ -41,7 +43,9 @@ def get_select_statement_info(
 ) -> Optional[SelectStatementColumnsAndTables]:
     """Analyze a select statement: targets, aliases, etc. Return info."""
     assert segment.is_type("select_statement")
-    table_aliases, standalone_aliases = get_aliases_from_select(segment, dialect)
+    table_aliases, standalone_aliases = get_aliases_from_select(
+        segment, dialect
+    )
     if early_exit and not table_aliases and not standalone_aliases:
         return None
 
@@ -153,7 +157,10 @@ def get_aliases_from_select(
     table_aliases = []
     for table_expr, alias_info in aliases:
         if _has_value_table_function(table_expr, dialect):
-            if alias_info.segment and alias_info.segment not in standalone_aliases:
+            if (
+                alias_info.segment
+                and alias_info.segment not in standalone_aliases
+            ):
                 standalone_aliases.append(alias_info.segment)
         elif alias_info not in table_aliases:
             table_aliases.append(alias_info)
@@ -174,7 +181,9 @@ def _has_value_table_function(
         # Other rules can increase whitespace in the function name, so use strip to
         # remove
         # See: https://github.com/sqlfluff/sqlfluff/issues/1304
-        if function_name.raw.upper().strip() in dialect.sets("value_table_functions"):
+        if function_name.raw.upper().strip() in dialect.sets(
+            "value_table_functions"
+        ):
             return True
     return False
 
@@ -194,7 +203,9 @@ def _get_pivot_table_columns(
 
     pivot_table_column_aliases: list[BaseSegment] = []
 
-    for pivot_table_column_alias in segment.recursive_crawl("pivot_column_reference"):
+    for pivot_table_column_alias in segment.recursive_crawl(
+        "pivot_column_reference"
+    ):
         if pivot_table_column_alias.raw not in [
             a.raw for a in pivot_table_column_aliases
         ]:
@@ -224,8 +235,12 @@ def _get_lambda_argument_columns(
         return []
 
     lambda_argument_columns: list[BaseSegment] = []
-    for potential_lambda in segment.recursive_crawl("expression", "lambda_function"):
-        potential_arrow = potential_lambda.get_child("binary_operator", "lambda_arrow")
+    for potential_lambda in segment.recursive_crawl(
+        "expression", "lambda_function"
+    ):
+        potential_arrow = potential_lambda.get_child(
+            "binary_operator", "lambda_arrow"
+        )
         if potential_arrow and potential_arrow.raw == "->":
             arrow_operator = potential_arrow
             # The arguments will be before the arrow operator, so we get anything
@@ -235,7 +250,9 @@ def _get_lambda_argument_columns(
             argument_segments = potential_lambda.select_children(
                 stop_seg=arrow_operator,
                 select_if=(
-                    lambda x: x.is_type("bracketed", "column_reference", "parameter")
+                    lambda x: x.is_type(
+                        "bracketed", "column_reference", "parameter"
+                    )
                 ),
             )
 
@@ -250,7 +267,9 @@ def _get_lambda_argument_columns(
                     bracketed_arguments = child_segment.get_children(
                         "column_reference", "parameter"
                     )
-                    raw_arguments = [argument for argument in bracketed_arguments]
+                    raw_arguments = [
+                        argument for argument in bracketed_arguments
+                    ]
                     lambda_argument_columns += raw_arguments
 
             elif child_segment.is_type("column_reference", "parameter"):

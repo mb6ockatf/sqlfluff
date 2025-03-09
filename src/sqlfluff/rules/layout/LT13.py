@@ -88,7 +88,9 @@ class Rule_LT13(BaseRule):
                 raw_segments.append(seg)
                 continue
 
-            raw_stack = Segments(*raw_segments, templated_file=context.templated_file)
+            raw_stack = Segments(
+                *raw_segments, templated_file=context.templated_file
+            )
             # Non-whitespace segment.
             if (
                 not raw_stack.all(sp.is_meta())
@@ -98,7 +100,9 @@ class Rule_LT13(BaseRule):
                 # should flag if a templated raw slice intersects with the
                 # source slices in the raw stack and skip this rule to avoid
                 # risking collisions with template objects.
-                and not raw_stack.raw_slices.any(rsp.is_slice_type("templated"))
+                and not raw_stack.raw_slices.any(
+                    rsp.is_slice_type("templated")
+                )
             ):
                 return LintResult(
                     anchor=context.segment,

@@ -58,7 +58,9 @@ class Rule_AM07(BaseRule):
     name = "ambiguous.set_columns"
     aliases = ("L068",)
     groups: Tuple[str, ...] = ("all", "ambiguous")
-    crawl_behaviour = SegmentSeekerCrawler({"set_expression"}, provide_raw_stack=True)
+    crawl_behaviour = SegmentSeekerCrawler(
+        {"set_expression"}, provide_raw_stack=True
+    )
 
     def __resolve_wild_query(
         self,
@@ -119,13 +121,17 @@ class Rule_AM07(BaseRule):
                 # Crawl inside the FROM expression looking for something to
                 # resolve to.
                 select_info_target = next(
-                    root_query.crawl_sources(alias_info.from_expression_element)
+                    root_query.crawl_sources(
+                        alias_info.from_expression_element
+                    )
                 )
 
                 if isinstance(select_info_target, str):
                     cte_name = select_info_target
                 else:
-                    _cols, _resolved = self.__resolve_wild_query(select_info_target)
+                    _cols, _resolved = self.__resolve_wild_query(
+                        select_info_target
+                    )
                     num_cols += _cols
                     resolved = resolved and _resolved
                     continue
@@ -148,16 +154,22 @@ class Rule_AM07(BaseRule):
         The selectable may or may not have wildcard (*) expressions.
         If it does, we attempt to resolve them.
         """
-        self.logger.debug("Resolving selectable: %r", selectable.selectable.raw)
+        self.logger.debug(
+            "Resolving selectable: %r", selectable.selectable.raw
+        )
         assert selectable.select_info
         wildcard_info = selectable.get_wildcard_info()
         # Start with the number of non-wild columns.
-        num_cols = len(selectable.select_info.select_targets) - len(wildcard_info)
+        num_cols = len(selectable.select_info.select_targets) - len(
+            wildcard_info
+        )
 
         # If there's no wildcard, just count the columns and move on.
         if not wildcard_info:
             # if there is no wildcard in the query use the count of select targets
-            self.logger.debug("Resolved N=%s: %r", num_cols, selectable.selectable.raw)
+            self.logger.debug(
+                "Resolved N=%s: %r", num_cols, selectable.selectable.raw
+            )
             return num_cols, True
 
         resolved = True
@@ -214,8 +226,8 @@ class Rule_AM07(BaseRule):
                 break
 
         query: Query = Query.from_segment(root, dialect=context.dialect)
-        set_segment_select_sizes, resolve_wildcard = self._get_select_target_counts(
-            query
+        set_segment_select_sizes, resolve_wildcard = (
+            self._get_select_target_counts(query)
         )
         self.logger.info(
             "Resolved select sizes (resolved wildcard: %s) : %s",

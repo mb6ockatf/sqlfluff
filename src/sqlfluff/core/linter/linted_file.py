@@ -12,7 +12,16 @@ import stat
 import tempfile
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, NamedTuple, Optional, Tuple, Type, Union
+from typing import (
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+)
 
 from sqlfluff.core.errors import (
     CheckTuple,
@@ -112,7 +121,9 @@ class LintedFile(NamedTuple):
                 new_violations.append(v)
                 dedupe_buffer.add(signature)
             else:
-                linter_logger.debug("Removing duplicate source violation: %r", v)
+                linter_logger.debug(
+                    "Removing duplicate source violation: %r", v
+                )
         # Sort on return so that if any are out of order, they're now ordered
         # appropriately. This happens most often when linting multiple variants.
         return sorted(new_violations, key=lambda v: (v.line_no, v.line_pos))
@@ -120,7 +131,9 @@ class LintedFile(NamedTuple):
     def get_violations(
         self,
         rules: Optional[Union[str, Tuple[str, ...]]] = None,
-        types: Optional[Union[Type[SQLBaseError], Iterable[Type[SQLBaseError]]]] = None,
+        types: Optional[
+            Union[Type[SQLBaseError], Iterable[Type[SQLBaseError]]]
+        ] = None,
         filter_ignore: bool = True,
         filter_warning: bool = True,
         warn_unused_ignores: bool = False,
@@ -152,13 +165,17 @@ class LintedFile(NamedTuple):
         if fixable is not None:
             # Assume that fixable is true or false if not None.
             # Fatal errors should always come through, regardless.
-            violations = [v for v in violations if v.fixable is fixable or v.fatal]
+            violations = [
+                v for v in violations if v.fixable is fixable or v.fatal
+            ]
         # Filter ignorable violations
         if filter_ignore:
             violations = [v for v in violations if not v.ignore]
             # Ignore any rules in the ignore mask
             if self.ignore_mask:
-                violations = self.ignore_mask.ignore_masked_violations(violations)
+                violations = self.ignore_mask.ignore_masked_violations(
+                    violations
+                )
         # Filter warning violations
         if filter_warning:
             violations = [v for v in violations if not v.warning]
@@ -169,7 +186,9 @@ class LintedFile(NamedTuple):
 
     def num_violations(
         self,
-        types: Optional[Union[Type[SQLBaseError], Iterable[Type[SQLBaseError]]]] = None,
+        types: Optional[
+            Union[Type[SQLBaseError], Iterable[Type[SQLBaseError]]]
+        ] = None,
         filter_ignore: bool = True,
         filter_warning: bool = True,
         fixable: Optional[bool] = None,
@@ -208,8 +227,12 @@ class LintedFile(NamedTuple):
         completely dialect agnostic. A Segment is determined by the
         Lexer from portions of strings after templating.
         """
-        assert self.templated_file, "Fixing a string requires successful templating."
-        linter_logger.debug("Original Tree: %r", self.templated_file.templated_str)
+        assert (
+            self.templated_file
+        ), "Fixing a string requires successful templating."
+        linter_logger.debug(
+            "Original Tree: %r", self.templated_file.templated_str
+        )
         assert self.tree, "Fixing a string requires successful parsing."
         linter_logger.debug("Fixed Tree: %r", self.tree.raw)
 
@@ -218,7 +241,9 @@ class LintedFile(NamedTuple):
         # It's also not the FIXED file either.
         linter_logger.debug("### Templated File.")
         for idx, file_slice in enumerate(self.templated_file.sliced_file):
-            t_str = self.templated_file.templated_str[file_slice.templated_slice]
+            t_str = self.templated_file.templated_str[
+                file_slice.templated_slice
+            ]
             s_str = self.templated_file.source_str[file_slice.source_slice]
             if t_str == s_str:
                 linter_logger.debug(
@@ -226,7 +251,9 @@ class LintedFile(NamedTuple):
                 )
             else:
                 linter_logger.debug("    File slice: %s %r", idx, file_slice)
-                linter_logger.debug("    \t\t\ttemplated: %r\tsource: %r", t_str, s_str)
+                linter_logger.debug(
+                    "    \t\t\ttemplated: %r\tsource: %r", t_str, s_str
+                )
 
         original_source = self.templated_file.source_str
 
@@ -248,7 +275,9 @@ class LintedFile(NamedTuple):
         # We now slice up the file using the patches and any source only slices.
         # This gives us regions to apply changes to.
         slice_buff = self._slice_source_file_using_patches(
-            filtered_source_patches, source_only_slices, self.templated_file.source_str
+            filtered_source_patches,
+            source_only_slices,
+            self.templated_file.source_str,
         )
 
         linter_logger.debug("Final slice buffer: %s", slice_buff)
@@ -405,7 +434,9 @@ class LintedFile(NamedTuple):
             success = True
 
         if formatter:
-            formatter.dispatch_persist_filename(filename=self.path, result=result_label)
+            formatter.dispatch_persist_filename(
+                filename=self.path, result=result_label
+            )
 
         return success
 

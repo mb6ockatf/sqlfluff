@@ -170,7 +170,9 @@ class Rule_CV11(BaseRule):
 
     @staticmethod
     def _shorthand_fix_list(
-        context: RuleContext, shorthand_arg_1: BaseSegment, shorthand_arg_2: BaseSegment
+        context: RuleContext,
+        shorthand_arg_1: BaseSegment,
+        shorthand_arg_2: BaseSegment,
     ) -> List[LintFix]:
         """Generate list of fixes to convert CAST and CONVERT to ShorthandCast."""
         if len(shorthand_arg_1.raw_segments) > 1:
@@ -238,7 +240,9 @@ class Rule_CV11(BaseRule):
         # convert_content = None
         if self.preferred_type_casting_style == "consistent":
             memory = context.memory
-            prior_type_casting_style = context.memory.get("prior_type_casting_style")
+            prior_type_casting_style = context.memory.get(
+                "prior_type_casting_style"
+            )
             previous_skipped = context.memory.get("previous_skipped")
 
             # if previous_skipped then we can skip the whole fix
@@ -372,7 +376,9 @@ class Rule_CV11(BaseRule):
                         functional_context.segment
                     )
 
-                    for data_type_idx, seg in enumerate(expression_datatype_segment):
+                    for data_type_idx, seg in enumerate(
+                        expression_datatype_segment
+                    ):
                         if seg.is_type("data_type"):
                             break
 

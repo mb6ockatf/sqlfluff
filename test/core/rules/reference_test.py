@@ -70,4 +70,7 @@ from sqlfluff.core.rules import reference
 )
 def test_object_ref_matches_table(possible_references, targets, result):
     """Test object_ref_matches_table()."""
-    assert reference.object_ref_matches_table(possible_references, targets) == result
+    assert (
+        reference.object_ref_matches_table(possible_references, targets)
+        == result
+    )

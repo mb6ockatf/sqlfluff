@@ -5,7 +5,10 @@ import os
 import pytest
 
 from sqlfluff.core.errors import SQLFluffUserError
-from sqlfluff.core.linter.discovery import _load_specs_from_lines, paths_from_path
+from sqlfluff.core.linter.discovery import (
+    _load_specs_from_lines,
+    paths_from_path,
+)
 
 
 def normalise_paths(paths):
@@ -38,7 +41,9 @@ def test__linter__path_from_paths__default():
 def test__linter__path_from_paths__exts():
     """Test configuration of file discovery."""
     paths = normalise_paths(
-        paths_from_path("test/fixtures/linter", target_file_exts=[".txt", ".txt.j2"])
+        paths_from_path(
+            "test/fixtures/linter", target_file_exts=[".txt", ".txt.j2"]
+        )
     )
     assert "test.fixtures.linter.passing.sql" not in paths
     assert "test.fixtures.linter.passing_cap_extension.SQL" not in paths
@@ -49,7 +54,9 @@ def test__linter__path_from_paths__exts():
 def test__linter__path_from_paths__file():
     """Test extracting paths from a file path."""
     paths = paths_from_path("test/fixtures/linter/indentation_errors.sql")
-    assert normalise_paths(paths) == {"test.fixtures.linter.indentation_errors.sql"}
+    assert normalise_paths(paths) == {
+        "test.fixtures.linter.indentation_errors.sql"
+    }
 
 
 def test__linter__path_from_paths__not_exist():
@@ -60,7 +67,9 @@ def test__linter__path_from_paths__not_exist():
 
 def test__linter__path_from_paths__not_exist_ignore():
     """Test extracting paths from a file path."""
-    paths = paths_from_path("asflekjfhsakuefhse", ignore_non_existent_files=True)
+    paths = paths_from_path(
+        "asflekjfhsakuefhse", ignore_non_existent_files=True
+    )
     assert len(paths) == 0
 
 

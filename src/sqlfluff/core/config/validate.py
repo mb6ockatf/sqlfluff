@@ -15,7 +15,9 @@ ALLOWABLE_LAYOUT_CONFIG_KEYS = (
 )
 
 
-def _validate_layout_config(config: ConfigMappingType, logging_reference: str) -> None:
+def _validate_layout_config(
+    config: ConfigMappingType, logging_reference: str
+) -> None:
     """Validate the layout config section of the config.
 
     We check for valid key values and for the depth of the
@@ -31,7 +33,9 @@ def _validate_layout_config(config: ConfigMappingType, logging_reference: str) -
     if not layout_section:
         return None
 
-    preamble = f"Config file {logging_reference!r} set an invalid `layout` option. "
+    preamble = (
+        f"Config file {logging_reference!r} set an invalid `layout` option. "
+    )
     reference = (
         "See https://docs.sqlfluff.com/en/stable/perma/layout.html"
         "#configuring-layout for more details."
@@ -62,7 +66,9 @@ def _validate_layout_config(config: ConfigMappingType, logging_reference: str) -
                 + reference
             )
 
-        invalid_keys = set(layout_section.keys()) - set(ALLOWABLE_LAYOUT_CONFIG_KEYS)
+        invalid_keys = set(layout_section.keys()) - set(
+            ALLOWABLE_LAYOUT_CONFIG_KEYS
+        )
         if invalid_keys:
             raise SQLFluffUserError(
                 preamble
@@ -83,7 +89,9 @@ def _validate_layout_config(config: ConfigMappingType, logging_reference: str) -
                     )
 
 
-def validate_config_dict(config: ConfigMappingType, logging_reference: str) -> None:
+def validate_config_dict(
+    config: ConfigMappingType, logging_reference: str
+) -> None:
     """Validate a config dict.
 
     Currently we validate:

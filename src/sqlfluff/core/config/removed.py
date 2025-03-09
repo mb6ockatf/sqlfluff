@@ -165,7 +165,8 @@ REMOVED_CONFIGS = [
 
 # Actually make a dict which matches the structure.
 REMOVED_CONFIG_MAP = records_to_nested_dict(
-    (removed_config.old_path, removed_config) for removed_config in REMOVED_CONFIGS
+    (removed_config.old_path, removed_config)
+    for removed_config in REMOVED_CONFIGS
 )
 
 

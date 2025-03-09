@@ -33,7 +33,9 @@ def generic_roundtrip_test(source_file, rulestring):
             dest_file.write(line)
     runner = CliRunner()
     # Check that we first detect the issue
-    result = runner.invoke(lint, ["--rules", rulestring, "--dialect=ansi", filepath])
+    result = runner.invoke(
+        lint, ["--rules", rulestring, "--dialect=ansi", filepath]
+    )
     assert result.exit_code == 1
     # Fix the file (in force mode)
     result = runner.invoke(
@@ -41,7 +43,9 @@ def generic_roundtrip_test(source_file, rulestring):
     )
     assert result.exit_code == 0
     # Now lint the file and check for exceptions
-    result = runner.invoke(lint, ["--rules", rulestring, "--dialect=ansi", filepath])
+    result = runner.invoke(
+        lint, ["--rules", rulestring, "--dialect=ansi", filepath]
+    )
     assert result.exit_code == 0
     shutil.rmtree(tempdir_path)
 

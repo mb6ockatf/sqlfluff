@@ -12,9 +12,17 @@ from sqlfluff.cli.helpers import LazySequence, pad_line, wrap_elem, wrap_field
         # Space wrap test
         ("how now brown cow", 10, ["how now", "brown cow"]),
         # Harder wrap test
-        ("A hippopotamus came for tea", 10, ["A hippopot", "amus came", "for tea"]),
+        (
+            "A hippopotamus came for tea",
+            10,
+            ["A hippopot", "amus came", "for tea"],
+        ),
         # Harder wrap test, with a newline.
-        ("A hippopotamus\ncame for tea", 10, ["A hippopot", "amus came", "for tea"]),
+        (
+            "A hippopotamus\ncame for tea",
+            10,
+            ["A hippopot", "amus came", "for tea"],
+        ),
     ],
 )
 def test__cli__helpers__wrap_elem(in_str, length, res):

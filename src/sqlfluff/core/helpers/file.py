@@ -17,7 +17,9 @@ def get_encoding(fname: str, config_encoding: str = "autodetect") -> str:
     return chardet.detect(data)["encoding"]
 
 
-def iter_intermediate_paths(inner_path: Path, outer_path: Path) -> Iterator[Path]:
+def iter_intermediate_paths(
+    inner_path: Path, outer_path: Path
+) -> Iterator[Path]:
     """Iterate paths between two given paths.
 
     If the `inner_path` is a subdirectory of the `outer_path` then all steps
@@ -48,7 +50,9 @@ def iter_intermediate_paths(inner_path: Path, outer_path: Path) -> Iterator[Path
 
     common_path: Optional[Path]
     try:
-        common_path = Path(os.path.commonpath([inner_path, outer_path])).absolute()
+        common_path = Path(
+            os.path.commonpath([inner_path, outer_path])
+        ).absolute()
     except ValueError:
         # Getting a value error means that we're likely on a windows system
         # and have been provided a `inner_path` and `outer_path` which are

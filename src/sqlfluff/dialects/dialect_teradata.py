@@ -137,7 +137,10 @@ teradata_dialect.replace(
     ),
     # match ANSI's naked identifier casefold, teradata is case-insensitive.
     QuotedIdentifierSegment=TypedParser(
-        "double_quote", IdentifierSegment, type="quoted_identifier", casefold=str.upper
+        "double_quote",
+        IdentifierSegment,
+        type="quoted_identifier",
+        casefold=str.upper,
     ),
 )
 
@@ -146,7 +149,9 @@ teradata_dialect.add(
     EqualsSegment_a=StringParser("EQ", ComparisonOperatorSegment),
     GreaterThanSegment_a=StringParser("GT", ComparisonOperatorSegment),
     LessThanSegment_a=StringParser("LT", ComparisonOperatorSegment),
-    GreaterThanOrEqualToSegment_a=StringParser("GE", ComparisonOperatorSegment),
+    GreaterThanOrEqualToSegment_a=StringParser(
+        "GE", ComparisonOperatorSegment
+    ),
     LessThanOrEqualToSegment_a=StringParser("LE", ComparisonOperatorSegment),
     NotEqualToSegment_a=StringParser("NE", ComparisonOperatorSegment),
     NotEqualToSegment_b=StringParser("NOT=", ComparisonOperatorSegment),
@@ -213,7 +218,9 @@ class BteqStatementSegment(BaseSegment):
             Ref("BteqKeyWordSegment"),
             # if ... then: the ...
             Sequence(
-                Ref("ComparisonOperatorGrammar"), Ref("LiteralGrammar"), optional=True
+                Ref("ComparisonOperatorGrammar"),
+                Ref("LiteralGrammar"),
+                optional=True,
             ),
             optional=True,
         ),
@@ -228,14 +235,18 @@ class TdCollectStatUsingOptionClauseSegment(BaseSegment):
     match_grammar = Sequence(
         OneOf(
             Sequence("SAMPLE", Ref("NumericLiteralSegment"), "PERCENT"),
-            Sequence("SYSTEM", "THRESHOLD", OneOf("PERCENT", "DAYS", optional=True)),
+            Sequence(
+                "SYSTEM", "THRESHOLD", OneOf("PERCENT", "DAYS", optional=True)
+            ),
             Sequence("SYSTEM", "SAMPLE"),
             Sequence(
                 "THRESHOLD",
                 Ref("NumericLiteralSegment"),
                 OneOf("PERCENT", "DAYS"),
             ),
-            Sequence("NO", "THRESHOLD", OneOf("PERCENT", "DAYS", optional=True)),
+            Sequence(
+                "NO", "THRESHOLD", OneOf("PERCENT", "DAYS", optional=True)
+            ),
             Sequence("NO", "SAMPLE"),
             Sequence("MAXINTERVALS", Ref("NumericLiteralSegment")),
             Sequence("SYSTEM", "MAXINTERVALS"),
@@ -252,7 +263,10 @@ class TdOrderByStatClauseSegment(BaseSegment):
 
     type = "stat_orderby_clause"
     match_grammar = Sequence(
-        "ORDER", "BY", OneOf("VALUES", "HASH"), Bracketed(Ref("ColumnReferenceSegment"))
+        "ORDER",
+        "BY",
+        OneOf("VALUES", "HASH"),
+        Bracketed(Ref("ColumnReferenceSegment")),
     )
 
 
@@ -518,7 +532,11 @@ class TdCreateTableOptions(BaseSegment):
                 # [NO | DUAL | LOCAL |NOT LOCAL] [AFTER | BEFORE] JOURNAL
                 Sequence(
                     OneOf(
-                        "NO", "DUAL", "LOCAL", Sequence("NOT", "LOCAL"), optional=True
+                        "NO",
+                        "DUAL",
+                        "LOCAL",
+                        Sequence("NOT", "LOCAL"),
+                        optional=True,
                     ),
                     OneOf("BEFORE", "AFTER", optional=True),
                     "JOURNAL",
@@ -601,7 +619,9 @@ class TdTableConstraints(BaseSegment):
                 Ref.keyword("UNIQUE", optional=True),
                 "PRIMARY",
                 "INDEX",
-                Ref("ObjectReferenceSegment", optional=True),  # primary index name
+                Ref(
+                    "ObjectReferenceSegment", optional=True
+                ),  # primary index name
                 OneOf(
                     Bracketed(
                         Delimited(
@@ -817,9 +837,11 @@ class SelectStatementSegment(ansi.SelectStatementSegment):
     https://dev.mysql.com/doc/refman/5.7/en/select.html
     """
 
-    match_grammar_with_qualify_clause = ansi.SelectStatementSegment.match_grammar.copy(
-        insert=[Ref("QualifyClauseSegment", optional=True)],
-        before=Ref("OrderByClauseSegment", optional=True),
+    match_grammar_with_qualify_clause = (
+        ansi.SelectStatementSegment.match_grammar.copy(
+            insert=[Ref("QualifyClauseSegment", optional=True)],
+            before=Ref("OrderByClauseSegment", optional=True),
+        )
     )
 
     match_grammar = match_grammar_with_qualify_clause.copy(
@@ -979,7 +1001,10 @@ class SetQueryBandStatementSegment(BaseSegment):
         OneOf(Ref("QuotedLiteralSegment"), "NONE"),
         Sequence("UPDATE", optional=True),
         "FOR",
-        OneOf(Sequence("SESSION", Sequence("VOLATILE", optional=True)), "TRANSACTION"),
+        OneOf(
+            Sequence("SESSION", Sequence("VOLATILE", optional=True)),
+            "TRANSACTION",
+        ),
     )
 
 

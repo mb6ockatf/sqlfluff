@@ -37,7 +37,9 @@ def _parse_mode_match_result(
 
     # Nothing in unmatched anyway?
     _stop_idx = current_match.matched_slice.stop
-    if _stop_idx == max_idx or all(not s.is_code for s in segments[_stop_idx:max_idx]):
+    if _stop_idx == max_idx or all(
+        not s.is_code for s in segments[_stop_idx:max_idx]
+    ):
         return current_match
 
     _trim_idx = skip_start_index_forward_to_code(segments, _stop_idx)
@@ -106,7 +108,9 @@ class AnyNumberOf(BaseGrammar):
         if any(elem is None for elem in option_simples):
             return None
         # We now know that there are no Nones.
-        simple_buff = cast(List[Tuple[FrozenSet[str], FrozenSet[str]]], option_simples)
+        simple_buff = cast(
+            List[Tuple[FrozenSet[str], FrozenSet[str]]], option_simples
+        )
         # Combine the lists
         simple_raws = [simple[0] for simple in simple_buff if simple[0]]
         simple_types = [simple[1] for simple in simple_buff if simple[1]]
@@ -226,7 +230,8 @@ class AnyNumberOf(BaseGrammar):
                 # Check if we have matched an option too many times.
                 if (
                     self.max_times_per_element
-                    and option_counter[matched_key] > self.max_times_per_element
+                    and option_counter[matched_key]
+                    > self.max_times_per_element
                 ):
                     # Return the match so far, without the most recent match.
                     return _parse_mode_match_result(
@@ -241,7 +246,9 @@ class AnyNumberOf(BaseGrammar):
             matched_idx = matched.matched_slice.stop
             working_idx = matched_idx
             if self.allow_gaps:
-                working_idx = skip_start_index_forward_to_code(segments, matched_idx)
+                working_idx = skip_start_index_forward_to_code(
+                    segments, matched_idx
+                )
             parse_context.update_progress(matched_idx)
             n_matches += 1
             # Continue around the loop...

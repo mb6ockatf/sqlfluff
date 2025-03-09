@@ -139,10 +139,14 @@ def assert_rule_fail_in_sql(
         if e.desc().startswith("Unexpected exception"):
             pytest.fail(f"Linter failed with {e.desc()}")  # pragma: no cover
     parse_errors = [
-        v for v in all_violations if isinstance(v, (SQLParseError, SQLTemplaterError))
+        v
+        for v in all_violations
+        if isinstance(v, (SQLParseError, SQLTemplaterError))
     ]
     if parse_errors:
-        pytest.fail(f"Found the following parse errors in test case: {parse_errors}")
+        pytest.fail(
+            f"Found the following parse errors in test case: {parse_errors}"
+        )
     lint_errors: List[SQLLintError] = [
         v for v in all_violations if isinstance(v, SQLLintError)
     ]
@@ -188,7 +192,9 @@ def assert_rule_pass_in_sql(
     linter = Linter(config=cfg)
 
     # This section is mainly for aid in debugging.
-    rendered = linter.render_string(sql, fname="<STR>", config=cfg, encoding="utf-8")
+    rendered = linter.render_string(
+        sql, fname="<STR>", config=cfg, encoding="utf-8"
+    )
     parsed = linter.parse_rendered(rendered)
     tree = parsed.tree  # Delegate assertions to the `.tree` property
     violations = parsed.violations
@@ -203,7 +209,9 @@ def assert_rule_pass_in_sql(
     # words, the "rendered" and "parsed" variables above are irrelevant to this
     # line of code.
     lint_result = linter.lint_string(sql, config=cfg, fname="<STR>")
-    lint_errors = [v for v in lint_result.violations if isinstance(v, SQLLintError)]
+    lint_errors = [
+        v for v in lint_result.violations if isinstance(v, SQLLintError)
+    ]
     if any(v.rule.code == code for v in lint_errors):
         print("Errors Found:")
         for e in lint_result.violations:
@@ -211,11 +219,16 @@ def assert_rule_pass_in_sql(
 
         if msg:
             print(msg)  # pragma: no cover
-        pytest.fail(f"Found {code} failures in query which should pass.", pytrace=False)
+        pytest.fail(
+            f"Found {code} failures in query which should pass.", pytrace=False
+        )
 
 
 def assert_rule_raises_violations_in_file(
-    rule: str, fpath: str, violations: List[Tuple[int, int]], fluff_config: FluffConfig
+    rule: str,
+    fpath: str,
+    violations: List[Tuple[int, int]],
+    fluff_config: FluffConfig,
 ) -> None:
     """Assert that a given rule raises given errors in specific positions of a file.
 
@@ -254,7 +267,9 @@ def assert_violations_before_fix(
         test_case.violations
     ), "Test case must have `violations` to call `assert_violations_before_fix()`"
     try:
-        assert violation_info == prep_violations(test_case.rule, test_case.violations)
+        assert violation_info == prep_violations(
+            test_case.rule, test_case.violations
+        )
     except AssertionError:  # pragma: no cover
         print(
             "Actual violations:\n",

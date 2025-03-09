@@ -141,7 +141,9 @@ class Rule_RF06(BaseRule):
         "ignore_words_regex",
         "case_sensitive",
     ]
-    crawl_behaviour = SegmentSeekerCrawler({"quoted_identifier", "naked_identifier"})
+    crawl_behaviour = SegmentSeekerCrawler(
+        {"quoted_identifier", "naked_identifier"}
+    )
     is_fix_compatible = True
 
     # Ignore "password_auth" type to allow quotes around passwords within
@@ -159,7 +161,9 @@ class Rule_RF06(BaseRule):
         self.case_sensitive: bool
 
         # Ignore some segment types
-        if FunctionalContext(context).parent_stack.any(sp.is_type(*self._ignore_types)):
+        if FunctionalContext(context).parent_stack.any(
+            sp.is_type(*self._ignore_types)
+        ):
             return None
 
         identifier_is_quoted = not regex.search(
@@ -170,9 +174,12 @@ class Rule_RF06(BaseRule):
         if identifier_is_quoted:
             identifier_contents = identifier_contents[1:-1]
 
-        identifier_is_keyword = identifier_contents.upper() in context.dialect.sets(
-            "reserved_keywords"
-        ) or identifier_contents.upper() in context.dialect.sets("unreserved_keywords")
+        identifier_is_keyword = (
+            identifier_contents.upper()
+            in context.dialect.sets("reserved_keywords")
+            or identifier_contents.upper()
+            in context.dialect.sets("unreserved_keywords")
+        )
 
         if self.prefer_quoted_identifiers:
             context_policy = "naked_identifier"
@@ -183,7 +190,10 @@ class Rule_RF06(BaseRule):
         ignore_words_list = self.ignore_words_list
 
         # Skip if in ignore list
-        if ignore_words_list and identifier_contents.lower() in ignore_words_list:
+        if (
+            ignore_words_list
+            and identifier_contents.lower() in ignore_words_list
+        ):
             return None
 
         # Skip if matches ignore regex
@@ -244,7 +254,10 @@ class Rule_RF06(BaseRule):
         # there is no casefolding (i.e. that the dialect is case sensitive, and
         # even when unquoted, and therefore we should never unquote).
         # EXCEPT: if we're in a totally case insensitive dialect like DuckDB.
-        is_case_insensitive_dialect = context.dialect.name in ("duckdb", "sparksql")
+        is_case_insensitive_dialect = context.dialect.name in (
+            "duckdb",
+            "sparksql",
+        )
         if (
             not is_case_insensitive_dialect
             and self.case_sensitive
@@ -290,5 +303,7 @@ class Rule_RF06(BaseRule):
         """
         ignore_words_config: str = str(getattr(self, "ignore_words"))
         if ignore_words_config and ignore_words_config != "None":
-            return self.split_comma_separated_string(ignore_words_config.lower())
+            return self.split_comma_separated_string(
+                ignore_words_config.lower()
+            )
         return []

@@ -77,14 +77,17 @@ class Rule_AL05(BaseRule):
         violations: List[LintResult] = []
         assert context.segment.is_type("select_statement")
         # Exit early if the SELECT does not define any aliases.
-        select_info = get_select_statement_info(context.segment, context.dialect)
+        select_info = get_select_statement_info(
+            context.segment, context.dialect
+        )
         if not select_info or not select_info.table_aliases:
             return None
 
         # Analyze the SELECT.
         alias: AliasInfo
         query = cast(
-            AL05Query, AL05Query.from_segment(context.segment, dialect=context.dialect)
+            AL05Query,
+            AL05Query.from_segment(context.segment, dialect=context.dialect),
         )
         self._analyze_table_aliases(query)
 
@@ -184,7 +187,9 @@ class Rule_AL05(BaseRule):
         return violations or None
 
     def _cs_str_id(self, identifier: BaseSegment):
-        _normal_val = identifier.raw_normalized(self.alias_case_check == "dialect")
+        _normal_val = identifier.raw_normalized(
+            self.alias_case_check == "dialect"
+        )
         if self.alias_case_check == "case_insensitive":
             _normal_val = _normal_val.upper()
         elif self.alias_case_check == "quoted_cs_naked_upper":
@@ -195,7 +200,9 @@ class Rule_AL05(BaseRule):
                 _normal_val = _normal_val.lower()
         return _normal_val
 
-    def _followed_by_qualify(self, context: RuleContext, alias: AliasInfo) -> bool:
+    def _followed_by_qualify(
+        self, context: RuleContext, alias: AliasInfo
+    ) -> bool:
         curr_from_seen = False
         assert alias.alias_expression
         for seg in context.segment.segments:
@@ -227,18 +234,23 @@ class Rule_AL05(BaseRule):
         # the FROM expression, potentially nested inside brackets. The reason we
         # allow nesting in brackets is that in some dialects (e.g. TSQL), this
         # is actually *required* in order for SQL Server to parse it.
-        for segment in from_expression_element.iter_segments(expanding=("bracketed",)):
+        for segment in from_expression_element.iter_segments(
+            expanding=("bracketed",)
+        ):
             if segment.is_type("table_expression"):
                 # Found a table expression. Does it have a VALUES clause?
                 if segment.get_child("values_clause"):
                     # Found a VALUES clause. Is this a dialect that requires
                     # VALUE clauses to be aliased?
                     return (
-                        dialect_name in self._dialects_requiring_alias_for_values_clause
+                        dialect_name
+                        in self._dialects_requiring_alias_for_values_clause
                     )
                 elif any(
                     seg.is_type(
-                        "select_statement", "set_expression", "with_compound_statement"
+                        "select_statement",
+                        "set_expression",
+                        "with_compound_statement",
                     )
                     for seg in segment.iter_segments(expanding=("bracketed",))
                 ):
@@ -267,7 +279,8 @@ class Rule_AL05(BaseRule):
                 # resolve the alias: could be an alias defined in "query"
                 # itself or an "ancestor" query.
                 for r in (
-                    select_info.reference_buffer + select_info.table_reference_buffer
+                    select_info.reference_buffer
+                    + select_info.table_reference_buffer
                 ):
                     for tr in r.extract_possible_references(
                         level=r.ObjectReferenceLevel.TABLE
@@ -281,10 +294,16 @@ class Rule_AL05(BaseRule):
         for child in query.children:
             self._analyze_table_aliases(cast(AL05Query, child))
 
-    def _resolve_and_mark_reference(self, query: AL05Query, ref: RawSegment) -> None:
+    def _resolve_and_mark_reference(
+        self, query: AL05Query, ref: RawSegment
+    ) -> None:
         # Does this query define the referenced alias?
         _ref = self._cs_str_id(ref)
-        if any(_ref == self._cs_str_id(a.segment) for a in query.aliases if a.segment):
+        if any(
+            _ref == self._cs_str_id(a.segment)
+            for a in query.aliases
+            if a.segment
+        ):
             # Yes. Record the reference.
             query.tbl_refs.add(_ref)
         elif query.parent:

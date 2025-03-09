@@ -46,7 +46,9 @@ class Rule_RF04(BaseRule):
     name = "references.keywords"
     aliases = ("L029",)
     groups = ("all", "references")
-    crawl_behaviour = SegmentSeekerCrawler({"naked_identifier", "quoted_identifier"})
+    crawl_behaviour = SegmentSeekerCrawler(
+        {"naked_identifier", "quoted_identifier"}
+    )
     config_keywords = [
         "unquoted_identifiers_policy",
         "quoted_identifiers_policy",
@@ -73,7 +75,10 @@ class Rule_RF04(BaseRule):
             ignore_words_list = self._init_ignore_string()
 
         # Skip if in ignore list
-        if ignore_words_list and context.segment.raw.lower() in ignore_words_list:
+        if (
+            ignore_words_list
+            and context.segment.raw.lower() in ignore_words_list
+        ):
             return LintResult(memory=context.memory)
 
         # Skip if matches ignore regex

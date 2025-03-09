@@ -130,19 +130,28 @@ class OutputStreamFormatter(FormatterInterface):
                 config_content.append(("dialect", linter.dialect.name))
             config_content += linter.templater.config_pairs()
             text_buffer.write(
-                self.cli_table(config_content, col_width=30, max_label_width=15)
+                self.cli_table(
+                    config_content, col_width=30, max_label_width=15
+                )
             )
             text_buffer.write("\n")
             if linter.config.get("rule_allowlist"):
                 text_buffer.write(
                     self.cli_table(
-                        [("rules", ", ".join(linter.config.get("rule_allowlist")))],
+                        [
+                            (
+                                "rules",
+                                ", ".join(linter.config.get("rule_allowlist")),
+                            )
+                        ],
                         col_width=41,
                     )
                 )
             if self.verbosity > 1:
                 text_buffer.write("\n== Raw Config:\n")
-                text_buffer.write(self.format_config_vals(linter.config.iter_vals()))
+                text_buffer.write(
+                    self.format_config_vals(linter.config.iter_vals())
+                )
         return text_buffer.getvalue()
 
     def dispatch_config(self, linter: Linter) -> None:
@@ -153,7 +162,9 @@ class OutputStreamFormatter(FormatterInterface):
         """Dispatch filenames during a persist operation."""
         # Only show the skip records at higher levels of verbosity
         if self.verbosity >= 2 or result != "SKIP":
-            self._dispatch(self.format_filename(filename=filename, success=result))
+            self._dispatch(
+                self.format_filename(filename=filename, success=result)
+            )
 
     def _format_path(self, path: str) -> str:
         """Format paths."""
@@ -169,7 +180,9 @@ class OutputStreamFormatter(FormatterInterface):
     ) -> None:
         """Dispatch the header displayed before templating."""
         if self.verbosity > 1:
-            self._dispatch(self.format_filename(filename=fname, success="TEMPLATING"))
+            self._dispatch(
+                self.format_filename(filename=fname, success="TEMPLATING")
+            )
             # This is where we output config diffs if they exist.
             if file_config:
                 # Only output config diffs if there is a config to diff to.
@@ -185,7 +198,9 @@ class OutputStreamFormatter(FormatterInterface):
     def dispatch_parse_header(self, fname: str) -> None:
         """Dispatch the header displayed before parsing."""
         if self.verbosity > 1:
-            self._dispatch(self.format_filename(filename=fname, success="PARSING"))
+            self._dispatch(
+                self.format_filename(filename=fname, success="PARSING")
+            )
 
     def dispatch_lint_header(self, fname: str, rules: List[str]) -> None:
         """Dispatch the header displayed before linting."""
@@ -196,7 +211,9 @@ class OutputStreamFormatter(FormatterInterface):
                 )
             )
 
-    def dispatch_compilation_header(self, templater: str, message: str) -> None:
+    def dispatch_compilation_header(
+        self, templater: str, message: str
+    ) -> None:
         """Dispatch the header displayed before linting."""
         self._dispatch(
             f"=== [{self.colorize(templater, Color.light)}] {message}"
@@ -212,7 +229,9 @@ class OutputStreamFormatter(FormatterInterface):
 
     def dispatch_dialect_warning(self, dialect) -> None:
         """Dispatch a warning for dialects."""
-        self._dispatch(self.format_dialect_warning(dialect))  # pragma: no cover
+        self._dispatch(
+            self.format_dialect_warning(dialect)
+        )  # pragma: no cover
 
     def _format_file_violations(
         self, fname: str, violations: List[SQLBaseError]
@@ -449,7 +468,9 @@ class OutputStreamFormatter(FormatterInterface):
         if name:
             desc += f" [{self.colorize(name, Color.light)}]"
 
-        split_desc = split_string_on_spaces(desc, line_length=max_line_length - 25)
+        split_desc = split_string_on_spaces(
+            desc, line_length=max_line_length - 25
+        )
 
         out_buff = ""
         # Grey out the violation if we're ignoring or warning it.
@@ -522,7 +543,9 @@ class OutputStreamFormatter(FormatterInterface):
             val = "" if v is None else str(v)
             text_buffer.write(
                 ("    " * i)
-                + self.colorize(pad_line(str(k) + ":", 20, "left"), color=Color.light)
+                + self.colorize(
+                    pad_line(str(k) + ":", 20, "left"), color=Color.light
+                )
                 + pad_line(val, 20, "left")
                 + "\n"
             )
@@ -601,7 +624,10 @@ class OutputStreamFormatter(FormatterInterface):
         )
 
     def print_out_residual_error_counts(
-        self, total_errors: int, num_filtered_errors: int, force_stderr: bool = False
+        self,
+        total_errors: int,
+        num_filtered_errors: int,
+        force_stderr: bool = False,
     ) -> None:
         """Output the residual error totals for the file.
 
@@ -615,7 +641,8 @@ class OutputStreamFormatter(FormatterInterface):
         if total_errors and not self.show_lint_violations:
             click.echo(
                 message=self.colorize(
-                    f"  [{total_errors} templating/parsing errors found]", Color.red
+                    f"  [{total_errors} templating/parsing errors found]",
+                    Color.red,
                 ),
                 color=self.plain_output,
                 err=True,
@@ -658,7 +685,9 @@ class OutputStreamFormatter(FormatterInterface):
             elif num_variants == 1:
                 # Backward compatible single parse
                 assert root_variant.tree
-                output_stream.write(root_variant.tree.stringify(code_only=code_only))
+                output_stream.write(
+                    root_variant.tree.stringify(code_only=code_only)
+                )
             else:
                 # Multi variant parse setup.
                 output_stream.write(
@@ -675,7 +704,9 @@ class OutputStreamFormatter(FormatterInterface):
                         )
                     )
                     if variant.tree:
-                        output_stream.write(variant.tree.stringify(code_only=code_only))
+                        output_stream.write(
+                            variant.tree.stringify(code_only=code_only)
+                        )
                     else:  # pragma: no cover
                         output_stream.write(
                             self.colorize("...Failed to Parse...", Color.red)
@@ -684,17 +715,25 @@ class OutputStreamFormatter(FormatterInterface):
             violations = parsed_string.violations
             violations_count += len(violations)
             if violations:
-                output_stream.write("==== parsing violations ====")  # pragma: no cover
+                output_stream.write(
+                    "==== parsing violations ===="
+                )  # pragma: no cover
             for v in violations:
-                output_stream.write(self.format_violation(v))  # pragma: no cover
+                output_stream.write(
+                    self.format_violation(v)
+                )  # pragma: no cover
             if violations:
                 output_stream.write(
-                    self.format_dialect_warning(parsed_string.config.get("dialect"))
+                    self.format_dialect_warning(
+                        parsed_string.config.get("dialect")
+                    )
                 )
 
             if verbose >= 2:
                 output_stream.write("==== timings ====")
-                output_stream.write(self.cli_table(parsed_string.time_dict.items()))
+                output_stream.write(
+                    self.cli_table(parsed_string.time_dict.items())
+                )
 
         if verbose >= 2 or bench:
             output_stream.write("==== overall timings ====")
@@ -702,7 +741,9 @@ class OutputStreamFormatter(FormatterInterface):
             timing_summary = timing.summary()
             for step in timing_summary:
                 output_stream.write(f"=== {step} ===")
-                output_stream.write(self.cli_table(timing_summary[step].items()))
+                output_stream.write(
+                    self.cli_table(timing_summary[step].items())
+                )
 
         return violations_count
 

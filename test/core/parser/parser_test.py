@@ -20,12 +20,15 @@ def test__parser__repr():
     # NOTE: For MultiStringParser we only test with one element here
     # because for more than one, the order is unpredictable.
     assert (
-        repr(MultiStringParser(["a"], KeywordSegment)) == "<MultiStringParser: {'A'}>"
+        repr(MultiStringParser(["a"], KeywordSegment))
+        == "<MultiStringParser: {'A'}>"
     )
     # For the typed & regex parser it's case sensitive (although lowercase
     # by convention).
     assert repr(TypedParser("foo", KeywordSegment)) == "<TypedParser: 'foo'>"
-    assert repr(RegexParser(r"fo|o", KeywordSegment)) == "<RegexParser: 'fo|o'>"
+    assert (
+        repr(RegexParser(r"fo|o", KeywordSegment)) == "<RegexParser: 'fo|o'>"
+    )
 
 
 class ExampleSegment(RawSegment):

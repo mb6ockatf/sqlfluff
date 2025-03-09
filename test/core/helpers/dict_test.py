@@ -67,7 +67,9 @@ def test__helpers_dict__dict_diff():
 
 def test__config__iter_records_from_nested_dict():
     """Test conversion from nested dict to records."""
-    c = iter_records_from_nested_dict({"a": {"b": {"c": 123, "d": 456}, "f": 6}})
+    c = iter_records_from_nested_dict(
+        {"a": {"b": {"c": 123, "d": 456}, "f": 6}}
+    )
     assert list(c) == [
         (("a", "b", "c"), 123),
         (("a", "b", "d"), 456),

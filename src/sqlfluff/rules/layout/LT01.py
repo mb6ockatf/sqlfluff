@@ -60,12 +60,24 @@ class Rule_LT01(BaseRule):
     # - L039: Unnecessary Whitespace
     # - L048: Spacing around quoted literals
     # - L071: Spacing around brackets
-    aliases = ("L001", "L005", "L006", "L008", "L023", "L024", "L039", "L048", "L071")
+    aliases = (
+        "L001",
+        "L005",
+        "L006",
+        "L008",
+        "L023",
+        "L024",
+        "L039",
+        "L048",
+        "L071",
+    )
     groups = ("all", "core", "layout")
     crawl_behaviour = RootOnlyCrawler()
     is_fix_compatible = True
 
     def _eval(self, context: RuleContext) -> Optional[List[LintResult]]:
         """Unnecessary whitespace."""
-        sequence = ReflowSequence.from_root(context.segment, config=context.config)
+        sequence = ReflowSequence.from_root(
+            context.segment, config=context.config
+        )
         return sequence.respace().get_results()

@@ -50,7 +50,8 @@ def test__plugin_manager_registers_example_plugin():
         # Use sets in case the dbt plugin (or other plugins) are
         # already installed too.
         installed_plugins = set(
-            plugin_module.__name__ for plugin_module in plugin_manager.get_plugins()
+            plugin_module.__name__
+            for plugin_module in plugin_manager.get_plugins()
         )
 
     print(f"Installed plugins: {installed_plugins}")
@@ -79,7 +80,9 @@ def test__plugin_example_rules_returned(rule_ref):
     plugin_manager = get_plugin_manager()
     # The plugin import order is non-deterministic
     rule_names = [
-        rule.__name__ for rules in plugin_manager.hook.get_rules() for rule in rules
+        rule.__name__
+        for rules in plugin_manager.hook.get_rules()
+        for rule in rules
     ]
     print(f"Rule names: {rule_names}")
     assert rule_ref in rule_names

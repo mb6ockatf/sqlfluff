@@ -17,7 +17,11 @@ from sqlfluff.dialects.dialect_ansi import ObjectReferenceSegment
 from sqlfluff.utils.analysis.query import Query
 from sqlfluff.utils.analysis.select import SelectStatementColumnsAndTables
 
-_START_TYPES = ["select_statement", "set_expression", "with_compound_statement"]
+_START_TYPES = [
+    "select_statement",
+    "set_expression",
+    "with_compound_statement",
+]
 
 
 class Rule_RF03(BaseRule):
@@ -71,7 +75,9 @@ class Rule_RF03(BaseRule):
     ]
     # If any of the parents would have also triggered the rule, don't fire
     # because they will more accurately process any internal references.
-    crawl_behaviour = SegmentSeekerCrawler(set(_START_TYPES), allow_recurse=False)
+    crawl_behaviour = SegmentSeekerCrawler(
+        set(_START_TYPES), allow_recurse=False
+    )
     _is_struct_dialect = False
     _dialects_with_structs = ["bigquery", "hive", "redshift"]
     # This could be turned into an option
@@ -94,7 +100,9 @@ class Rule_RF03(BaseRule):
         if context.dialect.name in self._dialects_with_structs:
             self._is_struct_dialect = True
 
-        query: Query = Query.from_segment(context.segment, dialect=context.dialect)
+        query: Query = Query.from_segment(
+            context.segment, dialect=context.dialect
+        )
         visited: Set = set()
         # Recursively visit and check each query in the tree.
         return list(self._visit_queries(query, visited))
@@ -112,10 +120,14 @@ class Rule_RF03(BaseRule):
                     ):
                         # Skip the subquery alias itself
                         continue
-                    if (subquery and not alias.object_reference) or alias.ref_str:
+                    if (
+                        subquery and not alias.object_reference
+                    ) or alias.ref_str:
                         yield alias
 
-    def _visit_queries(self, query: Query, visited: set) -> Iterator[LintResult]:
+    def _visit_queries(
+        self, query: Query, visited: set
+    ) -> Iterator[LintResult]:
         select_info: Optional[SelectStatementColumnsAndTables] = None
         if query.selectables:
             select_info = query.selectables[0].select_info
@@ -303,7 +315,9 @@ def _validate_one_reference(
         fixes = [
             LintFix.create_before(
                 ref.segments[0] if len(ref.segments) else ref,
-                source=[table_ref_str_source] if table_ref_str_source else None,
+                source=(
+                    [table_ref_str_source] if table_ref_str_source else None
+                ),
                 edit_segments=[
                     IdentifierSegment(
                         raw=table_ref_str,

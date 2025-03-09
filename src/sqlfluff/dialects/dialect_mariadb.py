@@ -167,11 +167,15 @@ class CreateTableStatementSegment(mysql.CreateTableStatementSegment):
                         OneOf("RANGE", "LIST"),
                         OneOf(
                             Ref("ExpressionSegment"),
-                            Bracketed(Delimited(Ref("ColumnReferenceSegment"))),
+                            Bracketed(
+                                Delimited(Ref("ColumnReferenceSegment"))
+                            ),
                         ),
                     ),
                 ),
-                Sequence("PARTITIONS", Ref("NumericLiteralSegment"), optional=True),
+                Sequence(
+                    "PARTITIONS", Ref("NumericLiteralSegment"), optional=True
+                ),
                 Sequence(
                     "SUBPARTITION",
                     "BY",
@@ -219,7 +223,9 @@ class CreateTableStatementSegment(mysql.CreateTableStatementSegment):
                                                             ES,
                                                             CRS,
                                                             NLS,
-                                                            Ref("LiteralGrammar"),
+                                                            Ref(
+                                                                "LiteralGrammar"
+                                                            ),
                                                         ),
                                                     ),
                                                 ),
@@ -227,7 +233,9 @@ class CreateTableStatementSegment(mysql.CreateTableStatementSegment):
                                             Sequence(
                                                 "IN",
                                                 Bracketed(
-                                                    Ref("ObjectReferenceSegment")
+                                                    Ref(
+                                                        "ObjectReferenceSegment"
+                                                    )
                                                 ),
                                             ),
                                         ),
@@ -247,17 +255,25 @@ class CreateTableStatementSegment(mysql.CreateTableStatementSegment):
                                             Ref("LiteralGrammar"),
                                             Ref("ParameterNameSegment"),
                                             Ref("QuotedLiteralSegment"),
-                                            Ref("SingleQuotedIdentifierSegment"),
+                                            Ref(
+                                                "SingleQuotedIdentifierSegment"
+                                            ),
                                             Ref("NumericLiteralSegment"),
                                             # Union option
                                             Bracketed(
-                                                Delimited(Ref("TableReferenceSegment")),
+                                                Delimited(
+                                                    Ref(
+                                                        "TableReferenceSegment"
+                                                    )
+                                                ),
                                             ),
                                         ),
                                     ),
                                     # optional subpartition_definition(s)
                                     Sequence(
-                                        Ref.keyword("SUBPARTITION", optional=True),
+                                        Ref.keyword(
+                                            "SUBPARTITION", optional=True
+                                        ),
                                         Ref("LiteralGrammar"),
                                         AnyNumberOf(
                                             Sequence(
@@ -280,8 +296,12 @@ class CreateTableStatementSegment(mysql.CreateTableStatementSegment):
                                             ),
                                             Sequence(
                                                 OneOf(
-                                                    Ref("ParameterNameSegment"),
-                                                    Sequence("CHARACTER", "SET"),
+                                                    Ref(
+                                                        "ParameterNameSegment"
+                                                    ),
+                                                    Sequence(
+                                                        "CHARACTER", "SET"
+                                                    ),
                                                     Sequence(
                                                         OneOf("DATA", "INDEX"),
                                                         "DIRECTORY",
@@ -294,10 +314,16 @@ class CreateTableStatementSegment(mysql.CreateTableStatementSegment):
                                                 ),
                                                 OneOf(
                                                     Ref("LiteralGrammar"),
-                                                    Ref("ParameterNameSegment"),
-                                                    Ref("QuotedLiteralSegment"),
+                                                    Ref(
+                                                        "ParameterNameSegment"
+                                                    ),
+                                                    Ref(
+                                                        "QuotedLiteralSegment"
+                                                    ),
                                                     SQIS,
-                                                    Ref("NumericLiteralSegment"),
+                                                    Ref(
+                                                        "NumericLiteralSegment"
+                                                    ),
                                                     # Union option
                                                     Bracketed(
                                                         Delimited(TRS),
@@ -405,7 +431,9 @@ class FlushStatementSegment(mysql.FlushStatementSegment):
             Sequence(
                 "TABLES",
                 Sequence(
-                    Delimited(Ref("TableReferenceSegment"), terminators=["WITH"]),
+                    Delimited(
+                        Ref("TableReferenceSegment"), terminators=["WITH"]
+                    ),
                     optional=True,
                 ),
                 Sequence(
@@ -419,7 +447,9 @@ class FlushStatementSegment(mysql.FlushStatementSegment):
             Sequence(
                 "TABLES",
                 Sequence(
-                    Delimited(Ref("TableReferenceSegment"), terminators=["FOR"]),
+                    Delimited(
+                        Ref("TableReferenceSegment"), terminators=["FOR"]
+                    ),
                     optional=False,
                 ),
                 Sequence("FOR", "EXPORT", optional=True),

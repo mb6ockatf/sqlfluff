@@ -95,7 +95,8 @@ class BaseFileSegment(BaseSegment):
         if not match:
             content = (
                 UnparsableSegment(
-                    segments[_start_idx:_end_idx], expected=str(cls.match_grammar)
+                    segments[_start_idx:_end_idx],
+                    expected=str(cls.match_grammar),
                 ),
             )
         elif _unmatched:
@@ -108,7 +109,8 @@ class BaseFileSegment(BaseSegment):
                 + _unmatched[:_idx]
                 + (
                     UnparsableSegment(
-                        _unmatched[_idx:], expected="Nothing else in FileSegment."
+                        _unmatched[_idx:],
+                        expected="Nothing else in FileSegment.",
                     ),
                 )
             )

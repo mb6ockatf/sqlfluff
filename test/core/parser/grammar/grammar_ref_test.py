@@ -22,7 +22,10 @@ def test_dialect():
         [
             RegexLexer("whitespace", r"[^\S\r\n]+", WhitespaceSegment),
             RegexLexer(
-                "code", r"[0-9a-zA-Z_]+", CodeSegment, segment_kwargs={"type": "code"}
+                "code",
+                r"[0-9a-zA-Z_]+",
+                CodeSegment,
+                segment_kwargs={"type": "code"},
             ),
         ]
     )
@@ -68,7 +71,9 @@ def test__parser__grammar_ref_match(generate_test_segments, test_dialect):
     )
 
 
-def test__parser__grammar_ref_exclude(generate_test_segments, fresh_ansi_dialect):
+def test__parser__grammar_ref_exclude(
+    generate_test_segments, fresh_ansi_dialect
+):
     """Test the Ref grammar exclude option with the match method."""
     identifier = Ref("NakedIdentifierSegment", exclude=Ref.keyword("ABS"))
     test_segments = generate_test_segments(["ABS", "ABSOLUTE"])

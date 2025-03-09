@@ -58,7 +58,9 @@ class Rule_CV05(BaseRule):
 
         # Allow assignments in EXEC clauses, or any other explicit assignments
         if context.parent_stack and context.parent_stack[-1].is_type(
-            "set_clause_list", "execute_script_statement", "assignment_operator"
+            "set_clause_list",
+            "execute_script_statement",
+            "assignment_operator",
         ):
             return None
 

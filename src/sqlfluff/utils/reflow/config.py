@@ -43,7 +43,9 @@ class BlockConfig:
             within or config.get("spacing_within", None) or self.spacing_within
         )
         self.line_position = (
-            line_position or config.get("line_position", None) or self.line_position
+            line_position
+            or config.get("line_position", None)
+            or self.line_position
         )
         self.keyword_line_position = (
             keyword_line_position
@@ -76,7 +78,9 @@ class ReflowConfig:
     ignore_comment_lines: bool = False
 
     @classmethod
-    def from_dict(cls, config_dict: ConfigDictType, **kwargs: Any) -> "ReflowConfig":
+    def from_dict(
+        cls, config_dict: ConfigDictType, **kwargs: Any
+    ) -> "ReflowConfig":
         """Construct a ReflowConfig from a dict."""
         config_types = set(config_dict.keys())
         # Enrich any of the "align" keys with what they're aligning with.
@@ -89,9 +93,13 @@ class ReflowConfig:
                     if config_dict[seg_type].get("align_within", None):
                         new_key += ":" + config_dict[seg_type]["align_within"]
                         if config_dict[seg_type].get("align_scope", None):
-                            new_key += ":" + config_dict[seg_type]["align_scope"]
+                            new_key += (
+                                ":" + config_dict[seg_type]["align_scope"]
+                            )
                     config_dict[seg_type][key] = new_key
-        return cls(_config_dict=config_dict, config_types=config_types, **kwargs)
+        return cls(
+            _config_dict=config_dict, config_types=config_types, **kwargs
+        )
 
     @classmethod
     def from_fluff_config(cls, config: FluffConfig) -> "ReflowConfig":
@@ -109,7 +117,9 @@ class ReflowConfig:
                 "allow_implicit_indents", ["indentation"]
             ),
             trailing_comments=config.get("trailing_comments", ["indentation"]),
-            ignore_comment_lines=config.get("ignore_comment_lines", ["indentation"]),
+            ignore_comment_lines=config.get(
+                "ignore_comment_lines", ["indentation"]
+            ),
         )
 
     def get_block_config(
@@ -138,7 +148,10 @@ class ReflowConfig:
             parent_start, parent_end = True, True
             for idx, key in enumerate(depth_info.stack_hashes[::-1]):
                 # Work out if we're allowed to claim the parent.
-                if depth_info.stack_positions[key].type not in ("solo", "start"):
+                if depth_info.stack_positions[key].type not in (
+                    "solo",
+                    "start",
+                ):
                     parent_start = False
                 if depth_info.stack_positions[key].type not in ("solo", "end"):
                     parent_end = False
@@ -146,18 +159,24 @@ class ReflowConfig:
                     break
                 # Get corresponding classes.
                 parent_classes = depth_info.stack_class_types[-1 - idx]
-                configured_parent_types = self.config_types.intersection(parent_classes)
+                configured_parent_types = self.config_types.intersection(
+                    parent_classes
+                )
                 # Claim the _before_ config if at the start.
                 if parent_start:
                     for seg_type in configured_parent_types:
                         block_config.incorporate(
-                            before=self._config_dict[seg_type].get("spacing_before")
+                            before=self._config_dict[seg_type].get(
+                                "spacing_before"
+                            )
                         )
                 # Claim the _after_ config if at the end.
                 if parent_end:
                     for seg_type in configured_parent_types:
                         block_config.incorporate(
-                            after=self._config_dict[seg_type].get("spacing_after")
+                            after=self._config_dict[seg_type].get(
+                                "spacing_after"
+                            )
                         )
 
         # Second: With the types of the raw segment itself.

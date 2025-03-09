@@ -309,11 +309,16 @@ def load_config_up_to_path(
         # here
         parent_config_paths = parent_config_paths[1:-1]
         parent_config_stack = [
-            load_config_at_path(str(p.resolve())) for p in list(parent_config_paths)
+            load_config_at_path(str(p.resolve()))
+            for p in list(parent_config_paths)
         ]
         # Resolve paths to ensure caching is accurate.
-        config_paths = iter_intermediate_paths(Path(path).absolute(), Path.cwd())
-        config_stack = [load_config_at_path(str(p.resolve())) for p in config_paths]
+        config_paths = iter_intermediate_paths(
+            Path(path).absolute(), Path.cwd()
+        )
+        config_stack = [
+            load_config_at_path(str(p.resolve())) for p in config_paths
+        ]
 
     # 4) Extra config paths.
     # When calling `load_config_file_as_dict` we resolve the path first so that caching

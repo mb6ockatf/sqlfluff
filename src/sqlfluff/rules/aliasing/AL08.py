@@ -3,7 +3,12 @@
 from typing import Dict, Optional, Tuple
 
 from sqlfluff.core.parser import BaseSegment
-from sqlfluff.core.rules import BaseRule, EvalResultType, LintResult, RuleContext
+from sqlfluff.core.rules import (
+    BaseRule,
+    EvalResultType,
+    LintResult,
+    RuleContext,
+)
 from sqlfluff.core.rules.crawlers import SegmentSeekerCrawler
 
 
@@ -75,7 +80,9 @@ class Rule_AL08(BaseRule):
         violations = []
 
         # Work through each of the elements
-        for clause_element in context.segment.get_children("select_clause_element"):
+        for clause_element in context.segment.get_children(
+            "select_clause_element"
+        ):
             # Is there an alias expression?
             alias_expression = clause_element.get_child("alias_expression")
             column_alias: Optional[BaseSegment] = None

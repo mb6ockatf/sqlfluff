@@ -21,7 +21,9 @@ def test_reflow_depthmap_from_parent(default_config):
     # What we can do is use them.
 
     # Check that we get the right depths.
-    assert [dm.depth_info[seg.uuid].stack_depth for seg in root.raw_segments] == [
+    assert [
+        dm.depth_info[seg.uuid].stack_depth for seg in root.raw_segments
+    ] == [
         4,
         4,
         4,
@@ -32,7 +34,11 @@ def test_reflow_depthmap_from_parent(default_config):
     # Check they all share the same first three hash and
     # class type elements (except the end of file marker at the end).
     # These should be the file, statement and select statement.
-    expected = ({"file", "base"}, {"statement", "base"}, {"select_statement", "base"})
+    expected = (
+        {"file", "base"},
+        {"statement", "base"},
+        {"select_statement", "base"},
+    )
     assert all(
         dm.depth_info[seg.uuid].stack_class_types[:3] == expected
         for seg in root.raw_segments[:-1]
@@ -87,11 +93,17 @@ def test_reflow_depthmap_order_by(default_config):
     order_seg_di = depth_map.get_depth_info(order_seg)
     desc_seg_di = depth_map.get_depth_info(desc_seg)
     # Make sure they both contain an order by clause.
-    assert frozenset({"base", "orderby_clause"}) in order_seg_di.stack_class_types
-    assert frozenset({"base", "orderby_clause"}) in desc_seg_di.stack_class_types
+    assert (
+        frozenset({"base", "orderby_clause"}) in order_seg_di.stack_class_types
+    )
+    assert (
+        frozenset({"base", "orderby_clause"}) in desc_seg_di.stack_class_types
+    )
     # Get the ID of one and make sure it's in the other
     order_by_hash = order_seg_di.stack_hashes[
-        order_seg_di.stack_class_types.index(frozenset({"base", "orderby_clause"}))
+        order_seg_di.stack_class_types.index(
+            frozenset({"base", "orderby_clause"})
+        )
     ]
     assert order_by_hash in order_seg_di.stack_hashes
     assert order_by_hash in desc_seg_di.stack_hashes

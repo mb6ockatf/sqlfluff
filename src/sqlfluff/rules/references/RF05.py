@@ -53,7 +53,9 @@ class Rule_RF05(BaseRule):
         "ignore_words",
         "ignore_words_regex",
     ]
-    crawl_behaviour = SegmentSeekerCrawler({"quoted_identifier", "naked_identifier"})
+    crawl_behaviour = SegmentSeekerCrawler(
+        {"quoted_identifier", "naked_identifier"}
+    )
 
     def _get_additional_allowed_characters(self, dialect_name: str) -> str:
         """Returns additional allowed characters, with adjustments for dialect."""
@@ -187,7 +189,9 @@ class Rule_RF05(BaseRule):
                 # Example configurations for table:
                 # https://spark.apache.org/docs/latest/sql-data-sources-parquet.html#configuration
                 #
-                if context.parent_stack[-1].is_type("property_name_identifier"):
+                if context.parent_stack[-1].is_type(
+                    "property_name_identifier"
+                ):
                     identifier = identifier.replace(".", "")
 
             # Strip spaces if allowed (note a separate config as only valid for quoted
@@ -208,8 +212,8 @@ class Rule_RF05(BaseRule):
             identifier = identifier[1:]
 
         # Set the identified minus the allowed characters
-        additional_allowed_characters = self._get_additional_allowed_characters(
-            context.dialect.name
+        additional_allowed_characters = (
+            self._get_additional_allowed_characters(context.dialect.name)
         )
         if additional_allowed_characters:
             identifier = identifier.translate(
@@ -217,9 +221,9 @@ class Rule_RF05(BaseRule):
             )
 
         # Finally test if the remaining identifier is only made up of alphanumerics
-        if identifiers_policy_applicable(policy, context.parent_stack) and not (
-            identifier.isalnum()
-        ):
+        if identifiers_policy_applicable(
+            policy, context.parent_stack
+        ) and not (identifier.isalnum()):
             return LintResult(anchor=context.segment)
 
         return None

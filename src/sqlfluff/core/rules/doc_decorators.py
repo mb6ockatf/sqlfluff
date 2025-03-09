@@ -34,7 +34,9 @@ def document_groups(cls: Type["BaseRule"]) -> Type["BaseRule"]:
     return cls
 
 
-def document_configuration(cls: Type["BaseRule"], **kwargs: Any) -> Type["BaseRule"]:
+def document_configuration(
+    cls: Type["BaseRule"], **kwargs: Any
+) -> Type["BaseRule"]:
     """Add a 'Configuration' section to a Rule docstring."""
     rules_logger.warning(
         f"{cls.__name__} uses the @document_configuration decorator "

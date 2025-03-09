@@ -14,7 +14,9 @@ class Parser:
     """Instantiates parsed queries from a sequence of lexed raw segments."""
 
     def __init__(
-        self, config: Optional[FluffConfig] = None, dialect: Optional[str] = None
+        self,
+        config: Optional[FluffConfig] = None,
+        dialect: Optional[str] = None,
     ):
         if config and dialect:
             raise ValueError(  # pragma: no cover

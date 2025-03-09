@@ -55,7 +55,9 @@ class Rule_AM05(BaseRule):
         assert context.segment.is_type("join_clause")
 
         join_clause_keywords = [
-            segment for segment in context.segment.segments if segment.type == "keyword"
+            segment
+            for segment in context.segment.segments
+            if segment.type == "keyword"
         ]
 
         # Identify LEFT/RIGHT/OUTER JOIN and if the next keyword is JOIN.
@@ -65,7 +67,9 @@ class Rule_AM05(BaseRule):
             and join_clause_keywords[1].raw_upper == "JOIN"
         ):
             # Define basic-level OUTER capitalization based on JOIN
-            outer_kw = ("outer", "OUTER")[join_clause_keywords[1].raw == "JOIN"]
+            outer_kw = ("outer", "OUTER")[
+                join_clause_keywords[1].raw == "JOIN"
+            ]
             # Insert OUTER after LEFT/RIGHT/FULL
             return LintResult(
                 context.segment.segments[0],
@@ -83,7 +87,9 @@ class Rule_AM05(BaseRule):
             and join_clause_keywords[0].raw_upper == "JOIN"
         ):
             # Define basic-level INNER capitalization based on JOIN
-            inner_kw = ("inner", "INNER")[join_clause_keywords[0].raw == "JOIN"]
+            inner_kw = ("inner", "INNER")[
+                join_clause_keywords[0].raw == "JOIN"
+            ]
             # Replace lone JOIN with INNER JOIN.
             return LintResult(
                 context.segment.segments[0],

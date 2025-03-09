@@ -137,7 +137,9 @@ class PositionMarker:
         )
         templated_files = {m.templated_file for m in markers if m}
         if len(templated_files) != 1:  # pragma: no cover
-            raise ValueError("Attempted to make a parent marker from multiple files.")
+            raise ValueError(
+                "Attempted to make a parent marker from multiple files."
+            )
         templated_file = templated_files.pop()
         return cls(source_slice, templated_slice, templated_file)
 
@@ -200,7 +202,9 @@ class PositionMarker:
         )
 
     @staticmethod
-    def infer_next_position(raw: str, line_no: int, line_pos: int) -> Tuple[int, int]:
+    def infer_next_position(
+        raw: str, line_no: int, line_pos: int
+    ) -> Tuple[int, int]:
         """Using the raw string provided to infer the position of the next.
 
         NB: Line position in 1-indexed.
@@ -214,7 +218,9 @@ class PositionMarker:
             line_pos + len(raw) if len(split) == 1 else len(split[-1]) + 1,
         )
 
-    def with_working_position(self, line_no: int, line_pos: int) -> "PositionMarker":
+    def with_working_position(
+        self, line_no: int, line_pos: int
+    ) -> "PositionMarker":
         """Copy this position and replace the working position."""
         return self.__class__(
             source_slice=self.source_slice,
@@ -248,4 +254,6 @@ class PositionMarker:
 
     def to_source_dict(self) -> Dict[str, int]:
         """Serialise the source position."""
-        return self.templated_file.source_position_dict_from_slice(self.source_slice)
+        return self.templated_file.source_position_dict_from_slice(
+            self.source_slice
+        )

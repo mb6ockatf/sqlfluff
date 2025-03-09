@@ -237,7 +237,9 @@ from foo
         ),
     ],
 )
-def test__rules__std_AL09_CP02_RF06(rules, dialect, fixed_sql, post_fix_errors):
+def test__rules__std_AL09_CP02_RF06(
+    rules, dialect, fixed_sql, post_fix_errors
+):
     """Test interactions between AL09, CP02 & RF06."""
     print(f"Running with rules: {rules}")
     linter = Linter(dialect=dialect, rules=rules)

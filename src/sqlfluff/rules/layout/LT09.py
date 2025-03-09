@@ -120,7 +120,9 @@ class Rule_LT09(BaseRule):
                 start_seg=selects.get(),
                 stop_seg=newlines.get(),
                 loop_while=sp.or_(
-                    sp.is_type("comment"), sp.is_type("whitespace"), sp.is_meta()
+                    sp.is_type("comment"),
+                    sp.is_type("whitespace"),
+                    sp.is_meta(),
                 ),
             )
             if comment_after_select:
@@ -135,12 +137,17 @@ class Rule_LT09(BaseRule):
             # the line with "SELECT" (before any select targets) has trailing
             # whitespace.
             segments_after_first_line = children.select(
-                sp.is_type("whitespace"), start_seg=children[first_new_line_idx]
+                sp.is_type("whitespace"),
+                start_seg=children[first_new_line_idx],
             )
-            first_whitespace_idx = children.find(segments_after_first_line.get())
+            first_whitespace_idx = children.find(
+                segments_after_first_line.get()
+            )
 
         siblings_post = FunctionalContext(context).siblings_post
-        from_segment = siblings_post.first(sp.is_type("from_clause")).first().get()
+        from_segment = (
+            siblings_post.first(sp.is_type("from_clause")).first().get()
+        )
         pre_from_whitespace = siblings_post.select(
             sp.is_type("whitespace"), stop_seg=from_segment
         )
@@ -208,10 +215,13 @@ class Rule_LT09(BaseRule):
                         else select_targets_info.select_targets[i - 1]
                     ),
                     select_if=lambda s: s.is_type("whitespace"),
-                    loop_while=lambda s: s.is_type("whitespace", "comma") or s.is_meta,
+                    loop_while=lambda s: s.is_type("whitespace", "comma")
+                    or s.is_meta,
                 )
                 fixes += [LintFix.delete(ws) for ws in ws_to_delete]
-                fixes.append(LintFix.create_before(select_target, [NewlineSegment()]))
+                fixes.append(
+                    LintFix.create_before(select_target, [NewlineSegment()])
+                )
 
             # If we are at the last select target check if the FROM clause
             # is on the same line, and if so move it to its own line.
@@ -391,7 +401,9 @@ class Rule_LT09(BaseRule):
                     # filter to guard against deleting the same segment
                     # multiple times -- this is illegal.
                     all_deletes = set(
-                        fix.anchor for fix in fixes if fix.edit_type == "delete"
+                        fix.anchor
+                        for fix in fixes
+                        if fix.edit_type == "delete"
                     )
                     for seg in (*to_delete, *move_after_select_clause):
                         if seg not in all_deletes:

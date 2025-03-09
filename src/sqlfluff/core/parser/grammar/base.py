@@ -40,7 +40,9 @@ def cached_method_for_parse_context(
     cache_key = "__cache_" + func.__name__
 
     def wrapped_method(
-        self: Any, parse_context: ParseContext, crumbs: Optional[Tuple[str]] = None
+        self: Any,
+        parse_context: ParseContext,
+        crumbs: Optional[Tuple[str]] = None,
     ) -> SimpleHintType:
         """Cache the output of the method against a given parse context.
 
@@ -198,7 +200,9 @@ class BaseGrammar(Matchable):
         return "<{}: [{}]>".format(
             self.__class__.__name__,
             curtail_string(
-                ", ".join(curtail_string(repr(elem), 40) for elem in self._elements),
+                ", ".join(
+                    curtail_string(repr(elem), 40) for elem in self._elements
+                ),
                 100,
             ),
         )
@@ -310,7 +314,9 @@ class BaseGrammar(Matchable):
 
         if replace_terminators:  # pragma: no cover
             # Override (NOTE: Not currently used).
-            new_grammar.terminators = [self._resolve_ref(t) for t in terminators]
+            new_grammar.terminators = [
+                self._resolve_ref(t) for t in terminators
+            ]
         else:
             # NOTE: This is also safe in the case that neither `terminators` or
             # `replace_terminators` are set. In that case, nothing will change.
@@ -378,7 +384,9 @@ class Ref(BaseGrammar):
             # Use the dialect to retrieve the grammar it refers to.
             return dialect.ref(self._ref)
         else:  # pragma: no cover
-            raise ReferenceError("No Dialect has been provided to Ref grammar!")
+            raise ReferenceError(
+                "No Dialect has been provided to Ref grammar!"
+            )
 
     def __repr__(self) -> str:
         """Return a string representation of the 'Ref' object."""

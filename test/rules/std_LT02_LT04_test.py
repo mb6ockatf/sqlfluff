@@ -46,7 +46,9 @@ FROM
         ),
     ],
 )
-def test_rules_std_LT02_LT04_interaction_indentation_leading(in_sql, out_sql) -> None:
+def test_rules_std_LT02_LT04_interaction_indentation_leading(
+    in_sql, out_sql
+) -> None:
     """Test interaction between LT02 and LT04.
 
     Test sql with two newlines with trailing commas expecting leading.

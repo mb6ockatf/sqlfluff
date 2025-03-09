@@ -15,7 +15,9 @@ def get_configs_info() -> Dict[str, Any]:
     return {
         "fully_qualify_join_types": {
             "validation": ["inner", "outer", "both"],
-            "definition": ("Which types of JOIN clauses should be fully qualified?"),
+            "definition": (
+                "Which types of JOIN clauses should be fully qualified?"
+            ),
         },
         "group_by_and_order_by_style": {
             "validation": ["consistent", "implicit", "explicit"],

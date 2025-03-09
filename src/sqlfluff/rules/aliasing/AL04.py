@@ -5,7 +5,12 @@ from typing import List, Optional, Tuple
 
 from sqlfluff.core.dialects.common import AliasInfo, ColumnAliasInfo
 from sqlfluff.core.parser import BaseSegment
-from sqlfluff.core.rules import BaseRule, EvalResultType, LintResult, RuleContext
+from sqlfluff.core.rules import (
+    BaseRule,
+    EvalResultType,
+    LintResult,
+    RuleContext,
+)
 from sqlfluff.core.rules.crawlers import SegmentSeekerCrawler
 from sqlfluff.dialects.dialect_ansi import ObjectReferenceSegment
 from sqlfluff.utils.analysis.select import get_select_statement_info
@@ -106,7 +111,8 @@ class Rule_AL04(BaseRule):
                     # Reference the element, not the string.
                     anchor=aliases.segment,
                     description=(
-                        "Duplicate table alias {!r}. Table " "aliases should be unique."
+                        "Duplicate table alias {!r}. Table "
+                        "aliases should be unique."
                     ).format(aliases.ref_str),
                 )
                 for aliases in duplicate
@@ -124,7 +130,9 @@ class Rule_AL04(BaseRule):
         `_lint_references_and_aliases` method.
         """
         assert context.segment.is_type("select_statement")
-        select_info = get_select_statement_info(context.segment, context.dialect)
+        select_info = get_select_statement_info(
+            context.segment, context.dialect
+        )
         if not select_info:
             return None
 

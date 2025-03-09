@@ -34,7 +34,11 @@ from typing import (
 from jinja2 import Environment
 from jinja2_simple_tags import StandaloneTag
 
-from sqlfluff.core.errors import SQLFluffSkipFile, SQLFluffUserError, SQLTemplaterError
+from sqlfluff.core.errors import (
+    SQLFluffSkipFile,
+    SQLFluffUserError,
+    SQLTemplaterError,
+)
 from sqlfluff.core.templaters.base import TemplatedFile, large_file_check
 from sqlfluff.core.templaters.jinja import JinjaTemplater
 
@@ -83,9 +87,7 @@ def is_dbt_exception(exception: Optional[BaseException]) -> bool:
 
 def _extract_error_detail(exception: BaseException) -> str:
     """Serialise an exception into a string for reuse in other messages."""
-    return (
-        f"{exception.__class__.__module__}.{exception.__class__.__name__}: {exception}"
-    )
+    return f"{exception.__class__.__module__}.{exception.__class__.__name__}: {exception}"
 
 
 T = TypeVar("T")
@@ -459,7 +461,9 @@ class DbtTemplater(JinjaTemplater):
         This avoids errors when an ephemeral model is processed before use.
         """
         if formatter:  # pragma: no cover
-            formatter.dispatch_compilation_header("dbt templater", "Sorting Nodes...")
+            formatter.dispatch_compilation_header(
+                "dbt templater", "Sorting Nodes..."
+            )
 
         # Initialise config if not already done
         self.sqlfluff_config = config
@@ -500,7 +504,9 @@ class DbtTemplater(JinjaTemplater):
 
             # If it's not in our selection, skip it
             if fpath not in selected_files:
-                templater_logger.debug("- Purging unselected ephemeral: %r", fpath)
+                templater_logger.debug(
+                    "- Purging unselected ephemeral: %r", fpath
+                )
             # If there are dependent nodes in the set, don't process it yet.
             elif any(
                 dependent in ephemeral_buffer for dependent in dependents
@@ -528,7 +534,8 @@ class DbtTemplater(JinjaTemplater):
 
     @large_file_check
     @handle_dbt_errors(
-        SQLTemplaterError, "Error received from dbt during project compilation. "
+        SQLTemplaterError,
+        "Error received from dbt during project compilation. ",
     )
     def process(
         self,
@@ -552,7 +559,9 @@ class DbtTemplater(JinjaTemplater):
         self.sqlfluff_config = config
         self.project_dir = self._get_project_dir()
         self.profiles_dir = self._get_profiles_dir()
-        fname_absolute_path = os.path.abspath(fname) if fname != "stdin" else fname
+        fname_absolute_path = (
+            os.path.abspath(fname) if fname != "stdin" else fname
+        )
 
         # NOTE: dbt exceptions are caught and handled safely for pickling by the outer
         # `handle_dbt_errors` decorator.
@@ -646,7 +655,9 @@ class DbtTemplater(JinjaTemplater):
                         # a render_func() closure with overwrites the variable
                         # from within _unsafe_process when from_string is run.
                         env = args[0]
-                        globals = args[2] if len(args) >= 3 else kwargs["globals"]
+                        globals = (
+                            args[2] if len(args) >= 3 else kwargs["globals"]
+                        )
 
                         # Overwrite the outer render_func
                         def render_func(in_str):
@@ -678,7 +689,9 @@ class DbtTemplater(JinjaTemplater):
         node = self._find_node(fname, config)
 
         templater_logger.debug(
-            "_find_node for path %r returned object of type %s.", fname, type(node)
+            "_find_node for path %r returned object of type %s.",
+            fname,
+            type(node),
         )
 
         save_ephemeral_nodes = dict(
@@ -754,7 +767,9 @@ class DbtTemplater(JinjaTemplater):
                 "    Trailing newline count in source dbt model: %r",
                 n_trailing_newlines,
             )
-            templater_logger.debug("    Raw SQL before compile: %r", source_dbt_sql)
+            templater_logger.debug(
+                "    Raw SQL before compile: %r", source_dbt_sql
+            )
             templater_logger.debug("    Node raw SQL: %r", raw_sql)
             templater_logger.debug("    Node compiled SQL: %r", compiled_sql)
 
@@ -847,10 +862,14 @@ class DbtTemplater(JinjaTemplater):
             if self.dbt_version_tuple >= (1, 8):
                 # See notes from https://github.com/dbt-labs/dbt-adapters/discussions/87
                 # about the decoupling of the adapters from core.
-                from dbt.context.providers import generate_runtime_macro_context
+                from dbt.context.providers import (
+                    generate_runtime_macro_context,
+                )
 
                 adapter.set_macro_resolver(self.dbt_manifest)
-                adapter.set_macro_context_generator(generate_runtime_macro_context)
+                adapter.set_macro_context_generator(
+                    generate_runtime_macro_context
+                )
                 adapter.set_relations_cache(self.dbt_manifest.nodes.values())
             else:
                 adapter.set_relations_cache(self.dbt_manifest)

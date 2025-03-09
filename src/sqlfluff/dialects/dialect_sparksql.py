@@ -276,9 +276,16 @@ sparksql_dialect.bracket_sets("angle_bracket_pairs").update(
 sparksql_dialect.replace(
     DateTimeLiteralGrammar=Sequence(
         OneOf(
-            "DATE", "TIME", "TIMESTAMP", "INTERVAL", "TIMESTAMP_LTZ", "TIMESTAMP_NTZ"
+            "DATE",
+            "TIME",
+            "TIMESTAMP",
+            "INTERVAL",
+            "TIMESTAMP_LTZ",
+            "TIMESTAMP_NTZ",
         ),
-        TypedParser("single_quote", LiteralSegment, type="date_constructor_literal"),
+        TypedParser(
+            "single_quote", LiteralSegment, type="date_constructor_literal"
+        ),
     ),
     ComparisonOperatorGrammar=OneOf(
         Ref("EqualsSegment"),
@@ -492,7 +499,9 @@ sparksql_dialect.add(
         CodeSegment,
         type="semi_structured_element",
     ),
-    RightArrowOperator=StringParser("->", SymbolSegment, type="binary_operator"),
+    RightArrowOperator=StringParser(
+        "->", SymbolSegment, type="binary_operator"
+    ),
     BinaryfileKeywordSegment=StringParser(
         "BINARYFILE",
         KeywordSegment,
@@ -503,15 +512,21 @@ sparksql_dialect.add(
         KeywordSegment,
         type="file_format",
     ),
-    RcfileKeywordSegment=StringParser("RCFILE", KeywordSegment, type="file_format"),
+    RcfileKeywordSegment=StringParser(
+        "RCFILE", KeywordSegment, type="file_format"
+    ),
     SequencefileKeywordSegment=StringParser(
         "SEQUENCEFILE", KeywordSegment, type="file_format"
     ),
-    TextfileKeywordSegment=StringParser("TEXTFILE", KeywordSegment, type="file_format"),
+    TextfileKeywordSegment=StringParser(
+        "TEXTFILE", KeywordSegment, type="file_format"
+    ),
     StartAngleBracketSegment=StringParser(
         "<", SymbolSegment, type="start_angle_bracket"
     ),
-    EndAngleBracketSegment=StringParser(">", SymbolSegment, type="end_angle_bracket"),
+    EndAngleBracketSegment=StringParser(
+        ">", SymbolSegment, type="end_angle_bracket"
+    ),
     EqualsSegment_a=StringParser("==", ComparisonOperatorSegment),
     EqualsSegment_b=StringParser("<=>", ComparisonOperatorSegment),
     FileKeywordSegment=MultiStringParser(
@@ -520,7 +535,9 @@ sparksql_dialect.add(
     JarKeywordSegment=MultiStringParser(
         ["JAR", "JARS"], KeywordSegment, type="file_keyword"
     ),
-    NoscanKeywordSegment=StringParser("NOSCAN", KeywordSegment, type="keyword"),
+    NoscanKeywordSegment=StringParser(
+        "NOSCAN", KeywordSegment, type="keyword"
+    ),
     WhlKeywordSegment=StringParser("WHL", KeywordSegment, type="file_keyword"),
     # Add relevant Hive Grammar
     CommentGrammar=hive_dialect.get_grammar("CommentGrammar"),
@@ -894,7 +911,9 @@ sparksql_dialect.add(
             Ref("LocationGrammar"),
             Ref("CommentGrammar"),
             Ref("TablePropertiesGrammar"),
-            Sequence("CLUSTER", "BY", Ref("BracketedColumnReferenceListGrammar")),
+            Sequence(
+                "CLUSTER", "BY", Ref("BracketedColumnReferenceListGrammar")
+            ),
             optional=True,
         ),
         # Create AS syntax:
@@ -1166,7 +1185,10 @@ class SemiStructuredAccessorSegment(BaseSegment):
         Ref("ColonSegment"),
         OneOf(
             Ref("NakedSemiStructuredElementSegment"),
-            Bracketed(Ref("QuotedSemiStructuredElementSegment"), bracket_type="square"),
+            Bracketed(
+                Ref("QuotedSemiStructuredElementSegment"),
+                bracket_type="square",
+            ),
         ),
         Ref("ArrayAccessorSegment", optional=True),
         AnyNumberOf(
@@ -1179,7 +1201,8 @@ class SemiStructuredAccessorSegment(BaseSegment):
                 OneOf(
                     Ref("NakedSemiStructuredElementSegment"),
                     Bracketed(
-                        Ref("QuotedSemiStructuredElementSegment"), bracket_type="square"
+                        Ref("QuotedSemiStructuredElementSegment"),
+                        bracket_type="square",
                     ),
                 ),
                 allow_gaps=True,
@@ -1344,7 +1367,9 @@ class AlterTableStatementSegment(ansi.AlterTableStatementSegment):
                         "COLUMNS",
                         Ref("IfExistsGrammar", optional=True),
                         Bracketed(
-                            Delimited(AnyNumberOf(Ref("ColumnReferenceSegment"))),
+                            Delimited(
+                                AnyNumberOf(Ref("ColumnReferenceSegment"))
+                            ),
                         ),
                     ),
                 ),
@@ -1440,7 +1465,9 @@ class AlterTableStatementSegment(ansi.AlterTableStatementSegment):
                                 # in Mysql,but is supported in enough other dialects
                                 # for it to make sense here for now.
                                 Sequence(
-                                    "NULLS", OneOf("FIRST", "LAST"), optional=True
+                                    "NULLS",
+                                    OneOf("FIRST", "LAST"),
+                                    optional=True,
                                 ),
                             ),
                             optional=True,
@@ -1542,7 +1569,10 @@ class CreateDatabaseStatementSegment(ansi.CreateDatabaseStatementSegment):
         Ref("CommentGrammar", optional=True),
         Ref("LocationGrammar", optional=True),
         Sequence(
-            "WITH", "DBPROPERTIES", Ref("BracketedPropertyListGrammar"), optional=True
+            "WITH",
+            "DBPROPERTIES",
+            Ref("BracketedPropertyListGrammar"),
+            optional=True,
         ),
     )
 
@@ -1633,7 +1663,9 @@ class CreateViewStatementSegment(ansi.CreateViewStatementSegment):
         Ref("OptionsGrammar", optional=True),
         Ref("CommentGrammar", optional=True),
         Ref("TablePropertiesGrammar", optional=True),
-        Sequence("AS", OptionallyBracketed(Ref("SelectableGrammar")), optional=True),
+        Sequence(
+            "AS", OptionallyBracketed(Ref("SelectableGrammar")), optional=True
+        ),
         Ref("WithNoSchemaBindingClauseSegment", optional=True),
     )
 
@@ -1657,7 +1689,9 @@ class CreateWidgetStatementSegment(BaseSegment):
                 Sequence("CHOICES", Ref("SelectStatementSegment")),
             ),
             Sequence(
-                "TEXT", Ref("WidgetNameIdentifierSegment"), Ref("WidgetDefaultGrammar")
+                "TEXT",
+                Ref("WidgetNameIdentifierSegment"),
+                Ref("WidgetDefaultGrammar"),
             ),
         ),
     )
@@ -2370,7 +2404,9 @@ class MultiValueColumnUnpivotSegment(BaseSegment):
             Indent,
             Delimited(
                 Sequence(
-                    Bracketed(Indent, Delimited(Ref("ColumnReferenceSegment"))),
+                    Bracketed(
+                        Indent, Delimited(Ref("ColumnReferenceSegment"))
+                    ),
                     Ref("AliasExpressionSegment", optional=True),
                 ),
             ),
@@ -2574,7 +2610,9 @@ class CacheTableSegment(BaseSegment):
         Ref("TableReferenceSegment"),
         Ref("OptionsGrammar", optional=True),
         Sequence(
-            Ref.keyword("AS", optional=True), Ref("SelectableGrammar"), optional=True
+            Ref.keyword("AS", optional=True),
+            Ref("SelectableGrammar"),
+            optional=True,
         ),
     )
 
@@ -3558,7 +3596,10 @@ class FrameClauseSegment(ansi.FrameClauseSegment):
 
     match_grammar: Matchable = Sequence(
         Ref("FrameClauseUnitGrammar"),
-        OneOf(_frame_extent, Sequence("BETWEEN", _frame_extent, "AND", _frame_extent)),
+        OneOf(
+            _frame_extent,
+            Sequence("BETWEEN", _frame_extent, "AND", _frame_extent),
+        ),
     )
 
 
